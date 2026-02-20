@@ -1,0 +1,344 @@
+$font-pairs: (
+    'google': (
+        /*
+        Дружелюбие, мягкость, инновации. Идеальное решение для экосистемных продуктов 
+        и интерфейсов, ориентированных на пользователя. 
+        Создает ощущение доступности, простоты и технологичного комфорта.
+        */
+        'txt-family': '"Google Sans", system-ui, sans-serif',
+        'hd-family': '"Google Sans", system-ui, sans-serif',
+        'hd-case': none,
+        'hd-weight': 600,
+        'hd-height': 1em,
+        'hd-letter-spacing': none,
+        'recommend-density': 'standard' //
+    ),
+    'strict': (
+        /*
+        Дисциплина, точность, функциональность. Отлично подходит для дашбордов, 
+        CRM-систем и инструментов разработки. 
+        Подчеркивает аналитический характер продукта и фокус на данных.
+        */
+        'txt-family': '"Roboto Mono", monospace',
+        'hd-family': '"Inter", sans-serif',
+        'hd-case': none,
+        'hd-weight': 600,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'editorial': (
+        /*
+        Эстетика, глубина, интеллектуальность. Превосходно подходит для лонгридов, 
+        медиа-проектов или брендов в сфере lifestyle. Передает атмосферу дорогого 
+        печатного издания и уважения к качественному контенту.
+        */
+        'hd-family': '"Playfair Display", serif',
+        'txt-family': '"Lora", serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+
+    // ---------------------------------------------------------------------
+    // МИНИМАЛИЗМ И ТЕХНОЛОГИИ
+    'startup': (
+        /*
+        Чистота, контроль, современность. Идеально для IT-сервисов и SaaS. 
+        Вызывает доверие и ощущение «отточенного» продукта.
+        */
+        'hd-family': '"Inter", sans-serif',
+        'txt-family': '"Inter", sans-serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'space': (
+        /*
+        Открытость, дружелюбие. Широкие буквы Montserrat дают ощущение масштаба, 
+        а Open Sans легко читается в длинных текстах.
+        */
+        'hd-family': '"Montserrat", sans-serif',
+        'txt-family': '"Open Sans", sans-serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'syntax': (
+        /*
+        Инженерная эстетика. Использование моноширинного шрифта 
+        в заголовках намекает на код, данные и точность.
+        */
+        'hd-family': '"JetBrains Mono", monospace',
+        'txt-family': '"Inter", sans-serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'neo-swiss': (
+        /*
+        Функциональность без эмоций. Стиль швейцарской школы дизайна. 
+        Ничего лишнего, только информация.
+        */
+        'hd-family': '"Arimo", sans-serif',
+        'txt-family': '"Heebo", sans-serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+
+    // ---------------------------------------------------------------------
+    // ПРЕМИУМ И ЭЛЕГАНТНОСТЬ
+    'vogue': (
+        /*
+        Роскошь, классика, высокий чек. 
+        Ассоциируется с модой, дорогими отелями и ювелирными брендами.
+        */
+        'hd-family': '"Playfair Display", serif',
+        'txt-family': '"Lora", serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'boutique': (
+        /*
+        Изящество и воздух. Тонкие засечки заголовка выглядят как искусство, 
+        а Montserrat придает современности.
+        */
+        'hd-family': '"Cormorant Garamond", serif',
+        'txt-family': '"Montserrat", sans-serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'wisdom': (
+        /*
+        Античность, история. Для сайтов с глубоким смыслом: 
+        виноделие, архитектура, философия или дорогие аксессуары.
+        */
+        'hd-family': '"Cinzel", serif',
+        'txt-family': '"Fauna One", serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': 0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'noble': (
+        /*
+        Крафтовый премиум. Мягкие, «вкусные» формы Fraunces создают уютное,
+        но очень дорогое ощущение (например, органика, кофе, мебель).
+        */
+        'hd-family': '"Fraunces", serif',
+        'txt-family': '"Manrope", sans-serif',
+        'hd-case': none,
+        'hd-weight': 500,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'manuscript': (
+        'hd-family': '"DM Serif Display", serif',
+        'txt-family': '"Source Sans 3", sans-serif',
+        'hd-case': none,
+        'hd-weight': 400,
+        'hd-height': 1.1em,
+        'hd-letter-spacing': 0em,
+        'recommend-density': 'standard' //
+    ),
+
+    // ---------------------------------------------------------------------
+    // БРУТАЛИЗМ И ХАРАКТЕР
+    'brutal': (
+        /*
+        Энергия, бескомпромиссность, акцент. Лучший выбор для промо-страниц, 
+        креативных агентств или манифестов. Выглядит громко и уверенно, 
+        мгновенно захватывая внимание за счет массивных заголовков.
+        */
+        'txt-family': '"Archivo", sans-serif',
+        'hd-family': '"Archivo Black", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'urban': (
+        /*
+        Сила, агрессия, скорость. Уличная мода, спорт, энергетические напитки. 
+        Заголовки «бьют» в глаза.
+        */
+        'txt-family': '"Archivo", sans-serif',
+        'hd-family': '"Archivo Black", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'manifesto': (
+        /*
+        Газетный напор. Узкие и высокие заголовки напоминают плакаты или 
+        заголовки новостей. Вызывает чувство срочности и важности.
+        */
+        'txt-family': '"Oswald", sans-serif',
+        'hd-family': '"Roboto", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'black-metal': (
+        /*
+        Техно-футуризм. Широкие, массивные буквы Unbounded выглядят как 
+        нечто из будущего или ночного клуба.
+        */
+        'txt-family': '"Unbounded", sans-serif',
+        'hd-family': '"Jost", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'raw': (
+        /*
+        Диджитал-арт. Немного «сломанные» формы букв создают ощущение эксперимента, 
+        креативного агентства или крипто-проекта.
+        */
+        'txt-family': '"Space Grotesk", sans-serif',
+        'hd-family': '"Space Mono", monospace',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'velocity': (
+        /*
+        Скорость, напор и мощь. Большие буквы в заголовках создают эффект громкого заявления, 
+        не оставляя места для сомнений.
+        */
+        'txt-family': '"Red Hat Display", sans-serif',
+        'hd-family': '"Exo 2", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-style': italic,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'courtside': ( //
+        'hd-family': '"Big Shoulders Display", sans-serif',
+        'txt-family': '"Saira Condensed", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 600,
+        'hd-height': 1.1em,
+        'hd-letter-spacing': 0.02em,
+    ),
+    'district': ( //
+        'hd-family': '"Ruslan Display", cursive',
+        'txt-family': '"Inter", sans-serif',
+        'hd-case': none,      // Для пущей важности
+        'hd-weight': 800,
+        'hd-height': 1em,
+        'hd-letter-spacing': 0.02em,
+    ),
+    'blast': ( //
+        'hd-family': '"Rubik Mono One", monospace',
+        'txt-family': '"Inter", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 400,          // У этого шрифта только один вес (Regular 400)
+        'hd-height': 1.05em,              // Буквы должны почти касаться друг друга по вертикали
+        'hd-letter-spacing': -0.05em,          // Отрицательный трекинг для эффекта монолита
+        'hd-size-mod': 1.2
+    ),
+    'industry': ( //
+        'hd-family': '"Oswald", sans-serif',
+        'txt-family': '"Source Sans 3", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 700,          // Oswald - вариативный шрифт, 700 - Bold
+        'hd-height': 1.05em,              // Буквы должны почти касаться друг друга по вертикали
+        'hd-letter-spacing': -0.05em,          // Отрицательный трекинг для эффекта монолита
+        'hd-size-mod': 1.2
+    ),
+    'overdrive': ( //
+        /*
+        Энергия, плакатность, уверенность. Это классика современного маркетинга. 
+        Выглядит как заголовок крутого YouTube-канала, афиша блокбастера или лендинг фитнес-клуба.
+        */
+        'hd-family': '"Bebas Neue", sans-serif',
+        'txt-family': '"Montserrat", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,          // У этого шрифта только один вес (Regular 400)
+        'hd-height': 0.9em,              // Буквы должны почти касаться друг друга по вертикали
+        'hd-letter-spacing': -0.05em,          // Отрицательный трекинг для эффекта монолита
+        'hd-size-mod': 1.3
+    ),
+
+    // ---------------------------------------------------------------------
+    // УЮТ И РЕТРО
+    'organic': (
+        /*
+        Мягкость, доброта, экология. Округлые формы успокаивают.
+        Идеально для детских товаров или товаров для йоги и здоровья.
+        */
+        'txt-family': '"Comfortaa", sans-serif',
+        'hd-family': '"Nunito", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'vintage': (
+        /*
+        Надежность прошлого. Напоминает старые книги или качественную журналистику 70-х. 
+        Вызывает ностальгию и доверие.
+        */
+        'txt-family': '"DM Serif Display", serif',
+        'hd-family': '"DM Sans", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+    'interface': (
+        'hd-family': '"DM Sans", sans-serif',
+        'txt-family': '"Source Sans 3", sans-serif',
+        'hd-case': none,
+        'hd-weight': 700,
+        'hd-height': 1.2em,
+        'hd-letter-spacing': -0.01em,
+        'recommend-density': 'standard' //
+    ),
+    'antidesign': (
+        /*
+        Ироничный примитивизм. Выглядит «никак», и в этом его сила.
+        Для тех, кто настолько крут, что ему не нужен дизайн (арт-галереи, модные фотографы).
+        */
+        'txt-family': '"Times New Roman", sans-serif',
+        'hd-family': '"Arial", sans-serif',
+        'hd-case': uppercase,
+        'hd-weight': 900,
+        'hd-height': 1em,
+        'hd-letter-spacing': -0.02em,
+        'recommend-density': 'standard' //
+    ),
+);

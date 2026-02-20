@@ -1,0 +1,39 @@
+@use "../funcs.scss" as f;
+
+article {
+
+    .meta>div,
+    .article-meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: .25em 1em;
+
+        p,
+        a,
+        div,
+        time,
+        span {
+            @include f.font-txt;
+            font-size: clamp(14px, 2vw, 18px);
+            text-wrap: none;
+            text-align: center;
+            user-select: none;
+            text-decoration: none;
+            line-height: 1em;
+
+            @media (min-width: 551px) {
+                &:not(:first-child)::before {
+                    content: "|";
+                    margin-right: 1em;
+                    opacity: 0.5;
+                }
+            }
+        }
+
+        @media (max-width: 550px) {
+            flex-direction: column;
+            align-content: center;
+        }
+    }
+}

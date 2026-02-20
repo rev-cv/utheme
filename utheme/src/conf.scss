@@ -1,0 +1,96 @@
+@use 'sass:color' as sys;
+@use "sass:string";
+@use "sass:map";
+@use "scheme.fonts.scss" as font;
+
+////////////////////////////////////////////////////////
+///  ВАЖНО!!! 
+///  
+///  Файл обрабатывается php
+///      - /utheme/inc/mod-google-font.php
+///      - /utheme/header.php
+/// 
+////////////////////////////////////////////////////////
+
+
+$main-menu: "aside"; // island, aside, marquee
+$toc-menu: "number"; // circle, number
+$is-not-section: "true"; // true, false
+$is-img_contain: "false"; // true, false
+
+$font-vibe: 'interface';
+$active-pair: map.get(font.$font-pairs, $font-vibe);
+
+$radius-vibe: "neutral";
+
+$density-vibe: 'auto';
+/* 
+compact
+- маленькие gap, узкие padding, мелкий шрифт, малые скругления
+- Утилитарность, много данных на экране
+
+standard
+- Сбалансированные отступы, базовый шрифт
+- Классический блог или корпоративный сайт.
+
+spacious
+- Гигантские margin между секциями, много «воздуха», крупные заголовки.
+- Премиальность, чистота, акцент на фото (Портфолио, Luxury).
+*/
+
+@if $density-vibe =='auto' {
+    $density-vibe: map.get(map.get(font.$font-pairs, $font-vibe), 'recommend-density');
+}
+
+// --- Светлая тема (Light Theme) ---
+$color-primary-light: #4166f5;
+$color-accent-light: #4166f5;
+$color-text-light: black;
+$color-bg-light: white;
+$color-section-light: #ffffffcc;
+
+// --- Темная тема (Dark Theme) ---
+$color-primary-dark: #4166f5;
+$color-accent-dark: #4166f5;
+$color-text-dark: white;
+$color-bg-dark: black;
+$color-section-dark: #000000cc;;
+
+// $color-H1-light: linear-gradient(75deg, $color-accent-light, $color-primary-dark);
+// $color-H1-dark: linear-gradient(75deg, $color-primary-dark, $color-accent-dark);
+$color-H1-light: #4166f5;
+$color-H1-dark: #4166f5;
+
+$color-success: #5db97a;
+$color-warning: #fcd34d;
+$color-error: #dc2f02;
+$color-info: #4fc3f7;
+
+// ============================================================================
+// ТИПОГРАФИКА (TYPOGRAPHY)
+// ============================================================================
+:root {
+    font-size: 20px; // Базовый размер шрифта (1rem)
+    --max-width: 1200px; // ~1152px
+}
+
+// ============================================================================
+// ОТСТУПЫ И РАЗМЕРЫ (SPACING & SIZING)
+// ============================================================================
+$default-radius: .7rem;
+$default-space: clamp(1rem, 3vw, 2rem);
+
+main:has(.article-box) {
+    max-width: 1300px;
+    width: 100%;
+}
+
+// ============================================================================
+// ЦВЕТОВАЯ ПАЛИТРА (COLOR PALETTE)
+// ============================================================================
+:root {
+    // Тени для создания иерархии элементов
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+}

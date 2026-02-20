@@ -1,0 +1,278 @@
+// Используемые CSS-переменные (для контекста, они определены в :root)
+// --shadow-sm
+// --header-bg
+// --text-secondary
+// --primary-color (изменено на --primary)
+// --secondary-color (изменено на --secondary)
+
+// Переопределение переменных для использования в SCSS вложенности
+// Примечание: В реальном SCSS проекте эти переменные должны быть объявлены в начале файла как $переменная
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+
+    body:not(:has(.header-box)) {
+        main {
+            margin-top: 4rem !important;
+        }
+    }
+
+    body:has(.header-box) {
+        .header-box {
+            margin-top: 4rem !important;
+
+            @media (max-width: 768px) {
+                margin-top: 1.2em !important;
+            }
+        }
+    }
+    
+    #island-wrapper {
+        user-select: none;
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        width: auto;
+        min-width: 400px;
+        backdrop-filter: blur(10px);
+        border-radius: f.get-radius();
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        // border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        overflow: hidden;
+        background: rgba(conf.$color-section-light, 0.9);
+
+        @media (prefers-color-scheme: dark) {
+            background: rgba(conf.$color-section-dark, 0.85);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Эффект при наведении на весь остров */
+        &:hover {
+            border-radius: f.get-radius();
+
+            .island-dropdown {
+                max-height: 500px;
+                opacity: 1;
+                padding: 20px;
+            }
+        }
+
+
+        .island-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 25px 10px 22px;
+            height: 60px;
+
+            @media (min-width: 769px) {
+                min-width: 450px;
+            }
+
+            @media (max-width: 768px) {
+                padding: 15px 20px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        .island-logo {
+            a {
+                display: flex;
+                justify-content: center;
+                align-items: center
+            }
+
+            img {
+                max-height: 40px;
+                width: auto;
+                transform: translateX(-.5em);
+            }
+        }
+
+        .island-name {
+            a {
+                @include f.font-txt;
+                font-weight: 700;
+                text-decoration: none;
+                padding-left: clamp(1em, 2vw, 3em);
+                padding-right: clamp(1em, 2vw, 3em);
+                // padding-right: clamp(1.3em, 3vw, 4em);
+                transform: translateX(-.3em) translateY(2px);
+                font-size: clamp(.6em, 1vw, 1em);
+                letter-spacing: .1em;
+                display: flex;
+                line-height: 1em;
+
+                color: conf.$color-text-light;
+                text-transform: uppercase;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+            }
+
+            @media (max-width: 768px) {
+                display: none;
+            }
+        }
+
+        .menu-title {
+            @include f.font-txt;
+            font-size: .55rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Кнопка */
+        #menu-toggle {
+
+            border: none;
+            padding: 8px 18px;
+            border-radius: f.get-radius();
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            background: conf.$color-accent-light;
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-accent-dark;
+            }
+        }
+
+        /* Скрытое меню */
+        .island-dropdown {
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.4s ease;
+            padding: 0 20px;
+
+            @media (max-width: 768px) {
+                max-height: none;
+                /* Снимаем ограничение высоты */
+                opacity: 1;
+                display: none;
+                /* Управляем видимостью через JS */
+            }
+        }
+
+        /* Сетка ссылок-карточек */
+        .island-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            list-style: none;
+            // direction: rtl;
+            /* Справа налево по вашей просьбе */
+
+            li a {
+                direction: ltr;
+                /* Возвращаем текст ссылок в обычный вид */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-decoration: none;
+                font-size: 12px;
+                line-height: 1.1em;
+
+                color: rgba(conf.$color-text-light, 0.8);
+
+                @media (prefers-color-scheme: dark) {
+                    color: rgba(conf.$color-text-dark, 0.8);
+                }
+
+                &:hover .menu-thumb {
+                    transform: scale(1.05);
+                }
+            }
+
+            @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                direction: ltr;
+                /* На мобилке лучше оставить стандарт, чтобы не путать пользователя */
+            }
+        }
+
+        /* Стили для "обложек" (миниатюр) */
+        .menu-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #eee;
+            border-radius: f.get-radius();
+            margin-bottom: 8px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+
+            @media (max-width: 768px) {
+                aspect-ratio: 1/1;
+                /* Квадратные превью на мобилках экономят место */
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        /* Адаптивность для мобильных (до 768px) */
+        @media (max-width: 768px) {
+            width: 90%;
+            /* Остров становится шире */
+            min-width: unset;
+            top: auto;
+            bottom: 20px;
+            /* Переносим вниз — так удобнее тянуться пальцем */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Когда меню открыто на мобилке */
+            &.is-open {
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                height: 100vh;
+                /* Разворачиваем на весь экран */
+                border-radius: 0 !important;
+                transform: translateX(0);
+                overflow-y: auto;
+
+                .island-dropdown {
+                    display: block;
+                    padding: 30px 20px;
+                }
+            }
+
+            /* Отключаем hover-эффекты для тач-скринов, чтобы избежать багов */
+            &:hover {
+                border-radius: 50px;
+                /* Оставляем как было */
+            }
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        main {
+            margin-top: 0 !important;
+        }
+
+        #scrollToTopBtn {
+            margin-bottom: 8em;
+            display: none !important;
+        }
+    }
+
+}

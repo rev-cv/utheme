@@ -1,0 +1,102 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+@use 'sass:color' as sys;
+
+// --- Footer Variables ---
+$footer-padding-y: 3rem;
+$footer-gap: 2rem;
+$footer-text-font-size: 0.8rem;
+$footer-link-font-size: 0.9rem;
+
+// --- Light Theme Colors ---
+$footer-bg-light: transparent;
+$footer-text-light: rgba(conf.$color-text-light, .7);
+$footer-link-light: conf.$color-text-light;
+$footer-link-hover-light: conf.$color-accent-light;
+
+// --- Dark Theme Colors ---
+$footer-bg-dark: transparent;
+$footer-text-dark: rgba(conf.$color-text-dark, .7);
+$footer-link-dark: conf.$color-text-dark;
+$footer-link-hover-dark: conf.$color-accent-light;
+
+footer {
+    background-color: $footer-bg-light;
+    padding: $footer-padding-y / 2 0;
+    color: $footer-text-light;
+    font-size: $footer-text-font-size;
+    line-height: 1.6;
+
+    .container {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0 conf.$default-space;
+    }
+
+    .footer-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: $footer-gap;
+    }
+
+    .main-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem 2rem;
+
+        * {
+            font-size: $footer-link-font-size;
+            font-weight: 500;
+        }
+
+    }
+
+    a {
+        @include f.font-txt;
+        color: $footer-link-light;
+        text-decoration: none;
+        font-size: 1em;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: $footer-link-hover-light;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            color: $footer-link-dark;
+        }
+    }
+
+    .footer-bottom {
+        // max-width: 80ch; // Ограничиваем ширину для лучшей читаемости
+
+        p {
+            margin: 0.5em 0 0;
+            @include f.font-txt;
+            font-size: .8em;
+
+            &:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $footer-bg-dark;
+        color: $footer-text-dark;
+
+        .main-menu a {
+            color: $footer-link-dark;
+
+            &:hover {
+                color: $footer-link-hover-dark;
+            }
+        }
+    }
+}

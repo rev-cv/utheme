@@ -1,0 +1,73 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+@use 'sass:color' as sys;
+
+// --- Scroll-to-Top Button Variables ---
+$stt-size: 45px;
+$stt-position-offset: 20px;
+$stt-z-index: 99;
+$stt-transition: opacity 0.3s, background-color 0.3s, transform 0.2s ease;
+$scroll-margin-top: 100px;
+
+// --- Light Theme Colors ---
+$stt-bg-light: conf.$color-accent-light;
+$stt-bg-hover-light: sys.scale($stt-bg-light, $lightness: 10%);
+$stt-text-light: conf.$color-bg-light;
+
+// --- Dark Theme Colors ---
+$stt-bg-dark: conf.$color-accent-dark;
+$stt-bg-hover-dark: sys.scale($stt-bg-dark, $lightness: -10%);
+$stt-text-dark: conf.$color-bg-dark;
+
+#scrollToTopBtn {
+    display: none;
+    position: fixed;
+    bottom: $stt-position-offset;
+    right: $stt-position-offset;
+    z-index: $stt-z-index;
+    border: none;
+    outline: none;
+    background-color: $stt-bg-light;
+    color: $stt-text-light;
+    cursor: pointer;
+    border-radius: f.get-radius();
+    box-shadow: var(--shadow-md);
+    width: $stt-size;
+    height: $stt-size;
+    transition: $stt-transition;
+
+    &:hover {
+        background-color: $stt-bg-hover-light;
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: $stt-bg-dark;
+        color: $stt-text-dark;
+
+        &:hover {
+            background-color: $stt-bg-hover-dark;
+        }
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+section,
+.toc {
+    scroll-margin-top: $scroll-margin-top;
+}

@@ -1,0 +1,128 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+
+/* ------------------------------------------------------ */
+// ПЕРЕМЕННЫЕ
+$tx-light: conf.$color-text-light;
+$tx-dark: conf.$color-text-dark;
+$act-light: conf.$color-accent-light;
+$act-dark: conf.$color-accent-dark;
+$space: conf.$default-space;
+
+/* ------------------------------------------------------ */
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        user-select: none;
+
+        .page-toc-title {
+            margin: 0 0 .8em;
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+        }
+
+        ol.page-toc-list,
+        ol.page-toc-list ol {
+            list-style: none;
+            counter-reset: toc-counter;
+            padding-left: 0;
+            margin-left: 0;
+            margin-bottom: 0;
+        }
+
+        // .site-name {
+        //     color: conf.$color-accent-dark;
+        //     font-size: clamp(.7em, 3vw, 1.5em) !important;
+        // }
+
+        li {
+            counter-increment: toc-counter;
+            padding: calc(conf.$default-space / 4) 0;
+            border-bottom: 1px solid var(--color-border);
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            a {
+                font-size: clamp(.8rem, 3vw, 1rem);
+                display: flex;
+                align-items: center; // Центрируем круг относительно текста
+                gap: clamp(1em, 3vw, 1.5em);
+                color: $tx-light;
+                transition: color 300ms ease-in-out, transform 300ms ease-in-out;
+                font-weight: normal;
+                text-decoration: none;
+
+                @media (prefers-color-scheme: dark) {
+                    color: $tx-dark;
+                }
+
+                &::before {
+                    // 1. Убираем 0 и задаем счетчик
+                    content: counter(toc-counter, decimal);
+
+                    // 2. Геометрия идеального круга
+                    display: flex; // Чтобы работал размер и центровка
+                    align-items: center; // Центрируем цифру вертикально
+                    justify-content: center; // Центрируем цифру горизонтально
+                    width: 1.6em; // Фиксированная ширина
+                    height: 1.6em; // Фиксированная высота (равна ширине)
+                    flex-shrink: 0; // Чтобы круг не сжимался текстом
+                    border-radius: 50%; // Идеальный круг
+
+                    // 3. Шрифты
+                    font-size: 0.85rem; // Размер цифры чуть меньше круга
+                    font-weight: 800;
+                    line-height: 1; // Убираем лишние отступы строк
+
+                    // 4. Фон круга (Градиент)
+                    background: $act-light;
+
+                    // 5. ЭФФЕКТ ВЫРЕЗАНИЯ (имитация)
+                    // Установите здесь цвет фона вашей страницы (например, белый или из переменной)
+                    color: #fff;
+
+                    @media (prefers-color-scheme: dark) {
+                        background: $act-dark;
+                        // Здесь цвет фона для темной темы
+                        color: #1a1a1a;
+                    }
+                }
+
+                &:hover {
+                    text-decoration: none;
+                    transform: translateX(8px);
+                    color: $act-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: $act-dark;
+                    }
+                }
+            }
+        }
+    }
+
+
+    aside .toc {
+        .page-toc-title {
+            font-size: .8em;
+        }
+
+        li a {
+            font-size: .7em;
+        }
+    }
+
+    article div.toc {
+        margin-bottom: clamp(.7em, 5vw, 2em) !important;
+        margin-top: clamp(1.4em, 5vw, 3em) !important;
+    }
+
+}

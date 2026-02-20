@@ -1,0 +1,76 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// --- Breadcrumbs Variables ---
+$breadcrumb-font-size: clamp(0.4rem, 3vw, .8rem);
+$breadcrumb-gap: 0.5em;
+
+// --- Light Theme Colors ---
+$breadcrumb-link-light: rgba(conf.$color-text-light, 0.7);
+$breadcrumb-link-hover-light: conf.$color-primary-light;
+$breadcrumb-current-light: conf.$color-text-light;
+$breadcrumb-separator-light: $breadcrumb-link-light;
+
+// --- Dark Theme Colors ---
+$breadcrumb-link-dark: rgba(conf.$color-text-dark, 0.7);
+$breadcrumb-link-hover-dark: conf.$color-primary-dark;
+$breadcrumb-current-dark: conf.$color-text-dark;
+$breadcrumb-separator-dark: $breadcrumb-link-dark;
+
+.rank-math-breadcrumb {
+    font-size: $breadcrumb-font-size;
+    line-height: 1.6;
+    margin-bottom: clamp(2em, 5vw, 5em);
+
+    p {
+        @include f.font-txt;
+        margin: 0;
+        font-size: 1em;
+    }
+
+    span {
+        @include f.font-txt;
+    }
+
+    a {
+        @include f.font-txt;
+        font-size: 1em;
+        color: $breadcrumb-link-light;
+        text-decoration: none !important;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: $breadcrumb-link-hover-light;
+            text-decoration: underline;
+        }
+    }
+
+    .separator {
+        margin: 0 $breadcrumb-gap;
+        color: $breadcrumb-separator-light;
+    }
+
+    .last {
+        color: $breadcrumb-current-light;
+        font-weight: 500;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        a {
+            color: $breadcrumb-link-dark;
+
+            &:hover {
+                color: $breadcrumb-link-hover-dark;
+            }
+        }
+
+        .separator {
+            color: $breadcrumb-separator-dark;
+        }
+
+        .last {
+            color: $breadcrumb-current-dark;
+        }
+    }
+}

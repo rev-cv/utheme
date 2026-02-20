@@ -1,0 +1,132 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+
+/* ------------------------------------------------------ */
+// ПЕРЕМЕННЫЕ
+
+$table-border-light: rgba(0, 0, 0, 0.08);
+$table-border-dark: rgba(255, 255, 255, 0.1);
+
+$th-bg-light: rgba(conf.$color-primary-light, 0.04);
+$th-bg-dark: rgba(conf.$color-primary-dark, 0.15);
+
+$zebra-bg-light: rgba(0, 0, 0, 0.015);
+$zebra-bg-dark: rgba(255, 255, 255, 0.02);
+
+.wp-block-table {
+    width: 100% !important;
+    max-width: 100vw; // Гарантируем, что блок не шире экрана
+    display: grid; // Grid лучше справляется с изоляцией overflow, чем block
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 2rem; // Чтобы тень не обрезалась снизу
+    user-select: none;
+
+    &::-webkit-scrollbar {
+        height: 6px; // Высота горизонтального скролла
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: conf.$color-accent-light;
+        border-radius: 10px;
+
+        &:hover {
+            background: sys.adjust(conf.$color-accent-light, $blackness: 10%);
+        }
+    }
+
+    table {
+        // 2. Гарантируем, что таблица не сжимается меньше контента
+        margin: 0;
+        border-collapse: collapse;
+        font-size: clamp(16px, 2vw, 18px);
+
+        border-collapse: collapse;
+        font-size: clamp(16px, 2vw, 18px);
+        background: transparent;
+        border-radius: 5px;
+        box-shadow: 0 4px 24px $table-border-light;
+
+
+        width: 100% !important;
+        table-layout: auto !important;
+        border-collapse: collapse;
+        min-width: 100% !important;
+
+        @media (prefers-color-scheme: dark) {
+            box-shadow: 0 4px 24px $table-border-dark;
+        }
+
+        thead {
+            background: conf.$color-accent-light;
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-accent-dark;
+            }
+        }
+
+        th {
+            text-align: left;
+            font-weight: 600;
+            color: conf.$color-bg-light;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-bg-dark;
+            }
+
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            border-bottom: 1px solid $table-border-light;
+            color: conf.$color-text-light;
+            background: transparent;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-text-dark;
+                border-bottom: 1px solid $table-border-dark;
+            }
+        }
+
+        tbody {
+            tr {
+                transition: background 100ms ease-in-out;
+
+                &:hover {
+                    background: sys.mix(conf.$color-bg-light, #000, 95%);
+
+                    @media (prefers-color-scheme: dark) {
+                        background: sys.mix(conf.$color-bg-dark, #fff, 90%);
+                    }
+                }
+
+                &:last-child td {
+                    border-bottom: none;
+                }
+            }
+        }
+
+        th,
+        td {
+            padding: clamp(.5rem, 2vw, 1rem) !important;
+        }
+
+        thead,
+        tr,
+        th,
+        td {
+            border: none !important;
+            white-space: nowrap !important;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+            hyphens: none !important;
+        }
+    }
+}

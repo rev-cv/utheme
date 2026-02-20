@@ -1,0 +1,110 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+/* ------------------------------------------------------ */
+// ПЕРЕМЕННЫЕ
+$tx-light: conf.$color-text-light;
+$tx-dark: conf.$color-text-dark;
+$act-light: conf.$color-accent-light;
+$act-dark: conf.$color-accent-dark;
+$space: conf.$default-space;
+
+/* ------------------------------------------------------ */
+
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        // Визуальные стили (фон, рамки, отступы) теперь в art__section/section.scss
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        user-select: none;
+
+        .page-toc-title {
+            margin: 0 0 .8em;
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+        }
+
+        ol.page-toc-list {
+            list-style: none;
+            counter-reset: toc-counter;
+            padding-left: 0;
+            margin-left: 0;
+            margin-bottom: 0;
+        }
+
+        li.page-toc-level-2 {
+            counter-increment: toc-counter;
+            padding: calc(conf.$default-space / 4) 0;
+            border-bottom: 1px solid var(--color-border);
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            a {
+                font-size: clamp(.8rem, 3vw, 1rem);
+                display: flex;
+                align-items: baseline;
+                gap: clamp(1em, 3vw, 1.5em);
+                color: $tx-light;
+                transition: color 300ms ease-in-out, transform 300ms ease-in-out;
+                font-weight: normal;
+                text-decoration: none;
+
+                @media (prefers-color-scheme: dark) {
+                    color: $tx-dark;
+                }
+
+                &::before {
+                    content: counter(toc-counter, decimal-leading-zero);
+                    font-size: 1em;
+                    font-weight: 700;
+                    color: $act-light;
+                    min-width: 1.5em;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: $act-dark;
+                    }
+                }
+
+                &:hover {
+                    text-decoration: none;
+                    transform: translateX(4px);
+                    color: $act-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: $act-dark;
+                    }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title {
+            font-size: .8em;
+        }
+
+        li a {
+            font-size: .7em;
+        }
+    }
+
+    article div.toc {
+        margin-bottom: clamp(.7em, 5vw, 2em) !important;
+        margin-top: clamp(1.4em, 5vw, 3em) !important;
+    }
+}
+
+
+/*
+
+<style>
+                        #matchesContainer { gap: 1em; margin-bottom: clamp(1em, 5vw, 4em);}
+                        .matches h2 {padding: 0 0 .4em 0;}
+                    </style>
+*/

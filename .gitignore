@@ -1,0 +1,40 @@
+# --- OS & IDE ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+# --- Python & Automation ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.uv/
+
+# --- Node.js & SASS ---
+node_modules/
+npm-debug.log
+.sass-cache/
+
+# --- Environment & Secrets ---
+.env
+.env.local
+*_access.txt
+temp_wp.json
+
+# --- Docker & WordPress Data ---
+db_data/
+uploads/
+plugins/
+
+# --- Theme Compiled Assets ---
+# Игнорируем собранный CSS, так как есть исходники в src/ и автосборщик
+utheme/style.css
+utheme/style.css.map
+
+# --- Runtime State & Logs ---
+created_pages.json
+*.log
+*.txt

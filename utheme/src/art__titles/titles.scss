@@ -1,0 +1,158 @@
+@use "sass:color" as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+/* ------------------------------------------------------ */
+// ПЕРЕМЕННЫЕ
+
+$colorH1-light: conf.$color-H1-light;
+$colorH1-dark: conf.$color-H1-dark;
+
+@mixin gradient-text($start: #fff, $end: #fbbf24) {
+    background: linear-gradient(135deg, $start, $end);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ------------------------------------------------------ */
+
+article,
+aside,
+.header-box {
+
+    h1,
+    h2,
+    .page-toc-title,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0.6em auto 0.8em;
+        line-height: 1.4;
+    }
+
+    h1 {
+        @include f.font-hd;
+        font-size: clamp(.9rem, 5vw, 3rem);
+        text-wrap: balance;
+        text-align: center;
+
+        @include f.mode(( //
+                background: (conf.$color-H1-light, conf.$color-H1-dark),
+                text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
+            ));
+
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+
+        strong {
+            @include f.font-hd;
+            font-weight: 700;
+            // color: conf.$color-primary-light;
+
+            @include f.mode(( //
+                    background: (conf.$color-H1-light, conf.$color-H1-dark),
+                ));
+
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        em {
+            font-size: 0.45em;
+            display: block;
+        }
+    }
+
+    h2,
+    .page-toc-title {
+        @include f.font-hd;
+        font-size: clamp(.9rem, 3vw, 2rem);
+        position: relative;
+        display: inline-block;
+        text-wrap: balance;
+        // width: 100%;
+        width: fit-content;
+
+        @include f.mode(( //
+                background: (conf.$color-accent-light, conf.$color-accent-dark),
+            ));
+
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+
+        // &::after {
+        //     content: "";
+        //     position: absolute;
+        //     bottom: -3px;
+        //     left: 0;
+        //     width: 100%;
+        //     height: 2px;
+        //     z-index: -1;
+
+        //     @include f.mode(( //
+        //             background: (conf.$color-primary-light, conf.$color-primary-dark),
+        //         ));
+        // }
+
+        // &::before {
+        //     content: '';
+        //     position: absolute;
+        //     bottom: -3px;
+        //     left: 0;
+        //     width: 100%;
+        //     height: 3px;
+        //     // background: linear-gradient(to right, #e85d04, #00b4d8);
+        //     background: conf.$color-accent-light;
+        //     // background: linear-gradient(135deg, conf.$color-primary-light, #ff6d00);
+        //     z-index: -1;
+
+        //     @media (prefers-color-scheme: dark) {
+        //         background: conf.$color-section-dark;
+        //     }
+        // }
+    }
+
+    h3 {
+        @include f.font-txt;
+        font-size: clamp(0.8rem, 2.5vw, 1.3rem);
+        font-weight: 500;
+
+        @include f.mode(( //
+                color: (conf.$color-primary-light, conf.$color-primary-dark),
+            ));
+    }
+
+    h4 {
+        @include f.font-txt;
+        @include f.mode(( //
+                color: (conf.$color-primary-light, conf.$color-primary-dark),
+            ));
+    }
+
+    h5 {
+        @include f.font-txt;
+        @include f.mode(( //
+                color: (conf.$color-primary-light, conf.$color-primary-dark),
+            ));
+    }
+
+    h6 {
+        @include f.font-txt;
+        @include f.mode(( //
+                color: (conf.$color-primary-light, conf.$color-primary-dark),
+            ));
+    }
+
+    hr+ :is(h3, h4, h5, h6, h1, h2) {
+        margin-top: 1.2rem;
+    }
+
+    .page-toc-title {
+        margin-bottom: 0 !important;
+    }
+}

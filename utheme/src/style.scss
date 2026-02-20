@@ -1,0 +1,72 @@
+@use "conf.scss";
+@use "scheme.fonts.scss";
+@use "funcs.scss";
+
+// @use "main-menu_default/main-menu.scss";
+// @use "main-menu_2-islands/main-menu.scss";
+// @use "main-menu_multi-level/multi-level.scss";
+// @use "main-menu_aside/menu.scss";
+// @use "main-menu_island/main-menu.scss";
+// @use "main-menu_new-aside/menu.scss";
+// @use "main-menu-marquee/menu.scss";
+
+@use "main-menu_island/main-menu" as island;
+@use "main-menu_new-aside/menu" as aside;
+@use "main-menu-marquee/menu" as marquee;
+
+@use "page/page.scss";
+// @use "cards__default/cards.scss";
+@use "page-articles/page-articles.scss";
+@use "scroll-to-top/scroll-to-top.scss";
+@use "pape-404/page-404.scss";
+// @use 'footer/footer.scss';
+@use 'footer-column/footer.scss';
+
+@use 'page-sitemap/sitemap.scss';
+
+@use "art__section/section.scss";
+@use "art__titles/titles.scss";
+@use "art__toc__01-number/toc.scss" as toc_number;
+@use "art__toc__01-circle/toc.scss" as toc_circle;
+@use "art__lists/lists.scss";
+@use "art__table/tables.scss";
+@use "art__images/images.scss";
+@use "art__box/box.scss";
+@use "art__meta/meta.scss";
+@use "art__description/descr.scss";
+@use "art__breadcrumbs/breadcrumbs.scss";
+// @use "art__details/details.scss";
+@use "art__details-plus/details.scss";
+@use "art__text-grid/text-grid.scss";
+@use "art__code/code.scss";
+
+// @use "header-box/header-box.scss";
+@use "header-section-box/header-box.scss";
+
+@use "block-autor/block-autor.scss";
+@use "block-related_articles/related-art.scss";
+
+@use "scrollbar/scrollbar.scss";
+@use "selection/selection.scss";
+
+@use "cookie-modal/cookie-modal.scss";
+
+@if conf.$main-menu =='island' {
+    @include island.styles;
+}
+
+@else if conf.$main-menu =='aside' {
+    @include aside.styles;
+}
+
+@else if conf.$main-menu =='marquee' {
+    @include marquee.styles;
+}
+
+@if conf.$toc-menu =='number' {
+    @include toc_number.styles;
+}
+
+@else if conf.$toc-menu =='circle' {
+    @include toc_circle.styles;
+}

@@ -1,0 +1,76 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// --- Section & TOC Block Variables ---
+$section-padding: conf.$default-space;
+$section-margin-y: 2rem;
+
+// --- Light Theme Colors ---
+$section-bg-light: linear-gradient(135deg, conf.$color-section-light, #f7fafc);
+$section-border-light: sys.scale(conf.$color-section-light, $lightness: -5%);
+
+// --- Dark Theme Colors ---
+$section-bg-dark: conf.$color-section-dark;
+$section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
+
+article,
+aside {
+
+    // Общие стили для всех контентных блоков внутри статьи
+    section {
+        background: $section-bg-light;
+        border: 1px solid $section-bg-light;
+        border: 1px solid transparent;
+        border-radius: f.get-radius();
+        padding: $section-padding;
+        margin: $section-margin-y auto;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+
+        @media (prefers-color-scheme: dark) {
+            background: $section-bg-dark;
+            border-color: $section-bg-dark;
+        }
+
+        h2,
+        .page-toc-title,
+        h3,
+        h4 {
+            margin-top: 0;
+        }
+
+        p:last-of-type,
+        .wp-block-list:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    section section {
+        box-shadow: none;
+        background: transparent;
+    }
+
+    section h1,
+    h2+section {
+        margin-top: 0;
+    }
+
+    // Специфичные стили только для <section>
+    section h4 {
+        font-size: 1.2em;
+    }
+
+    section:first-of-type {
+        margin-top: 0;
+    }
+
+    hr {
+        opacity: .3;
+        user-select: none;
+    }
+}
+
+aside section {
+    padding: calc($section-padding / 2) !important;
+}

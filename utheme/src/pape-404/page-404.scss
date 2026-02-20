@@ -1,0 +1,104 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+.main-404 {
+    padding: clamp(30px, 5vw, 50px) 0;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-404-content {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0 conf.$default-space;
+
+    .error-code {
+        font-size: clamp(4rem, 20vw, 8rem);
+        font-weight: 900;
+        color: conf.$color-error;
+        margin-bottom: 0;
+        line-height: 1;
+        // opacity: 0.5;
+    }
+
+    p:nth-of-type(1) {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: conf.$color-text-light;
+
+        @media (prefers-color-scheme: dark) {
+            color: conf.$color-text-dark;
+        }
+    }
+
+    p:nth-of-type(2) {
+        font-size: 1.125rem;
+        color: conf.$color-text-light;
+        opacity: 0.7;
+        margin-bottom: 2.5rem;
+        text-wrap: balance;
+        line-height: 1.5;
+
+        @media (prefers-color-scheme: dark) {
+            color: conf.$color-text-dark;
+        }
+    }
+
+    .error-btns {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        font-size: clamp(.6em, 2vw, 1em);
+
+        a {
+            @include f.font-txt;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.1em 2em;
+            background-color: conf.$color-accent-light;
+            color: conf.$color-bg-light;
+            text-decoration: none;
+            border-radius: conf.$default-radius;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s;
+            border: 2px solid transparent;
+
+            @media (prefers-color-scheme: dark) {
+                background-color: conf.$color-accent-dark;
+                color: conf.$color-bg-dark;
+            }
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            &:last-child {
+                background-color: transparent;
+                border-color: conf.$color-accent-light;
+                color: conf.$color-accent-light;
+
+                @media (prefers-color-scheme: dark) {
+                    border-color: conf.$color-accent-dark;
+                    color: conf.$color-accent-dark;
+                }
+
+                &:hover {
+                    background-color: conf.$color-accent-light;
+                    color: conf.$color-bg-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        background-color: conf.$color-accent-dark;
+                        color: conf.$color-bg-dark;
+                    }
+                }
+            }
+        }
+    }
+}

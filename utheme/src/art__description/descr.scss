@@ -1,0 +1,14 @@
+@use "../funcs.scss" as f;
+
+.article-description {
+    @include f.font-txt;
+    font-size: 1.2em;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 0.8em;
+    font-style: italic;
+    margin-bottom: 1em;
+    text-wrap: balance;
+    margin-top: 0 !important;
+}

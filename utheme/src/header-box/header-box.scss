@@ -1,0 +1,50 @@
+@use "../conf.scss" as conf;
+@use 'sass:color' as sys;
+
+.header-box {
+    width: 100%;
+    // background-color: yellowgreen;
+    position: relative;
+
+    >div {
+        padding: 0 clamp(1em, 3vw, 2em);
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        color: white;
+        margin-bottom: 16px;
+    }
+
+    .article-description {
+        color: white;
+        max-width: 1000px;
+        font-weight: 800;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60%;
+        z-index: -1;
+        background-color: #111;
+        background-color: conf.$color-accent-light;
+        // background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+        background-image: radial-gradient(rgba(conf.$color-bg-dark, 0.5) 2px, transparent 1px);
+        background-size: 20px 20px;
+        // mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        // -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+
+        @media (prefers-color-scheme: dark) {
+            background-color: conf.$color-accent-dark;
+        }
+    }
+
+    figure {
+        margin-bottom: 0 !important;
+    }
+}

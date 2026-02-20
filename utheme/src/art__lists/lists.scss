@@ -1,0 +1,75 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+/* ------------------------------------------------------ */
+// ПЕРЕМЕННЫЕ
+
+/* ------------------------------------------------------ */
+
+$space: conf.$default-space;
+
+article .wp-block-list,
+aside .wp-block-list {
+    padding-left: 2em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    overflow: hidden;
+    margin-top: -1em;
+
+    li {
+        line-height: 1.7;
+        text-wrap: balance;
+        font-size: clamp(.8rem, 3vw, 1rem) !important;
+        color: conf.$color-text-light;
+
+        @media (prefers-color-scheme: dark) {
+            color: conf.$color-text-dark;
+        }
+
+        :is(ul, .wp-block-list:not(ol)) & {
+            list-style-type: disc;
+        }
+
+        :is(ol, .wp-block-list[type="1"]) & {
+            list-style-type: decimal;
+        }
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+
+        &::marker {
+            font-weight: 600;
+            color: conf.$color-accent-light;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-accent-dark;
+            }
+        }
+
+        a {
+            @include f.mode(( //
+                    color: (conf.$color-text-light, conf.$color-text-dark),
+                ));
+            text-decoration: none;
+            transition: color 300ms ease-in-out;
+            font-weight: 600;
+
+            &:hover {
+                @include f.mode(( //
+                        color: (conf.$color-accent-light, conf.$color-accent-dark),
+                    ));
+            }
+        }
+    }
+}
+
+
+aside .wp-block-list {
+    padding-left: 1em !important;
+    margin-top: .3em;
+
+    li {
+        font-size: 0.7em !important;
+    }
+}

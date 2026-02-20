@@ -1,0 +1,60 @@
+version: "3.8"
+services:
+  db:
+    image: mariadb:10.6
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+    volumes:
+      - db_data:/var/lib/mysql
+    
+    # === НАЧАЛО: HEALTHCHECK ДЛЯ БАЗЫ ДАННЫХ ===
+    healthcheck:
+      # Проверяем, что сервер MariaDB доступен, используя утилиту mysqladmin.
+      # Важно: root_password здесь используется та, что задана в MYSQL_ROOT_PASSWORD.
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s         # Проверять каждые 5 секунд
+      timeout: 3s          # Ждать ответ 3 секунды
+      retries: 10          # Повторить 10 раз, прежде чем объявить unhealthy
+      start_period: 20s    # Дать контейнеру 20 секунд на запуск, прежде чем начать отсчет retries
+    # === КОНЕЦ: HEALTHCHECK ДЛЯ БАЗЫ ДАННЫХ ===
+
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "${HOST_PORT}:80"
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      # ... маппинги ...
+      - ./utheme:/var/www/html/wp-content/themes/utheme
+      - ./uploads:/var/www/html/wp-content/uploads
+      - ./plugins:/var/www/html/wp-content/plugins
+      - ./core/setup_site.sh:/var/www/html/setup_site.sh
+      - ./core/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      
+    # дополнительная настройка:
+    depends_on:
+      db:
+        condition: service_healthy # Запустить WordPress только после того, как DB станет healthy
+        
+    # === НАЧАЛО: HEALTHCHECK ДЛЯ WORDPRESS ===
+    healthcheck:
+      # Проверяем, что веб-сервер отвечает на HTTP-запросы.
+      # 'curl -f' вернет ошибку, если код ответа >= 400.
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 10s        # Проверять каждые 10 секунд
+      timeout: 5s          # Ждать ответ 5 секунд
+      retries: 5           # Повторить 5 раз
+      start_period: 10s    # Дать контейнеру 10 секунд на запуск
+    # === КОНЕЦ: HEALTHCHECK ДЛЯ WORDPRESS ===
+
+volumes:
+  db_data: {}

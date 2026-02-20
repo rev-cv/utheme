@@ -1,0 +1,10 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+::selection {
+    @include f.mode(( //
+            background: (conf.$color-primary-light, conf.$color-primary-dark), //
+            color: (conf.$color-bg-light, conf.$color-bg-dark) //
+        ));
+    border-radius: 2px;
+}

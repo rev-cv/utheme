@@ -1,0 +1,34 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+::-webkit-scrollbar {
+    width: 7px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    $bg-light: sys.mix(conf.$color-bg-light, #000, 95%);
+    $bg-dark: sys.mix(conf.$color-bg-dark, #fff, 95%);
+
+    @include f.mode(( //
+            background: ($bg-light, $bg-dark),
+        ));
+}
+
+::-webkit-scrollbar-thumb {
+    $bg-light: sys.mix(conf.$color-bg-light, #000, 70%);
+    $bg-dark: sys.mix(conf.$color-bg-dark, #fff, 70%);
+
+    @include f.mode(( //
+            background: ($bg-light, $bg-dark),
+        ));
+
+    border-radius: 5px;
+    transition: background 300ms ease-in-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @include f.mode((background: (conf.$color-accent-light, conf.$color-accent-dark),
+        ));
+}

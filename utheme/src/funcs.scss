@@ -1,0 +1,86 @@
+@use "conf.scss" as conf;
+@use "scheme.radius.scss" as radius;
+@use "sass:string";
+@use "sass:map";
+@use "sass:list";
+
+@mixin mode($map) {
+    @each $prop, $values in $map {
+        #{$prop}: list.nth($values, 1); // первое значение (light)
+
+        @media (prefers-color-scheme: dark) {
+            #{$prop}: list.nth($values, 2); // второе значение (dark)
+        }
+    }
+}
+
+@mixin font-hd {
+    @if map.has-key(conf.$active-pair, 'hd-family') {
+        font-family: string.unquote(map.get(conf.$active-pair, 'hd-family'));
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-weight') {
+        font-weight: map.get(conf.$active-pair, 'hd-weight');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-case') {
+        text-transform: map.get(conf.$active-pair, 'hd-case');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-letter-spacing') {
+        letter-spacing: map.get(conf.$active-pair, 'hd-letter-spacing');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-height') {
+        line-height: map.get(conf.$active-pair, 'hd-height');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-style') {
+        font-style: map.get(conf.$active-pair, 'hd-style');
+    }
+}
+
+@mixin font-txt {
+    @if map.has-key(conf.$active-pair, 'txt-family') {
+        font-family: string.unquote(map.get(conf.$active-pair, 'txt-family'));
+    }
+
+    font-weight: 400; // Обычно текст всегда 400
+    text-transform: none;
+}
+
+@mixin font-logo {
+    @if map.has-key(conf.$active-pair, 'hd-family') {
+        font-family: string.unquote(map.get(conf.$active-pair, 'hd-family'));
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-weight') {
+        font-weight: map.get(conf.$active-pair, 'hd-weight');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-case') {
+        text-transform: map.get(conf.$active-pair, 'hd-case');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-letter-spacing') {
+        letter-spacing: map.get(conf.$active-pair, 'hd-letter-spacing');
+    }
+
+    @if map.has-key(conf.$active-pair, 'hd-height') {
+        line-height: map.get(conf.$active-pair, 'hd-height');
+    }
+}
+
+
+@function get-radius($component: "default") {
+    // 1. Достаем всю карту выбранного вайба
+    $current-vibe-map: map.get(radius.$radius-schemes, conf.$radius-vibe);
+
+    // 2. Проверяем, есть ли в этом вайбе специфичный ключ для компонента
+    @if map.has-key($current-vibe-map, $component) {
+        @return map.get($current-vibe-map, $component);
+    }
+
+    // 3. Если ключа нет или он не передан, отдаем default этого вайба
+    @return map.get($current-vibe-map, "default");
+}

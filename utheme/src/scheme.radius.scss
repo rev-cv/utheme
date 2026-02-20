@@ -1,0 +1,40 @@
+$radius-schemes: (
+    // Строгий, технический стиль
+    "sharp": ( //
+        "default": 2px, //
+    ),
+
+    // Мягкий, современный
+    "neutral": ( //
+        "default": 8px,
+        "header": 12px,
+        "card": 10px //
+    ),
+
+    // Спортивный, адаптивный (с использованием clamp)
+    "dynamic": ( //
+        "default": clamp(10px, 2vw, 20px),
+        "header": 0px,
+        "card": clamp(16px, 4vw, 32px),
+        "button": 999px // Всегда пилюля
+    ),
+
+    // Дизайнерский (сложные формы)
+    "art": ("default": 20px 5px, // Эллиптическое скругление
+        "header": 0 0 40px 40px, // Только низ скруглен
+        "card": 30% 70% 70% 30% / 30% 30% 70% 70%),
+
+    "organic": ( //
+        "default": 40% 60% 70% 30% / 40% 50% 60% 50%, //
+    ),
+
+    "velocity": ( //
+        "default": clamp(4px, 1.5vw, 16px)
+        /* Верх-Лево */
+        clamp(28px, 8vw, 40px)
+        /* Верх-Право */
+        clamp(4px, 1.5vw, 16px)
+        /* Низ-Право */
+        clamp(28px, 8vw, 40px), //
+    )
+);

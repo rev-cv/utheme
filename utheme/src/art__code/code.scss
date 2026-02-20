@@ -1,0 +1,11 @@
+@use "../conf.scss" as conf;
+
+code {
+    margin-bottom: 1em;
+    background-color: conf.$color-accent-dark;
+    color: conf.$color-text-dark;
+    padding: .5em;
+    width: 100%;
+    display: block;
+    border-radius: 3px;
+}

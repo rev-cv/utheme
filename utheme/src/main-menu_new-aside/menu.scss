@@ -1,0 +1,330 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// --max-width: 1200px;
+$panel-width: 380px;
+$transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+
+@mixin styles {
+
+    #site-header {
+        /* Меняем fixed на sticky */
+        position: -webkit-sticky;
+        position: sticky;
+        top: clamp(5px, 2vw, 20px);
+        /* Расстояние от верха экрана при скролле */
+        z-index: 1000;
+
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        pointer-events: none;
+        /* Чтобы область вокруг острова не перекрывала клики по контенту */
+        user-select: none;
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Остров */
+        .header-island {
+            pointer-events: auto;
+            /* Возвращаем кликабельность самому острову */
+            width: 95%;
+            max-width: var(--max-width);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            // border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: f.get-radius();
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
+
+            /* Плавная компенсация сдвига при JS-блокировке скролла */
+            transition: margin-right 0.4s ease, transform 0.3s ease;
+
+            background: conf.$color-section-light;
+
+            @media (prefers-color-scheme: dark) {
+                background: rgba(conf.$color-section-dark, .85);
+            }
+        }
+
+        /* Логотип: ограничение размера */
+        .site-logo {
+            img {
+                display: block;
+                max-height: 40px;
+                width: auto;
+                transition: transform 0.3s ease;
+            }
+
+            a:hover img {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Название сайта */
+        .site-name {
+            a {
+                @include f.font-logo;
+                text-decoration: none;
+                // letter-spacing: -0.5px;
+                color: conf.$color-text-light;
+                font-size: clamp(.6em, 2vw, .88em);
+                // font-weight: 700;
+                text-transform: uppercase;
+                word-spacing: .5em;
+                letter-spacing: .2em;
+                line-height: 1.1em;
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                padding-right: 1em;
+                padding-left: 1em;
+                text-wrap: balance;
+                transform: translateY(.1em);
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-primary-dark;
+                }
+            }
+        }
+
+        /* Кнопка Бургер */
+        .menu-toggle {
+            background: transparent;
+            color: conf.$color-text-light;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: f.get-radius();
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-text-dark;
+            }
+
+            &:hover {
+                // transform: translateY(-2px);
+                // box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+                color: conf.$color-accent-light;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-accent-dark;
+                }
+            }
+        }
+    }
+
+
+    /* Боковая панель */
+    .side-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: $panel-width;
+        max-width: 85%;
+        /* Чтобы на мобильных всегда оставался кусочек страницы слева */
+        height: 100%;
+        z-index: 2000;
+        /* Выше шторки */
+        padding: 30px 20px;
+
+        transform: translateX(105%);
+        /* Полностью прячем, включая тени */
+        visibility: hidden;
+        transition: transform $transition, visibility $transition;
+        box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+
+        background: conf.$color-section-light;
+        user-select: none;
+
+        @media (prefers-color-scheme: dark) {
+            background: rgba(conf.$color-section-dark, .85);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .aside-title {
+            @include f.font-txt;
+            margin-top: 0;
+            font-size: clamp(.6rem, 2vw, 1.1rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            color: conf.$color-text-light;
+            margin-bottom: 1em;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-text-dark;
+            }
+        }
+
+        &.is-active {
+            transform: translateX(0);
+            /* Возвращаем на место */
+            visibility: visible;
+
+            /* Состояние при открытом меню */
+            .menu-item-card {
+                opacity: 1;
+                transform: translateY(0);
+
+                /* Задержки для первых 6 элементов (каскадный эффект) */
+                @for $i from 1 through 6 {
+                    &:nth-child(#{$i}) {
+                        transition-delay: 0.05s + ($i * 0.05s);
+                    }
+                }
+            }
+        }
+
+        /* Убираем точки списка везде в меню */
+        .side-menu-list {
+
+            &,
+            ul {
+                list-style: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        }
+
+        /* Карточки в меню */
+        .menu-item-card {
+            margin-bottom: 12px;
+
+            /* Начальное состояние карточек */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+
+            a {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 12px;
+                border-radius: f.get-radius();
+                text-decoration: none;
+                transition: all 0.2s ease;
+                border: 1px solid transparent;
+                background: conf.$color-section-light;
+
+                @media (prefers-color-scheme: dark) {
+                    background: conf.$color-section-dark;
+                }
+
+                &:hover {
+                    // background: #ffffff;
+                    transform: translateX(-5px);
+                    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.05);
+                    // border-color: var(--accent);
+                }
+            }
+
+            .menu-title {
+                @include f.font-txt;
+                font-weight: 500;
+                line-height: 1.3;
+                font-size: clamp(.7em, 1vw, 16px);
+                color: conf.$color-text-light;
+                transition: color 300ms ease-in-out;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+
+
+            }
+
+            &:hover .menu-title {
+                color: conf.$color-accent-light;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-accent-dark;
+                }
+            }
+
+            .menu-thumb {
+                width: 56px;
+                height: 56px;
+                border-radius: f.get-radius();
+                background-size: cover;
+                background-position: center;
+                flex-shrink: 0;
+                align-self: start;
+                overflow: hidden;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+
+        /* Кнопка закрытия внутри панели */
+        .menu-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            margin-bottom: 30px;
+            padding: 0;
+            color: #94a3b8;
+
+            visibility: hidden;
+            /* Элемент нельзя кликнуть */
+            opacity: 0;
+            position: fixed;
+
+            &:hover {
+                color: conf.$color-text-light;
+            }
+        }
+    }
+
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        /* Эффект размытия фона */
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 1500;
+        /* Ниже панели, но выше контента */
+
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity $transition, visibility $transition;
+
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    /* Блокировка скролла страницы */
+    body.menu-open {
+        overflow: hidden;
+
+        .menu-overlay {
+            opacity: 1;
+            visibility: visible;
+            cursor: pointer;
+        }
+    }
+
+
+}

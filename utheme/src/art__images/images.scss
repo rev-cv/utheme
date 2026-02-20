@@ -1,0 +1,77 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+article {
+    figure:has(img) {
+        width: 100%;
+        max-height: 60vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: auto;
+        user-select: none;
+        margin: 0 auto 2rem auto;
+
+        @media (max-width: 850px) {
+            width: 100%;
+        }
+
+        img {
+            object-fit: contain;
+            width: 100%;
+            height: auto;
+            border-radius: f.get-radius();
+            overflow: hidden;
+        }
+
+        // Дополнительные классы для figure
+        &.hero,
+        &:has(img) {
+            border-radius: f.get-radius();
+            overflow: hidden;
+
+            img {
+                object-fit: contain;
+                border-radius: f.get-radius();
+                overflow: hidden;
+
+                @if conf.$is-img_contain == 'true' {
+                    object-fit: contain;
+                    width: fit-content;
+                } @else {
+                    object-fit: cover;
+                    width: 100%;
+                }
+            }
+        }
+
+        &.hero {
+            width: 100%;
+            max-height: 300px;
+
+            img {
+                object-fit: cover;
+            }
+        }
+
+        figcaption {
+            font-style: italic;
+            margin: 0;
+            opacity: .7;
+            font-size: .8em;
+            text-align: center;
+            padding-top: .2em;
+            text-wrap: balance;
+        }
+    }
+
+    figure:has(:has(img), .mobile-betting-container, .platforms-comparison, .bottom-space-p) {
+        margin-bottom: 1.6rem;
+    }
+
+    section figure:last-child {
+        margin-bottom: 0;
+    }
+}

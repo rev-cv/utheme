@@ -1,0 +1,157 @@
+@use "../conf.scss" as conf;
+
+article {
+
+    // .center-box,
+    // .warning-box,
+    // .info-box,
+    // .success-box .error-box {
+    //     // padding: var(--spacing-md);
+    //     // margin: var(--spacing-md) 0;
+    //     // padding-top: 1em;
+    //     // padding-bottom: 1em;
+    // }
+
+    .warning-box {
+        // border-left: 4px solid conf.$color-warning;
+        // background-color: rgba($color-warning-light, 0.1);
+        // background: linear-gradient(135deg, rgba(conf.$color-warning, 0.1) 0%, transparent 100%);
+        // @include dark-theme-styles {
+        //     background-color: rgba($color-warning-dark, 0.1);
+        // }
+        // border-radius: conf.$default-radius;
+        // border-left: 4px solid conf.$color-warning;
+
+        // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
+        // border-radius: var(--radius-sm);
+        // background-color: rgba(conf.$color-warning, 0.1);
+        // background-color: rgba(#b45309, 0.3);
+
+        // @include dark-theme-styles {
+        //     // background-color: rgba($color-info-dark, 0.1);
+        //     border-left: 4px solid conf.$color-accent-dark;
+        // }
+        // @media (prefers-color-scheme: dark) {
+        //     border-color: conf.$color-warning;
+        //     background-color: rgba(#b45309, 0.3);
+        // }
+
+        border: none;
+        border-left: 4px solid conf.$color-warning;
+        border-radius: 3px;
+        // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
+        background-color: rgba(conf.$color-warning, 0.05);
+
+        strong {
+            color: conf.$color-warning;
+        }
+    }
+
+    section .warning-box:last-child {
+        margin-bottom: 0;
+    }
+
+    .center-box {
+        border: 3px solid conf.$color-accent-light;
+        background: rgba(conf.$color-accent-light, 0.1);
+        border-radius: conf.$default-radius;
+
+        @media (prefers-color-scheme: dark) {
+            border-color: conf.$color-accent-dark;
+        }
+
+        >* {
+            text-align: center;
+        }
+
+        code {
+            font-weight: 600;
+            color: conf.$color-accent-light;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-accent-dark;
+            }
+
+        }
+    }
+
+    .info-box {
+        border: none;
+        border-left: 4px solid conf.$color-info;
+        border-radius: 3px;
+        // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
+        background-color: rgba(conf.$color-info, 0.05);
+
+        // @include dark-theme-styles {
+        //     // background-color: rgba($color-info-dark, 0.1);
+        //     border-left: 4px solid conf.$color-accent-dark;
+        // }
+        // @media (prefers-color-scheme: dark) {
+        //     border-color: conf.$color-accent-dark;
+        //     background-color: rgba(conf.$color-accent-dark, 0.1);
+        // }
+    }
+
+    .success-box {
+        // border-left: 4px solid conf.$color-success;
+        // background-color: rgba(conf.$color-success, 0.1);
+        // background: linear-gradient(135deg, rgba(conf.$color-success, 0.1) 0%, transparent 100%);
+        border: none;
+        border-left: 4px solid conf.$color-success;
+        border-radius: 3px;
+        // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
+        background-color: rgba(conf.$color-success, 0.05);
+
+        strong {
+            color: conf.$color-success;
+        }
+    }
+
+    .error-box {
+        border-left: 4px solid conf.$color-error;
+        // background-color: rgba($color-success-light, 0.1);
+        border-radius: var(--radius-sm);
+        // background: linear-gradient(135deg, rgba(conf.$color-error, 0.15), rgba(conf.$color-bg-dark, 1));
+
+        strong {
+            color: conf.$color-error;
+        }
+    }
+
+    .banner-box {
+        background: linear-gradient(135deg, rgba(conf.$color-accent-light, 0.15), transparent);
+        ;
+    }
+
+    .task-box {
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-left: 0;
+
+            li {
+                position: relative;
+                padding-left: 2rem;
+                margin-bottom: 0.5rem;
+                font-size: clamp(.8em, 2vw, 1em);
+
+                &::before {
+                    content: '✓';
+                    position: absolute;
+                    left: 0;
+                    top: 15%;
+                    width: 1.2em;
+                    height: 1.2em;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.875rem;
+                    font-weight: 700;
+                    color: conf.$color-success;
+                    background: rgba(conf.$color-success, 0.15);
+                    border-radius: 50%;
+                }
+            }
+        }
+    }
+}
