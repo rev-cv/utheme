@@ -29,11 +29,6 @@ db_data/
 uploads/
 plugins/
 
-# --- Theme Compiled Assets ---
-# Игнорируем собранный CSS, так как есть исходники в src/ и автосборщик
-utheme/style.css
-utheme/style.css.map
-
 # --- Runtime State & Logs ---
 created_pages.json
 *.log
