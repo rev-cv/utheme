@@ -1,0 +1,113 @@
+// my-theme/src/_footer-central.scss
+
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles { 
+    .footer-central-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 2rem;
+        padding: 3rem 1rem;
+
+        .footer-branding {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+
+            .footer-logo img {
+                max-height: 50px;
+                width: auto;
+            }
+
+            .footer-site-name a {
+                @include f.font-logo;
+                font-size: 1.2rem;
+                text-decoration: none;
+                color: conf.$color-text-light;
+                
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+            }
+        }
+
+        .footer-central-nav .footer-central-menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem 2rem;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            a {
+                text-decoration: none;
+                @include f.font-txt;
+                color: conf.$color-text-light;
+                transition: color 0.2s ease;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+
+                &:hover {
+                    color: conf.$color-accent-light;
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-accent-dark;
+                    }
+                }
+            }
+        }
+
+        .footer-disclaimers {
+            font-size: 0.8rem;
+            color: sys.scale(conf.$color-text-light, $lightness: 25%);
+            max-width: 800px;
+            line-height: 1.5;
+
+            @media (prefers-color-scheme: dark) {
+                color: sys.scale(conf.$color-text-dark, $lightness: -25%);
+            }
+
+            p {
+                margin: 0.5rem 0;
+                text-wrap: pretty;
+            }
+            
+            a {
+                color: inherit;
+                text-decoration: underline;
+                text-decoration-style: dotted;
+                
+                &:hover {
+                    color: conf.$color-accent-light;
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-accent-dark;
+                    }
+                }
+            }
+        }
+
+        .footer-copyright {
+            font-size: 0.8rem;
+            color: sys.scale(conf.$color-text-light, $lightness: 25%);
+            
+            @media (prefers-color-scheme: dark) {
+                color: sys.scale(conf.$color-text-dark, $lightness: -25%);
+            }
+            
+            p {
+                margin: 0;
+            }
+            
+            a {
+                color: inherit;
+            }
+        }
+    }
+}

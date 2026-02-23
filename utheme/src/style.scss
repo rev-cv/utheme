@@ -14,14 +14,19 @@
 @use "main-menu_new-aside/menu" as aside;
 @use "main-menu-marquee/menu" as marquee;
 
-@use "page/page.scss";
-// @use "cards__default/cards.scss";
-@use "page-articles/page-articles.scss";
-@use "scroll-to-top/scroll-to-top.scss";
-@use "pape-404/page-404.scss";
-// @use 'footer/footer.scss';
-@use 'footer-column/footer.scss';
+@use 'footer-2column/footer.scss' as footer_2columns;
+@use 'footer-central/footer.scss'  as footer_central;
 
+@use "page/page.scss";
+@use "scroll-to-top/scroll-to-top.scss";
+
+@use "page-articles/page-articles.scss";
+@use "page-articles/card-default.scss" as card_default;
+@use "page-articles/card-frame.scss" as card_frame;
+@use "page-articles/card-slide.scss" as card_slide;
+@use "page-articles/card-windows.scss" as card_windows;
+
+@use "pape-404/page-404.scss";
 @use 'page-sitemap/sitemap.scss';
 
 @use "art__section/section.scss";
@@ -42,7 +47,6 @@
 
 // @use "header-box/header-box.scss";
 @use "header-section-box/header-box.scss";
-
 @use "block-autor/block-autor.scss";
 @use "block-related_articles/related-art.scss";
 
@@ -51,22 +55,44 @@
 
 @use "cookie-modal/cookie-modal.scss";
 
+// блок вставки разных меню
 @if conf.$main-menu =='island' {
     @include island.styles;
 }
-
 @else if conf.$main-menu =='aside' {
     @include aside.styles;
 }
-
 @else if conf.$main-menu =='marquee' {
     @include marquee.styles;
 }
 
+// блок стилизация оглавления
 @if conf.$toc-menu =='number' {
     @include toc_number.styles;
 }
-
 @else if conf.$toc-menu =='circle' {
     @include toc_circle.styles;
 }
+
+// блок стилизация карточек статей
+@if conf.$article-card =='default' {
+    @include card_default.styles;
+}
+@else if conf.$article-card =='frame' {
+    @include card_frame.styles;
+}
+@else if conf.$article-card =='slide' {
+    @include card_slide.styles;
+}
+@else if conf.$article-card =='windows' {
+    @include card_windows.styles;
+}
+
+// блок стилизация футера
+@if conf.$footer-menu =='2columns' {
+    @include footer_2columns.styles;
+}
+@else if conf.$footer-menu =='central' {
+    @include footer_central.styles;
+}
+

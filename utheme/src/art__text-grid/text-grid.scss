@@ -22,7 +22,7 @@ $section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
         padding: 1.5rem;
         margin: 0 !important;
         border-radius: f.get-radius();
-        box-shadow: var(--shadow-sm);
+        box-shadow: conf.$shadow-section;
 
         display: flex;
         justify-content: center;

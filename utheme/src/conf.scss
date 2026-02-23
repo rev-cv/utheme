@@ -8,21 +8,35 @@
 ///  
 ///  Файл обрабатывается php
 ///      - /utheme/inc/mod-google-font.php
-///      - /utheme/header.php
 /// 
 ////////////////////////////////////////////////////////
 
+// тип добавляемого меню на сайте
+$main-menu: "island"; // island, aside, marquee
+$footer-menu: "central"; // 2columns, central
 
-$main-menu: "aside"; // island, aside, marquee
+// стилизация оглавления в статьяъ
 $toc-menu: "number"; // circle, number
+// меню должно быть в секции или располагаться открыто?
 $is-not-section: "true"; // true, false
+
+// тип используемой на сайте карточки статей
+$article-card: "slide"; // default, frame, slide, windows
+
+// картинки вписываются или занимают всю ширину страницы?
 $is-img_contain: "false"; // true, false
 
+// в блоках секций, карточек, меню, футера использовать бордер?
+$is-border: "true"; // true, false
+
+// какую шрифтовую пару выбрать для сайта?
 $font-vibe: 'interface';
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
+// какой радиус использовать для секций, меню, карточек и прочее?
 $radius-vibe: "neutral";
 
+// 
 $density-vibe: 'auto';
 /* 
 compact
@@ -61,6 +75,9 @@ $color-section-dark: #000000cc;;
 $color-H1-light: #4166f5;
 $color-H1-dark: #4166f5;
 
+$color-border-light: sys.scale($color-section-light, $lightness: -5%);
+$color-border-dark: sys.scale($color-section-dark, $lightness: 10%);
+
 $color-success: #5db97a;
 $color-warning: #fcd34d;
 $color-error: #dc2f02;
@@ -85,12 +102,5 @@ main:has(.article-box) {
     width: 100%;
 }
 
-// ============================================================================
-// ЦВЕТОВАЯ ПАЛИТРА (COLOR PALETTE)
-// ============================================================================
-:root {
-    // Тени для создания иерархии элементов
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
+$shadow-section: 0 4px 12px rgba(0, 0, 0, 0.1);
+$shadow-section-hover: 0 2px 10px rgba(0, 0, 0, 0.2);

@@ -1,15 +1,7 @@
 <?php
 function my_theme_enqueue_fonts()
 {
-    $config_file = get_template_directory() . '/src/conf.scss';
-
-    if (!file_exists($config_file)) return;
-
-    $content = file_get_contents($config_file);
-
-    // Ищем переменную $font-vibe в SCSS
-    preg_match('/\$font-vibe:\s*[\'"]?([a-zA-Z0-9_-]+)[\'"]?\s*;/', $content, $matches);
-    $active_vibe = !empty($matches[1]) ? $matches[1] : 'strict';
+    $active_vibe = my_theme_get_config('font-vibe', 'strict');
 
     $font_map = [
         'google'    => 'https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap',

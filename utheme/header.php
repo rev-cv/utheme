@@ -16,21 +16,13 @@
 
 <body>
     <?php
-    $conf_file = get_template_directory() . '/src/conf.scss';
-    $menu_type = 'island'; // Значение по умолчанию
+        $menu_type = my_theme_get_config('main-menu', 'island');
 
-    if (file_exists($conf_file)) {
-        $conf_content = file_get_contents($conf_file);
-        if (preg_match('/\$main-menu:\s*["\']?(island|aside|marquee)["\']?/', $conf_content, $matches)) {
-            $menu_type = $matches[1];
+        if ($menu_type === 'aside') {
+            get_template_part('components/main-menu-new-aside');
+        } elseif ($menu_type === 'marquee') {
+            get_template_part('components/main-menu-marquee');
+        } else {
+            get_template_part('components/main-menu-island');
         }
-    }
-
-    if ($menu_type === 'aside') {
-        get_template_part('components/main-menu-new-aside');
-    } elseif ($menu_type === 'marquee') {
-        get_template_part('components/main-menu-marquee');
-    } else {
-        get_template_part('components/main-menu-island');
-    }
     ?>

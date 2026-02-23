@@ -1,13 +1,14 @@
 <?php
 function my_theme_enqueue_styles()
 {
-    wp_enqueue_style('utheme-style', get_stylesheet_uri());
+    wp_enqueue_style('my-theme-style', get_stylesheet_uri());
 }
-add_action('wp_enqueue_scripts', 'utheme_enqueue_styles');
+add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles');
 
 $inc_dir = get_stylesheet_directory() . '/inc/';
 
 $includes = array(
+    'theme-config.php',
     'language-pack.php',
     'setting-admin.php',
     'custom-styles.php',

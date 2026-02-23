@@ -51,6 +51,13 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             @media (prefers-color-scheme: dark) {
                 background: rgba(conf.$color-section-dark, .85);
             }
+
+            @if conf.$is-border == 'true' {
+                border: 1px solid conf.$color-border-light;
+                @media (prefers-color-scheme: dark) {
+                    border-color: conf.$color-border-dark;
+                }
+            }
         }
 
         /* Логотип: ограничение размера */

@@ -9,6 +9,7 @@
 // Примечание: В реальном SCSS проекте эти переменные должны быть объявлены в начале файла как $переменная
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
+@use 'sass:color' as sys;
 
 @mixin styles {
 
@@ -71,6 +72,13 @@
             justify-content: space-between;
             padding: 10px 25px 10px 22px;
             height: 60px;
+
+            @if conf.$is-border == 'true' {
+                border: 1px solid conf.$color-border-light;
+                @media (prefers-color-scheme: dark) {
+                    border-color: conf.$color-border-dark;
+                }
+            }
 
             @media (min-width: 769px) {
                 min-width: 450px;

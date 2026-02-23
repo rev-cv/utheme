@@ -2,19 +2,6 @@
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
-/* ------------------------------------------------------ */
-// ПЕРЕМЕННЫЕ
-
-$section-bg-light: conf.$color-section-light;
-$section-border-light: sys.scale($section-bg-light, $lightness: -5%);
-
-// --- Dark Theme Colors ---
-$section-bg-dark: conf.$color-section-dark;
-$section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
-
-/* ------------------------------------------------------ */
-
-
 .articles-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -22,76 +9,6 @@ $section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
     margin-bottom: 30px;
     // padding: 2em 1em;
 }
-
-.article-card {
-    border: 1px solid $section-border-light;
-    border-radius: f.get-radius("card");
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: $section-bg-light;
-    transition: transform 0.2s;
-
-    @media (prefers-color-scheme: dark) {
-        background: $section-bg-dark;
-        border-color: $section-border-dark;
-    }
-
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-image {
-        height: 200px;
-        background-size: cover;
-        background-position: center;
-        // background-color: #f0f0f0;
-    }
-
-    .card-content {
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-
-        h3 {
-            margin: 0 0 10px 0;
-            font-size: clamp(.8rem, 2vw, 1rem);
-
-            a {
-                text-decoration: none;
-            }
-        }
-
-        p {
-            @include f.font-txt;
-            font-size: 0.8rem;
-            color: rgba(conf.$color-text-light, 0.7);
-            flex-grow: 1;
-            margin-bottom: 0;
-
-            @media (prefers-color-scheme: dark) {
-                color: rgba(conf.$color-text-dark, 0.7);
-            }
-        }
-
-        .read-more {
-            margin-top: 15px;
-            font-weight: bold;
-            text-decoration: none;
-            color: conf.$color-accent-light;
-            text-align: right;
-            font-size: clamp(.8rem, 2vw, 1rem);
-
-            @media (prefers-color-scheme: dark) {
-                color: conf.$color-accent-dark;
-            }
-        }
-    }
-}
-
-
 
 section.article-box {
     @media (max-width: 725px) {

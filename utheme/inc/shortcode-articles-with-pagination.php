@@ -10,7 +10,7 @@ function custom_articles_shortcode()
 
     $args = array(
         'post_type' => 'page',
-        'posts_per_page' => 9, // Оптимально для сетки по 3 в ряд
+        'posts_per_page' => 9, // оптимально для сетки по 3 в ряд
         'paged' => $paged,
         'post__not_in' => array($home_id),
         'category__not_in' => array(15),
@@ -29,23 +29,24 @@ function custom_articles_shortcode()
 
     if ($query->have_posts()) :
         while ($query->have_posts()) : $query->the_post();
-            $img_url = get_the_post_thumbnail_url(get_the_ID(), 'medium_large');
+            ob_start();
+            $card_type = my_theme_get_config('article-card', 'default');
 
-            $output .= '<div class="article-card">';
-
-            // Вывод картинки
-            if ($img_url) {
-                $output .= '<div class="card-image" style="background-image: url(' . esc_url($img_url) . ');"></div>';
-            } else {
-                $output .= '<div class="card-image no-image"></div>'; // Заглушка
+            // подключение шаблона components/card-article.php
+            if ($card_type === 'default') {
+                get_template_part('components/card', 'article-default', ['read_more_text' => $TEXT_READING]);
+            }
+            elseif ($card_type === 'frame') {
+                get_template_part('components/card', 'article-frame', ['read_more_text' => $TEXT_READING]);
+            }
+            elseif ($card_type === 'slide') {
+                get_template_part('components/card', 'article-slide', ['read_more_text' => $TEXT_READING]);
+            }
+            elseif ($card_type === 'windows') {
+                get_template_part('components/card', 'article-windows', ['read_more_text' => $TEXT_READING]);
             }
 
-            $output .= '<div class="card-content">';
-            $output .= '<h3><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>';
-            $output .= '<p>' . wp_trim_words(get_the_excerpt(), 15) . '</p>';
-            $output .= '<a class="read-more" href="' . get_permalink() . '">' . $TEXT_READING . '</a>';
-            $output .= '</div>';
-            $output .= '</div>';
+            $output .= ob_get_clean();
         endwhile;
 
         // Пагинация

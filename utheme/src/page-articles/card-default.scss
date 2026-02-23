@@ -1,0 +1,77 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card {
+        border-radius: f.get-radius("card");
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: conf.$color-section-light;
+        transition: transform 0.2s;
+
+        @media (prefers-color-scheme: dark) {
+            background: conf.$color-section-dark;
+        }
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid $color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-color: $color-border-dark;
+            }
+        }
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-content {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+
+            h3 {
+                margin: 0 0 10px 0;
+                font-size: clamp(.8rem, 2vw, 1rem);
+
+                a {
+                    text-decoration: none;
+                }
+            }
+
+            p {
+                @include f.font-txt;
+                font-size: 0.8rem;
+                color: rgba(conf.$color-text-light, 0.7);
+                flex-grow: 1;
+                margin-bottom: 0;
+
+                @media (prefers-color-scheme: dark) {
+                    color: rgba(conf.$color-text-dark, 0.7);
+                }
+            }
+
+            .read-more {
+                margin-top: 15px;
+                font-weight: bold;
+                text-decoration: none;
+                color: conf.$color-accent-light;
+                text-align: right;
+                font-size: clamp(.8rem, 2vw, 1rem);
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-accent-dark;
+                }
+            }
+        }
+    }
+}

@@ -74,16 +74,9 @@ function my_theme_dynamic_content_injection($content)
     }
 
     // --- ГЕНЕРАЦИЯ И ВСТАВКА TOC ---
-    $conf_file = get_template_directory() . '/src/conf.scss';
     $toc_tag = 'section';
-
-    if (file_exists($conf_file)) {
-        $conf_content = file_get_contents($conf_file);
-        if (preg_match('/\$is-not-section:\s*["\']?(true|false)["\']?/', $conf_content, $matches)) {
-            if ($matches[1] === 'true') {
-                $toc_tag = 'div';
-            }
-        }
+    if (my_theme_get_config('is-not-section', false)) {
+        $toc_tag = 'div';
     }
 
     $toc_html = '<' . $toc_tag . ' class="toc">

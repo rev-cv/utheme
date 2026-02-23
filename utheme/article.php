@@ -3,7 +3,7 @@
 
 <?php while (have_posts()) : the_post(); ?>
     <?php
-    // 1. Временно отключаем инъекцию TOC, чтобы она не мешала парсингу DOM
+    // временно отключаем инъекцию TOC, чтобы она не мешала парсингу DOM
     remove_filter('the_content', 'my_theme_dynamic_content_injection');
 
     $content = get_the_content();
@@ -12,12 +12,12 @@
 
     $extracted = extract_header_box_from_html($content);
 
-    // 2. Вручную применяем инъекцию только к основному контенту (уже без хедера)
+    // вручную применяем инъекцию только к основному контенту (уже без хедера)
     if (function_exists('my_theme_dynamic_content_injection')) {
         $extracted['content'] = my_theme_dynamic_content_injection($extracted['content']);
     }
 
-    // Возвращаем фильтр на место для других циклов
+    // возвращаем фильтр на место для других циклов
     add_filter('the_content', 'my_theme_dynamic_content_injection');
     ?>
     <?php echo $extracted['header']; ?>

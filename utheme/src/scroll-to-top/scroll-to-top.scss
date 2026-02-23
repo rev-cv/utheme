@@ -31,7 +31,7 @@ $stt-text-dark: conf.$color-bg-dark;
     color: $stt-text-light;
     cursor: pointer;
     border-radius: f.get-radius();
-    box-shadow: var(--shadow-md);
+    box-shadow: conf.$shadow-section;
     width: $stt-size;
     height: $stt-size;
     transition: $stt-transition;

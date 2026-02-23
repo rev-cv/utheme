@@ -1,0 +1,144 @@
+@use "../conf.scss" as conf;
+@use 'sass:color' as sys;
+@use "../funcs.scss" as f;
+
+// --- Footer Variables ---
+$footer-padding-y: 3rem;
+$footer-gap: 2rem;
+$footer-text-font-size: 0.8rem;
+$footer-link-font-size: 0.8rem;
+
+// --- Light Theme Colors ---
+$footer-bg-light: transparent;
+$footer-text-light: rgba(conf.$color-text-light, .7);
+$footer-link-light: conf.$color-text-light;
+$footer-link-hover-light: conf.$color-accent-light;
+$footer-border-light: rgba(conf.$color-text-light, .1);
+
+// --- Dark Theme Colors ---
+$footer-bg-dark: transparent;
+$footer-text-dark: rgba(conf.$color-text-dark, .7);
+$footer-link-dark: conf.$color-text-dark;
+$footer-link-hover-dark: conf.$color-accent-dark;
+$footer-border-dark: rgba(conf.$color-text-dark, .1);
+
+@mixin styles { 
+    footer {
+        background-color: $footer-bg-light;
+        padding: $footer-padding-y 0 calc($footer-padding-y / 3) 0;
+        color: $footer-text-light;
+        font-size: $footer-text-font-size;
+        line-height: 1.6;
+        border-top: 1px solid $footer-border-light;
+        margin-top: 0;
+
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 conf.$default-space;
+        }
+
+        .footer-columns {
+            display: grid;
+            grid-template-columns: 1fr 3fr; // Левая колонка 1 часть, правая 2
+            gap: $footer-gap;
+            margin-bottom: $footer-gap;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr; // Складываем колонки на мобильных
+                gap: $footer-gap;
+                text-align: center;
+            }
+        }
+
+        .footer-column {
+
+            h4,
+            &__title {
+                @include f.font-txt;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: $footer-link-light;
+                margin-top: 0;
+                margin-bottom: 1rem;
+                text-wrap: balance;
+            }
+
+            p {
+                @include f.font-txt;
+                margin: 0.5em 0 0;
+                font-size: 1em;
+                text-wrap: pretty;
+
+                &:first-of-type {
+                    margin-top: 0;
+                }
+            }
+        }
+
+        .footer-nav .footer-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            @media (max-width: 768px) {
+                align-items: center;
+            }
+
+            a {
+                @include f.font-txt;
+                font-size: $footer-link-font-size;
+                font-weight: 500;
+            }
+        }
+
+        a {
+            @include f.font-txt;
+            color: $footer-link-light;
+            text-decoration: none !important;
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: $footer-link-hover-light;
+                text-decoration: underline;
+            }
+        }
+
+        .footer-copyright {
+            text-align: center;
+            padding-top: $footer-gap;
+            border-top: 1px solid $footer-border-light;
+            font-size: 0.9em;
+            opacity: 0.8;
+
+            p {
+                margin: 0;
+            }
+        }
+
+        // Dark mode
+        @media (prefers-color-scheme: dark) {
+            color: $footer-text-dark;
+            border-top-color: $footer-border-dark;
+
+            .footer-column :is(h4, .footer-column__title) {
+                color: $footer-link-dark;
+            }
+
+            a {
+                color: $footer-link-dark;
+
+                &:hover {
+                    color: $footer-link-hover-dark;
+                }
+            }
+
+            .footer-copyright {
+                border-top-color: $footer-border-dark;
+            }
+        }
+    }
+}
