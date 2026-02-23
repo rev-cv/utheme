@@ -59,15 +59,15 @@ spacious
 // --- Светлая тема (Light Theme) ---
 $color-primary-light: #4166f5;
 $color-accent-light: #4166f5;
-$color-text-light: black;
-$color-bg-light: white;
+$color-text-light: #000;
+$color-bg-light: #fff;
 $color-section-light: #ffffffcc;
 
 // --- Темная тема (Dark Theme) ---
 $color-primary-dark: #4166f5;
 $color-accent-dark: #4166f5;
-$color-text-dark: white;
-$color-bg-dark: black;
+$color-text-dark: #fff;
+$color-bg-dark: #000;
 $color-section-dark: #000000cc;;
 
 // $color-H1-light: linear-gradient(75deg, $color-accent-light, $color-primary-dark);

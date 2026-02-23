@@ -2,35 +2,30 @@
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
-// --- Section & TOC Block Variables ---
 $section-padding: conf.$default-space;
 $section-margin-y: 2rem;
-
-// --- Light Theme Colors ---
-$section-bg-light: linear-gradient(135deg, conf.$color-section-light, #f7fafc);
-$section-border-light: sys.scale(conf.$color-section-light, $lightness: -5%);
-
-// --- Dark Theme Colors ---
-$section-bg-dark: conf.$color-section-dark;
-$section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
 
 article,
 aside {
 
     // Общие стили для всех контентных блоков внутри статьи
     section {
-        background: $section-bg-light;
-        border: 1px solid $section-bg-light;
-        border: 1px solid transparent;
+        background: linear-gradient(135deg, conf.$color-section-light, #f7fafc);
         border-radius: f.get-radius();
         padding: $section-padding;
         margin: $section-margin-y auto;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         overflow: hidden;
 
+        @if conf.$is-border == 'true' {
+            border: 1px solid conf.$color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
         @media (prefers-color-scheme: dark) {
-            background: $section-bg-dark;
-            border-color: $section-bg-dark;
+            background: conf.$color-section-dark;
         }
 
         h2,

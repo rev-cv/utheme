@@ -69,6 +69,10 @@ U5_DICT = [
 required_folders = [
     SPEC_DIR / "PILLAR",
     SPEC_DIR / "ADD PAGES",
+    SPEC_DIR / "ADD PAGES" / "about-us.html",
+    SPEC_DIR / "ADD PAGES" / "legal-notice.html",
+    SPEC_DIR / "ADD PAGES" / "privacy-policy.html",
+    SPEC_DIR / "ADD PAGES" / "cookie-policy.html",
     SPEC_DIR / "logo.png",
     SPEC_DIR / "CL1", 
     SPEC_DIR / "CL2", 
@@ -83,6 +87,10 @@ if __name__ == "__main__":
 
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
+
+    # попытка исправить структуру проекта перед проверкой целостности
+    check_structure.bulk_rename_folders(SPEC_DIR)
+    check_structure.bulk_rename(SPEC_DIR)
 
     # ПРОВЕРКА ЦЕЛОСТНОСТИ СТРУКТУРЫ ПРОЕКТА НЕОБХОДИМОГО ДЛЯ ВЫПОЛНЕНИЯ СКРИПТА
     check_structure.check_structure_flexible(SPEC_DIR.parent, required_folders)

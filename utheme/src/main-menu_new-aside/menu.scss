@@ -219,7 +219,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 display: flex;
                 align-items: center;
                 gap: 16px;
-                padding: 12px;
+                border-radius: calc(f.get-radius() + 12px);
                 border-radius: f.get-radius();
                 text-decoration: none;
                 transition: all 0.2s ease;
@@ -231,10 +231,8 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 }
 
                 &:hover {
-                    // background: #ffffff;
                     transform: translateX(-5px);
                     box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.05);
-                    // border-color: var(--accent);
                 }
             }
 
