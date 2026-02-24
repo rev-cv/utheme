@@ -22,7 +22,7 @@ if [ ! -f wp-config.php ]; then
     exit 1
 fi
 
-echo "--- 🚀 Начинаем автоматическую настройку ---"
+echo "--- Автоматическая настройка WordPress ---"
 
 # ===========================================================================
 # 1. УСТАНОВКА WORDPRESS
@@ -137,7 +137,7 @@ echo "Admin ID for content creation: $ADMIN_ID"
 echo "Setting admin user ($ADMIN_USER) language to English (en_US)..."
 # ID пользователя, созданного через wp core install, всегда равен 1
 wp user update 1 --locale=en_US
-echo "✅ Admin language set to English."
+echo "Admin language set to English."
 
 # темы (активация кастомной темы, удаление мусора)
 echo "Activating theme $THEME_SLUG..."
@@ -160,7 +160,7 @@ wp option update blogname "$SITE_TITLE"
 # Пермалинки (ЧПУ) - выставляем /%postname%/
 wp rewrite structure '/%postname%/' --hard
 wp rewrite flush
-echo "✅ Permalink Settings applied."
+echo "Permalink Settings applied."
 
 echo "Configuring Discussion and Media Settings..."
 
@@ -212,14 +212,14 @@ wp option update comment_moderation 1
 # [x] Comment author must have a previously approved comment (1)
 wp option update comment_whitelist 1
 
-echo "✅ Discussion settings applied."
+echo "Discussion settings applied."
 
 # MEDIA SETTINGS (Настройки медиафайлов)
 
 # [ ] Organize my uploads into month- and year-based folders (0)
 wp option update uploads_use_yearmonth_folders 0
 
-echo "✅ Media settings applied."
+echo "Media settings applied."
 
 # ===========================================================================
 # 3. СОЗДАНИЕ СТРУКТУРЫ СТРАНИЦ
@@ -562,27 +562,27 @@ echo "Added 5 items to $FOOTER_MENU_SLUG."
 wp menu location assign $FOOTER_MENU_SLUG $FOOTER_MENU_LOC
 echo "Assigned $FOOTER_MENU_SLUG to location: $FOOTER_MENU_LOC"
 
-echo "--- ✅ Menu Setup Complete ---"
+echo "--- Menu Setup Complete ---"
 
 
 # ===========================================================================
 # 6. УСТАНОВКА ПЛАГИНОВ
 wp plugin delete hello dolly
 wp plugin delete akismet
-echo "✅ Default plugins removed."
+echo "Default plugins removed."
 # echo "Installing plugins..."
 # wp plugin install wpvivid-backuprestore
-# echo "    - ✅ WPvivid Backup Plugin"
+# echo "    - WPvivid Backup Plugin"
 # wp plugin install seo-by-rank-math --activate
-# echo "    - ✅ Rank Math SEO"
+# echo "    - Rank Math SEO"
 # wp plugin install clearfy --activate
-# echo "    - ✅ Clearfy"
+# echo "    - Clearfy"
 
 # Создание Application Password для autoposter
 echo "Creating Application Password 'autoposter'..."
 APP_PASS=$(wp user application-password create $ADMIN_USER "autoposter" --porcelain)
 
-echo "--- ✅ Готово! Сайт настроен. ---"
+echo "--- Готово! Сайт настроен. ---"
 
 echo ""
 echo "========================================================="
@@ -607,5 +607,5 @@ printf '{\n  "admin_user": "%s",\n  "admin_pass": "%s",\n  "admin_email": "%s",\
   "$ADMIN_EMAIL" \
   "$APP_PASS" > "$JSON_FILE"
 
-echo "✅ Учетные данные сохранены в $JSON_FILE"
+echo "Учетные данные сохранены в $JSON_FILE"
 echo ""

@@ -21,4 +21,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
   window.addEventListener('scroll', toggleButtonVisibility);
   scrollToTopBtn.addEventListener('click', scrollToTop);
+
+  // --- FIX: Lazy Load vs Anchor Scroll ---
+
+  const tocLinks = document.querySelectorAll('.page-toc-list a');
+  tocLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelectorAll('img[loading="lazy"]').forEach(img => img.setAttribute('loading', 'eager'));
+    });
+  });
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('img[loading="lazy"]').forEach(img => img.setAttribute('loading', 'eager'));
+    }, 3000);
+  });
 });

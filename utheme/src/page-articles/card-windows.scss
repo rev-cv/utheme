@@ -88,11 +88,11 @@
             transition: background-color 0.3s ease;
 
             background-color: conf.$color-primary-light;
-            color: conf.$color-text-light;
+            color: conf.$color-section-light;
 
             @media (prefers-color-scheme: dark) {
                 background-color: conf.$color-primary-dark;
-                color: conf.$color-text-dark;
+                color: conf.$color-section-dark;
             }
 
             &:hover {

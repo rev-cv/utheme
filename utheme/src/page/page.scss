@@ -101,6 +101,19 @@ aside {
             opacity: .3;
         }
     }
+
+    a {
+        @include f.mode(( //
+                color: (conf.$color-text-light, conf.$color-text-dark),
+            ));
+        transition: color 300ms ease-in-out;
+
+        &:hover {
+            @include f.mode(( //
+                color: (conf.$color-primary-light, conf.$color-primary-dark),
+            ));
+        }
+    }
 }
 
 main {

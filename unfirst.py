@@ -9,7 +9,6 @@
 # ]
 # ///
 import sys
-import os
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -21,22 +20,78 @@ from core import img_find_images
 from core import link_images_to_articles as linking
 from core import wp_api
 from core import check_structure
-from core import enrich_with_schedule as schedule
-from core import assign_category_to_articles as cat
 
 SPEC_DIR = Path(__file__).parent / "spec"
 
-U30_DICT = [{"resource": f"CLUSTERS ADD/CL{i}"} for i in range(1, 31)]
+U5_DICT = [
+    {
+        "resource": "PILLAR",
+        "post": 4
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL1",
+        "post": 6
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL2",
+        "post": 7
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL3",
+        "post": 8
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL4",
+        "post": 9
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL5",
+        "post": 10
+    },
+    {
+        "resource": "ADD PAGES/about-us",
+        "post": 11
+    },
+    {
+        "resource": "ADD PAGES/cookie-policy",
+        "post": 12
+    },
+    {
+        "resource": "ADD PAGES/privacy-policy",
+        "post": 13
+    },
+    {
+        "resource": "ADD PAGES/legal-notice",
+        "post": 14
+    },
+]
 
-required_folders = [SPEC_DIR / f"CLUSTERS ADD/CL{i}" for i in range(1, 31)]
-
+required_folders = [
+    SPEC_DIR / "PILLAR",
+    SPEC_DIR / "ADD PAGES",
+    SPEC_DIR / "ADD PAGES" / "about-us.html",
+    SPEC_DIR / "ADD PAGES" / "legal-notice.html",
+    SPEC_DIR / "ADD PAGES" / "privacy-policy.html",
+    SPEC_DIR / "ADD PAGES" / "cookie-policy.html",
+    SPEC_DIR / "logo.png",
+    SPEC_DIR / "CLUSTERS MAIN",
+    SPEC_DIR / "CLUSTERS MAIN" / "CL1", 
+    SPEC_DIR / "CLUSTERS MAIN" / "CL2", 
+    SPEC_DIR / "CLUSTERS MAIN" / "CL3", 
+    SPEC_DIR / "CLUSTERS MAIN" / "CL4", 
+    SPEC_DIR / "CLUSTERS MAIN" / "CL5",
+]
 
 if __name__ == "__main__":
     # ПРОВЕРКА: ДАННЫЙ СКРИПТ ПРЕДНАЗНАЧЕН ТОЛЬКО ДЛЯ ЛОКАЛЬНОГО САЙТА
-    # wp_api.check_local()
+    wp_api.check_local()
 
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
+
+    # попытка исправить структуру проекта перед проверкой целостности
+    check_structure.bulk_rename_folders(SPEC_DIR)
+    check_structure.bulk_rename(SPEC_DIR)
 
     # ПРОВЕРКА ЦЕЛОСТНОСТИ СТРУКТУРЫ ПРОЕКТА НЕОБХОДИМОГО ДЛЯ ВЫПОЛНЕНИЯ СКРИПТА
     check_structure.check_structure_flexible(SPEC_DIR.parent, required_folders)
@@ -45,7 +100,7 @@ if __name__ == "__main__":
     pics = img_find_images.get_all_images(SPEC_DIR)
 
     # НОРМАЛИЗАЦИЯ ПУТЕЙ ДО РЕСУРСОВ
-    pages = extraction.resolve_resource_paths(SPEC_DIR, U30_DICT)
+    pages = extraction.resolve_resource_paths(SPEC_DIR, U5_DICT)
 
     # ИЗВЛЕЧЕНИЕ TITLE И DESCRIPTION
     pages = extraction.fetch_meta_data(pages)
@@ -53,18 +108,14 @@ if __name__ == "__main__":
     # КОНВЕРТАЦИЯ HTML в WP-BLOCKS
     pages = conv.conversion_init(pages)
 
-    # ПРИСВОЕНИЕ ДАТЫ ПУБЛИКАЦИИ НА ОСНОВАНИИ АЛГОРИТМА
-    pages = schedule.enrich_with_schedule(pages, os.getenv("SCHEDULE_PATTERN", "3d 2-3p (10-21)"))
-
-    # ДОБАВЛЕНИЕ СТАТЬЯМ КАТЕГОРИИ
-    pages = cat.assign_category_to_articles("page+30", pages)
-
     # ЛИНКОВА КАРТИНОК СО СТАТЬЯМИ
     pages = linking.link_images_to_articles(pages, pics)
 
     # ЗАГРУЗКА КАРТИНОК В WP MEDIA
     pages = wp_api.upload_article_images(pages, 120)
 
-    # ПУБЛИКАЦИЯ СТАТЕЙ НА WP
+    # ПУБЛИКАЦИЯ СТАТЬИ НА WP
     pages = wp_api.publish_wp_pages(pages)
     
+    # УСТАНАВКА ФАВИКОНА И ЛОГО САЙТА
+    wp_api.upload_and_set_logo(30)

@@ -28,7 +28,7 @@ $section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
         justify-content: center;
         // align-items: center;
         flex-direction: column;
-        align-self: self-start;
+        align-self: stretch;
 
         background: $section-bg-light;
 
