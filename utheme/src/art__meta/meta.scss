@@ -1,4 +1,5 @@
 @use "../funcs.scss" as f;
+@use "../conf.scss" as conf;
 
 article {
 
@@ -21,6 +22,11 @@ article {
             user-select: none;
             text-decoration: none;
             line-height: 1em;
+            color: conf.$color-text-light;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-text-dark;
+            }
 
             @media (min-width: 551px) {
                 &:not(:first-child)::before {

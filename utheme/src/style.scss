@@ -2,14 +2,6 @@
 @use "scheme.fonts.scss";
 @use "funcs.scss";
 
-// @use "main-menu_default/main-menu.scss";
-// @use "main-menu_2-islands/main-menu.scss";
-// @use "main-menu_multi-level/multi-level.scss";
-// @use "main-menu_aside/menu.scss";
-// @use "main-menu_island/main-menu.scss";
-// @use "main-menu_new-aside/menu.scss";
-// @use "main-menu-marquee/menu.scss";
-
 @use "main-menu_island/main-menu" as island;
 @use "main-menu_new-aside/menu" as aside;
 @use "main-menu-marquee/menu" as marquee;
@@ -45,6 +37,7 @@
 @use "art__details/details-arrow.scss" as details_arrow;
 @use "art__text-grid/text-grid.scss";
 @use "art__code/code.scss";
+@use "art__yes-no/yesno.scss";
 
 // @use "header-box/header-box.scss";
 @use "header-section-box/header-box.scss";

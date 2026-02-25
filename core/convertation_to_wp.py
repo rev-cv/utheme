@@ -29,7 +29,6 @@ def _handle_image(tag):
     # Формируем блок. src оставляем пустым, ID заполняем из имени файла.
     return f'<!-- wp:image -->\n<figure id="{img_id}" class="wp-block-image"><img src="" alt="{alt}"/></figure>\n<!-- /wp:image -->'
 
-
 def _handle_list(tag):
     """Обработка списков (ul, ol)."""
     content = tag.decode_contents()
@@ -42,11 +41,38 @@ def _handle_table(tag):
     content = tag.decode_contents()
     return f'<!-- wp:table -->\n<figure class="wp-block-table"><table class="has-fixed-layout">{content}</table></figure>\n<!-- /wp:table -->'
 
+def _handle_details(tag):
+    """Обработка <details> (аккордеон)."""
+    summary_tag = tag.find('summary')
+    summary_text = summary_tag.get_text(strip=True) if summary_tag else ''
+    
+    if summary_tag:
+        summary_tag.extract()
+
+    # Распаковываем обертки, чтобы добраться до контентных тегов
+    for wrapper in tag.find_all(['div', 'section']):
+        wrapper.unwrap()
+
+    # Конвертируем дочерние элементы в WP-блоки
+    inner_blocks = []
+    for child in tag.children:
+        if isinstance(child, NavigableString) and not child.strip():
+            continue
+
+        if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+            handler = BLOCK_HANDLERS[child.name]
+            inner_blocks.append(handler(child))
+        # Неизвестные теги просто игнорируются, как в основной функции
+
+    inner_blocks_content = '\n'.join(inner_blocks)
+    
+    return f'<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_blocks_content}</details>\n<!-- /wp:details -->'
+
 BLOCK_HANDLERS = {
     'h1': _handle_heading, 'h2': _handle_heading, 'h3': _handle_heading,
     'h4': _handle_heading, 'h5': _handle_heading, 'h6': _handle_heading,
     'p': _handle_paragraph, 'img': _handle_image, 'ul': _handle_list, 'ol': _handle_list,
-    'table': _handle_table,
+    'table': _handle_table, 'details': _handle_details,
 }
 
 # --- Основная логика ---

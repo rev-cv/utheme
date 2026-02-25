@@ -1,0 +1,66 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+.yesno-box {
+    margin: 2rem 0;
+    overflow: hidden;
+    border-radius: 3px 3px f.get-radius() f.get-radius();
+
+    // Сетка для колонок.
+    // Учитываем структуру WP: .wp-block-group > .wp-block-group__inner-container > col1 + col2
+    & > .wp-block-group__inner-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0; // Стыкуем блоки как в таблице
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    // Общие стили для колонок
+    &__yes,
+    &__no {
+        padding: conf.$default-space;
+        background-color: conf.$color-section-light;
+
+        @media (prefers-color-scheme: dark) {
+            background-color: conf.$color-section-dark;
+        }
+
+        // Убираем верхний отступ у заголовка (Do / Don't)
+        p:first-child {
+            margin-top: 0;
+        }
+
+        // Стилизация списка внутри колонок
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+
+            li {
+                position: relative;
+                padding-left: 1.2em;
+                margin-bottom: 0.5em;
+
+                &::before {
+                    content: "–";
+                    position: absolute;
+                    left: 0;
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+
+    &__yes {
+        border-top: 3px solid conf.$color-success;
+        strong { color: conf.$color-success; text-transform: uppercase; }
+    }
+
+    &__no {
+        border-top: 3px solid conf.$color-error;
+        strong { color: conf.$color-error; text-transform: uppercase; }
+    }
+}
