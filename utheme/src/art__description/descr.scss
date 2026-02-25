@@ -1,4 +1,5 @@
 @use "../funcs.scss" as f;
+@use "../conf.scss" as conf;
 
 .article-description {
     @include f.font-txt;
@@ -11,4 +12,13 @@
     margin-bottom: 1em;
     text-wrap: balance;
     margin-top: 0 !important;
+}
+
+.head-tag {
+    @include f.font-hd;
+    font-size: .8em;
+    text-align: center;
+    @include f.mode(( //
+            color: (conf.$color-primary-light, conf.$color-primary-dark),
+        ));
 }

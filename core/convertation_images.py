@@ -107,8 +107,8 @@ def ensure_image_size(file_path, max_size_kb):
                 f.write(buf.getvalue())
             return temp_path
 
-        if quality > 25:
+        if quality > 38:
             quality -= 10
         else:
             resize_factor *= 0.9
-            quality = 85
+            quality = 90

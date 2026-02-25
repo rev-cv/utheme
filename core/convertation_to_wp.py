@@ -37,10 +37,16 @@ def _handle_list(tag):
         return f'<!-- wp:list {{"ordered":true}} -->\n<ol>{content}</ol>\n<!-- /wp:list -->'
     return f'<!-- wp:list -->\n<ul>{content}</ul>\n<!-- /wp:list -->'
 
+def _handle_table(tag):
+    """Обработка таблиц (table)."""
+    content = tag.decode_contents()
+    return f'<!-- wp:table -->\n<figure class="wp-block-table"><table class="has-fixed-layout">{content}</table></figure>\n<!-- /wp:table -->'
+
 BLOCK_HANDLERS = {
     'h1': _handle_heading, 'h2': _handle_heading, 'h3': _handle_heading,
     'h4': _handle_heading, 'h5': _handle_heading, 'h6': _handle_heading,
     'p': _handle_paragraph, 'img': _handle_image, 'ul': _handle_list, 'ol': _handle_list,
+    'table': _handle_table,
 }
 
 # --- Основная логика ---

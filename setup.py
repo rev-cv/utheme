@@ -44,13 +44,13 @@ def run_command(command, error_message, check_output=False):
         process.wait()
 
         if process.returncode != 0:
-            print(f"\n❌ ОШИБКА: {error_message}")
+            print(f"\n ОШИБКА: {error_message}")
             sys.exit(1)
             
         return "".join(output) if check_output else None
 
     except Exception as e:
-        print(f"\n❌ ОШИБКА: {e}")
+        print(f"\nОШИБКА: {e}")
         sys.exit(1)
 
 def start_sass_watch():
@@ -58,17 +58,17 @@ def start_sass_watch():
     theme_src_path = Path.cwd() / "utheme" / "src"
     
     if not theme_src_path.exists():
-        print(f"⚠️ Папка {theme_src_path} не найдена. Пропуск запуска SASS.")
+        print(f"Папка {theme_src_path} не найдена. Пропуск запуска SASS.")
         return
 
     sass_cmd = "sass style.scss:style.css --style=compressed --watch --no-source-map"
     
-    print(f"🚀 Запускаю SASS в папке: {theme_src_path}")
+    print(f"Запускаю SASS в папке: {theme_src_path}")
     
     if sys.platform.startswith('win'):
         subprocess.Popen(f'start "SASS Watch" /D "{theme_src_path}" cmd /k "{sass_cmd}"', shell=True)
     else:
-        print(f"⚠️ Запуск в новом окне не поддерживается. Выполните вручную: cd {theme_src_path} && {sass_cmd}")
+        print(f"Запуск в новом окне не поддерживается. Выполните вручную: cd {theme_src_path} && {sass_cmd}")
 
 def start_docker():
     print("\n=== 2/3: Запуск Docker и настройка прав ===")
@@ -135,7 +135,7 @@ def process_temp_credentials():
     json_path = current_path / "uploads" / "temp_wp.json"
     
     if not json_path.exists():
-        print(f"⚠️  Файл {json_path} не найден. Пропуск обновления учетных данных.")
+        print(f"Файл {json_path} не найден. Пропуск обновления учетных данных.")
         return
 
     try:
@@ -149,10 +149,10 @@ def process_temp_credentials():
         app_pass = data.get("app_pass")
 
         if not all([admin_user, admin_pass, admin_email, app_pass]):
-            print("❌ В temp_wp.json отсутствуют необходимые поля. Пропуск.")
+            print("В temp_wp.json отсутствуют необходимые поля. Пропуск.")
             return
         
-        print("✅ Данные из temp_wp.json успешно считаны.")
+        print("Данные из temp_wp.json успешно считаны.")
 
         # 2. Запись app_pass в .env
         env_path = current_path / ".env"
@@ -167,11 +167,11 @@ def process_temp_credentials():
                 )
                 if new_content != content:
                     env_path.write_text(new_content, encoding='utf-8')
-                    print(f"✅ WP_APP_PASSWORD в {env_path.name} обновлен.")
+                    print(f"WP_APP_PASSWORD в {env_path.name} обновлен.")
                 else:
-                    print(f"⚠️ WP_APP_PASSWORD не найден в {env_path.name} для обновления.")
+                    print(f"WP_APP_PASSWORD не найден в {env_path.name} для обновления.")
             except Exception as e:
-                print(f"❌ Ошибка при обновлении {env_path.name}: {e}")
+                print(f"Ошибка при обновлении {env_path.name}: {e}")
 
         # 3. Сохранение доступов в *_access.txt
         access_files = list(current_path.glob("*_access.txt"))
@@ -185,14 +185,14 @@ def process_temp_credentials():
             f.write(f" - login: {admin_user}\n")
             f.write(f" - password: {admin_pass}\n")
             f.write(f" - email: {admin_email}\n")
-        print(f"✅ Доступы CMS GENERATE добавлены в {access_file_path.name}.")
+        print(f"Доступы CMS GENERATE добавлены в {access_file_path.name}.")
 
     except Exception as e:
-        print(f"❌ Непредвиденная ошибка при обработке учетных данных: {e}")
+        print(f"Непредвиденная ошибка при обработке учетных данных: {e}")
     finally:
         # Удаляем файл в любом случае
         os.remove(json_path)
-        print(f"✅ Временный файл {json_path.name} удален.")
+        print(f"Временный файл {json_path.name} удален.")
 
 def run_setup_script():
     print("\n=== 3/3: Настройка сайта (setup_site.sh) ===")
@@ -220,7 +220,7 @@ def run_setup_script():
 
 def main():
     print("=====================================================")
-    print("🚀 Настройка Docker + WordPress")
+    print("Настройка Docker + WordPress")
     print("=====================================================")
 
     start_docker()
@@ -229,7 +229,7 @@ def main():
     start_sass_watch()
 
     print("\n=====================================================")
-    print("✅ УСПЕШНОЕ ЗАВЕРШЕНИЕ!🎉")
+    print("УСПЕШНОЕ ЗАВЕРШЕНИЕ!")
     print("=====================================================")
     
     if sys.platform.startswith('win'):

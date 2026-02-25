@@ -14,12 +14,16 @@ $section-border-dark: sys.scale($section-bg-dark, $lightness: 10%);
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 1.5rem;
-        margin-bottom: clamp(1rem, 3vw, 2rem)
+        margin-bottom: clamp(1rem, 3vw, 2rem);
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
     }
 
     &__card {
         list-style: none;
-        padding: 1.5rem;
+        padding: clamp(.4rem, 3vw, 1.5rem) !important;
         margin: 0 !important;
         border-radius: f.get-radius();
         box-shadow: conf.$shadow-section;

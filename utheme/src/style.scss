@@ -31,8 +31,9 @@
 
 @use "art__section/section.scss";
 @use "art__titles/titles.scss";
-@use "art__toc__01-number/toc.scss" as toc_number;
-@use "art__toc__01-circle/toc.scss" as toc_circle;
+@use "art__toc/toc-number.scss" as toc_number;
+@use "art__toc/toc-circle.scss" as toc_circle;
+@use "art__toc/toc-icon.scss" as toc_icon;
 @use "art__lists/lists.scss";
 @use "art__table/tables.scss";
 @use "art__images/images.scss";
@@ -40,8 +41,8 @@
 @use "art__meta/meta.scss";
 @use "art__description/descr.scss";
 @use "art__breadcrumbs/breadcrumbs.scss";
-// @use "art__details/details.scss";
-@use "art__details-plus/details.scss";
+@use "art__details/details-plus.scss" as details_plus;
+@use "art__details/details-arrow.scss" as details_arrow;
 @use "art__text-grid/text-grid.scss";
 @use "art__code/code.scss";
 
@@ -73,6 +74,9 @@
 @else if conf.$toc-menu =='circle' {
     @include toc_circle.styles;
 }
+@else if conf.$toc-menu =='icon' {
+    @include toc_icon.styles;
+}
 
 // блок стилизация карточек статей
 @if conf.$article-card =='default' {
@@ -96,3 +100,9 @@
     @include footer_central.styles;
 }
 
+@if conf.$details =='plus' {
+    @include details_plus.styles;
+}
+@else if conf.$details =='arrow' {
+    @include details_arrow.styles;
+}

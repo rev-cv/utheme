@@ -1,4 +1,5 @@
 @use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
 article {
 
@@ -38,7 +39,7 @@ article {
 
         border: none;
         border-left: 4px solid conf.$color-warning;
-        border-radius: 3px;
+        border-radius: 3px f.get-radius() f.get-radius() 3px;
         // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
         background-color: rgba(conf.$color-warning, 0.05);
 
@@ -78,7 +79,7 @@ article {
     .info-box {
         border: none;
         border-left: 4px solid conf.$color-info;
-        border-radius: 3px;
+        border-radius: 3px f.get-radius() f.get-radius() 3px;
         // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
         background-color: rgba(conf.$color-info, 0.05);
 
@@ -98,7 +99,7 @@ article {
         // background: linear-gradient(135deg, rgba(conf.$color-success, 0.1) 0%, transparent 100%);
         border: none;
         border-left: 4px solid conf.$color-success;
-        border-radius: 3px;
+        border-radius: 3px f.get-radius() f.get-radius() 3px;
         // background: linear-gradient(135deg, rgba(conf.$color-info, 0.1) 0%, transparent 100%);
         background-color: rgba(conf.$color-success, 0.05);
 
@@ -110,7 +111,7 @@ article {
     .error-box {
         border-left: 4px solid conf.$color-error;
         // background-color: rgba($color-success-light, 0.1);
-        border-radius: var(--radius-sm);
+        border-radius: 3px f.get-radius() f.get-radius() 3px;
         // background: linear-gradient(135deg, rgba(conf.$color-error, 0.15), rgba(conf.$color-bg-dark, 1));
 
         strong {

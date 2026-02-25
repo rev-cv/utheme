@@ -103,8 +103,12 @@ aside {
     }
 
     a {
+        $color-light: sys.mix(conf.$color-accent-light, conf.$color-text-light, 60%);
+        $color-dark: sys.mix(conf.$color-accent-dark, conf.$color-text-dark, 50%);
+        text-decoration: none;;
+
         @include f.mode(( //
-                color: (conf.$color-text-light, conf.$color-text-dark),
+                color: ($color-light, $color-dark),
             ));
         transition: color 300ms ease-in-out;
 
