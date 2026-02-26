@@ -2,9 +2,11 @@
 @use "scheme.fonts.scss";
 @use "funcs.scss";
 
-@use "main-menu_island/main-menu" as island;
-@use "main-menu_new-aside/menu" as aside;
-@use "main-menu-marquee/menu" as marquee;
+@use "main-menu/island.scss" as island;
+@use "main-menu/aside.scss" as aside;
+@use "main-menu/marquee.scss" as marquee;
+@use "main-menu/boring.scss" as boring;
+@use "main-menu/docs.scss" as docs;
 
 @use 'footer-2column/footer.scss' as footer_2columns;
 @use 'footer-central/footer.scss'  as footer_central;
@@ -58,6 +60,12 @@
 }
 @else if conf.$main-menu =='marquee' {
     @include marquee.styles;
+}
+@else if conf.$main-menu =='boring' {
+    @include boring.styles;
+}
+@else if conf.$main-menu =='docs' {
+    @include docs.styles;
 }
 
 // блок стилизация оглавления

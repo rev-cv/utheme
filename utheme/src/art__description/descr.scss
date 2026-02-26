@@ -16,7 +16,7 @@
 
 .head-tag {
     @include f.font-hd;
-    font-size: .8em;
+    font-size: clamp(.5em, 2vw, 1.1em);
     text-align: center;
     @include f.mode(( //
             color: (conf.$color-primary-light, conf.$color-primary-dark),

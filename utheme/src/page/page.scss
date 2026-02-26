@@ -129,6 +129,12 @@ main {
     max-width: var(--max-width);
     border-radius: 0;
 
+    width: 100%;
+
+    article {
+        width: 100%;
+    }
+
     &::before {
         content: '';
         position: fixed;

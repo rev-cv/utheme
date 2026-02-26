@@ -4,15 +4,15 @@
 @use "scheme.fonts.scss" as font;
 
 ////////////////////////////////////////////////////////
-///  ВАЖНО!!! 
-///  
+///  ВАЖНО!!!
+///
 ///  Файл обрабатывается php
 ///      - /utheme/inc/mod-google-font.php
-/// 
+///
 ////////////////////////////////////////////////////////
 
 // тип добавляемого меню на сайте
-$main-menu: "island"; // island, aside, marquee
+$main-menu: "island";  // island, aside, marquee, boring, docs
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
@@ -39,9 +39,9 @@ $active-pair: map.get(font.$font-pairs, $font-vibe);
 // какой радиус использовать для секций, меню, карточек и прочее?
 $radius-vibe: "neutral";
 
-// 
+//
 $density-vibe: 'auto';
-/* 
+/*
 compact
 - маленькие gap, узкие padding, мелкий шрифт, малые скругления
 - Утилитарность, много данных на экране

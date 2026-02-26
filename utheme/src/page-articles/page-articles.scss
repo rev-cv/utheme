@@ -31,13 +31,22 @@ section.article-box {
         text-decoration: none;
         transition: color 300ms ease-in-out;
 
+        @include f.mode(( //
+            color: (conf.$color-text-light, conf.$color-text-dark),
+        ));
+
         &:hover {
-            color: conf.$color-accent-light;
+            @include f.mode(( //
+                color: (conf.$color-accent-light, conf.$color-accent-dark),
+            ));
         }
+        
     }
 
     .current {
-        color: conf.$color-accent-light;
+        @include f.mode(( //
+            color: (conf.$color-accent-light, conf.$color-accent-dark),
+        ));
     }
 }
 

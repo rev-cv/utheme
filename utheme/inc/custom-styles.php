@@ -6,7 +6,7 @@
 */
 function mytheme_scripts()
 {
-    $theme_version = '1.0';
+    $theme_version = '1.1';
     $template_uri = get_template_directory_uri();
 
     $styles = [

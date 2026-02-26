@@ -1,0 +1,285 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// --max-width: 1200px;
+$panel-width: 380px;
+$transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
+
+@mixin styles {
+    /* Базовые стили для нового меню */
+    $panel-width: 280px;
+
+    /* Кнопка переключения меню */
+    .docs-menu-toggle-btn {
+        position: fixed;
+        top: 30px;
+        left: $panel-width + 10px;
+        transform: translateY(-50%);
+        z-index: 1035;
+        border-radius: 50%;
+        border: none;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: left 300ms ease-in-out, transform 300ms ease, background 300ms ease;
+        outline: none;
+        box-shadow: conf.$shadow-section;
+
+        @include f.mode(( //
+            background: (conf.$color-section-light, conf.$color-section-dark),
+            color: (conf.$color-text-light, conf.$color-text-dark),
+        ));
+
+        &:hover {
+            $bg-light: sys.mix(conf.$color-section-light, #000, 95%);
+            $bg-dark: sys.mix(conf.$color-section-dark, #fff, 90%);
+            @include f.mode(( //
+                background: ($bg-light, $bg-dark),
+            ));
+        }
+
+        svg {
+            transition: transform 300ms ease;
+        }
+    }
+
+    body:has(.docs-menu-sidebar.is-closed) .docs-menu-toggle-btn  {
+        left: 10px;
+        svg {
+            transform: rotate(180deg);
+        }
+    }
+
+    .docs-menu-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: $panel-width;
+        z-index: 1040;
+        display: flex;
+        flex-direction: column;
+        transition: transform 300ms ease-in-out, left 300ms ease-in-out;
+
+        @include f.mode(( //
+            background: (conf.$color-section-light, conf.$color-section-dark),
+            color: (conf.$color-text-light, conf.$color-text-dark),
+        ));
+
+        @if conf.$is-border == 'true' {
+            border-right: 1px solid conf.$color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
+        &.is-closed {
+            transform: translateX(-100%);
+        }
+    }
+
+    .docs-menu-header {
+        display: flex;
+        align-items: center;
+        // justify-content: space-between;
+        padding: 5px 1rem;
+        // border-bottom: 1px solid #dee2e6;
+        flex-shrink: 0;
+        gap: 10px;
+
+        .site-logo {
+            max-width: 40px;
+            display: flex;
+            align-items: center;
+
+            a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        .site-name a {
+            @include f.font-logo;
+            text-decoration: none;
+            text-wrap: balance;
+            @include f.mode(( //
+                color: (conf.$color-text-light, conf.$color-text-dark),
+            ));
+            font-size: 14px;
+        }
+    }
+    
+    
+    .docs-menu-content {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    .docs-menu-list {
+        list-style: none;
+        padding: 0.5rem 0;
+        margin: 0;
+
+        .docs-menu-item {
+            display: flex;
+            align-items: start;
+
+            a {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                color: #212529;
+                text-decoration: none;
+                transition: background-color 0.15s ease-in-out;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: wrap;
+
+                $bg-light: sys.mix(conf.$color-section-light, conf.$color-primary-light, 95%);
+                $bg-dark: sys.mix(conf.$color-section-dark, conf.$color-primary-dark, 90%);
+
+                &.active, &:hover {
+                    @include f.mode(( //
+                        background: ($bg-light, $bg-dark),
+                    ));
+                }
+            }
+
+            span {
+                line-height: 1em;
+                font-size: 16px;
+                @include f.mode(( //
+                    color: (conf.$color-text-light, conf.$color-text-dark),
+                ));
+            }
+        }
+
+        .docs-menu-item-img {
+            width: 32px;
+            height: 32px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            align-self: self-start;
+        }
+    }
+
+    
+
+
+
+    /* Стили для мобильных устройств */
+    .docs-menu-toggle {
+        display: none; /* Скрыт по умолчанию, показывается через media query */
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 1050;
+    }
+
+    .docs-menu-close {
+        display: none; /* Скрыт по умолчанию, показывается через media query */
+        font-size: 2rem;
+        font-weight: bold;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: .5;
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+    .docs-menu-close:hover {
+        opacity: .75;
+    }
+
+    .docs-menu-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1030;
+    }
+
+    /* Добавлено для масштабирования самого изображения логотипа */
+    .docs-menu-header .site-logo .custom-logo {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    /* Когда мобильное меню открыто */
+    body.docs-menu-open .docs-menu-overlay {
+        display: block;
+    }
+    
+    body.docs-menu-open {
+        overflow: hidden;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 991.98px) {
+        body {
+            padding-left: 0 !important; /* Сброс для мобильных */
+        }
+        
+        .docs-menu-sidebar {
+            transform: translateX(-100%);
+        }
+        
+        .docs-menu-sidebar.is-active {
+            transform: translateX(0);
+        }
+
+        .docs-menu-toggle,
+        .docs-menu-close {
+            display: block;
+        }
+        
+        /* Скрываем лого и название в основном хедере, чтобы освободить место */
+        #site-header .site-logo,
+        #site-header .site-name {
+            display: none;
+        }
+    }
+
+    @media (min-width: 992px) {
+        /* Освобождаем место для всегда видимой боковой панели */
+        body {
+            padding-left: $panel-width;
+            transition: padding-left 300ms ease-in-out;
+        }
+        
+        /* Скрываем мобильные элементы управления */
+        .docs-menu-toggle,
+        .docs-menu-close {
+            display: none;
+        }
+        
+        /* Адаптируем основной хедер сайта */
+        #site-header {
+            left: $panel-width;
+            width: calc(100% - $panel-width);
+            transition: left 300ms ease-in-out, width 300ms ease-in-out;
+        }
+
+        /* Закрытое состояние меню - сдвигаем контент */
+        body.docs-menu-closed {
+            padding-left: 0;
+        }
+        
+        body.docs-menu-closed #site-header {
+            left: 0;
+            width: 100%;
+        }
+    }
+}

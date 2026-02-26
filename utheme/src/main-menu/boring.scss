@@ -1,0 +1,245 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles { 
+    // Стили для шапки сайта
+    $header-height: 65px;
+    $header-bg-light: rgba(conf.$color-section-light, 0.9);
+    $header-bg-dark: rgba(conf.$color-section-dark, 0.9);
+    $text-color-light: conf.$color-text-light;
+    $text-color-dark: conf.$color-text-dark;
+    $menu-z-index: 1000;
+
+    body.menu-open {
+        overflow: auto !important;
+    }
+
+    body {
+        margin-top: $header-height / 2;
+    }
+
+    #site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: $header-height;
+        z-index: $menu-z-index;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        @include f.mode(( //
+            background: ($header-bg-light, $header-bg-dark),
+        ));
+
+        @if conf.$is-border == 'true' {
+            border-bottom: 1px solid conf.$color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
+        .header-island {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 20px;
+        }
+
+        .site-logo {
+            flex-shrink: 0; // Запрещаем логотипу сжиматься
+
+            img {
+                display: block;
+                height: 40px; // Примерная высота, настройте под себя
+                width: auto;
+                transform: translateY(-2px);
+            }
+        }
+
+        .site-name {
+            margin-left: 15px;
+            font-size: clamp(.7em, 3vw, 1.1em);
+            font-weight: 600;
+            line-height: 1em;
+            text-wrap: balance;
+
+            a {
+                @include f.font-logo;
+                text-decoration: none;
+                @include f.mode(( //
+                    color: ($text-color-light, $text-color-dark),
+                ));
+            }
+        }
+
+        .menu-toggle {
+            margin-left: auto; // << Это свойство прижимает кнопку вправо
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: f.get-radius();
+            transition: background-color 0.2s ease;
+
+            @include f.mode(( //
+                color: ($text-color-light, $text-color-dark),
+            ));
+
+            &:hover {
+                $bg-hover-light: sys.mix($header-bg-light, #000, 90%);
+                $bg-hover-dark: sys.mix($header-bg-dark, #fff, 90%);
+                @include f.mode(( //
+                    background: ($bg-hover-light, $bg-hover-dark),
+                ));
+            }
+        }
+    }
+
+    body:has(.side-panel.is-active) #site-header{
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .side-panel {
+        position: fixed;
+        top: $header-height; // Располагаем сразу под шапкой
+        left: 0;
+        width: 100%;
+        z-index: $menu-z-index - 1; // Ниже шапки, но выше остального контента
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-height: calc(100vh - #{$header-height}); // Ограничиваем высоту
+        overflow-y: auto;
+
+        // По умолчанию меню скрыто
+        visibility: hidden;
+        opacity: 0;
+        transform: translateY(-15px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        @include f.mode(( //
+            background: ($header-bg-light, $header-bg-dark),
+        ));
+
+        // Когда меню активно (класс .is-active добавляется через JS)
+        &.is-active {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        // Заголовок "Related articles" и кнопка закрытия в выпадающем меню не нужны
+        .side-panel-header {
+            display: none;
+        }
+
+        .side-nav {
+            padding: 0;
+
+            .side-menu-list {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                gap: 12px;
+                list-style: none;
+                margin: 0 clamp(0em, 10vw, 8em);
+                padding: 15px;
+
+                @media (max-width: 1200px) {
+                    grid-template-columns: repeat(4, 1fr);
+                }
+
+                @media (max-width: 900px) {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+
+                @media (max-width: 600px) {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .menu-item-card {
+                    aspect-ratio: 1 / 1;
+                    position: relative;
+                    overflow: hidden;
+                    border-radius: f.get-radius();
+
+                    a {
+                        display: block;
+                        width: 100%;
+                        height: 100%;
+                        position: relative;
+                        text-decoration: none;
+                    }
+
+                    .menu-thumb {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        overflow: hidden;
+                        filter: brightness(0.4) blur(3px);
+                        transition: filter 0.4s ease, transform 0.4s ease;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+
+                    .menu-title {
+                        @include f.font-txt;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 90%;
+                        text-align: center;
+                        color: #ffffff;
+                        font-weight: 600;
+                        line-height: 1.3;
+                        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+                        z-index: 1;
+                        pointer-events: none;
+                        font-size: clamp(12px, 3vw, 0.85rem);
+                    }
+
+                    &:hover {
+                        .menu-thumb {
+                            filter: brightness(0.7) blur(0);
+                            transform: scale(1.05);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+    * Оверлей используется для закрытия меню по клику вне его.
+    * В JS он уже настроен. Мы просто делаем его невидимым,
+    * но он по-прежнему будет перехватывать клики.
+    */
+    .menu-overlay {
+        position: fixed;
+        top: $header-height; // Начинается под шапкой
+        left: 0;
+        width: 100%;
+        height: calc(100% - #{$header-height});
+        background: transparent;
+        z-index: $menu-z-index - 2;
+        display: none;
+
+        // JS добавляет класс .menu-open на body, что покажет оверлей
+        body.menu-open & {
+            display: block;
+        }
+    }
+}
