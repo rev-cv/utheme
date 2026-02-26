@@ -40,7 +40,7 @@ aside,
 
         @include f.mode(( //
                 background: (conf.$color-H1-light, conf.$color-H1-dark),
-                text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
+                // text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
             ));
 
         -webkit-background-clip: text;

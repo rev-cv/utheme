@@ -5,7 +5,7 @@
         </div>
 
         <div class="site-name">
-            <a href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>
+            <a href="<?php echo home_url(); ?>"><?php bloginfo("name"); ?></a>
         </div>
 
         <button class="menu-toggle" aria-label="Open Menu">
@@ -23,7 +23,9 @@
 <div class="side-panel">
     <div class="side-panel-header">
         <button class="menu-close" aria-label="Close">&times;</button>
-        <div class="aside-title"><?php echo get_site_translation('related_articles'); ?></div>
+        <div class="aside-title"><?php echo get_site_translation(
+            "related_articles",
+        ); ?></div>
     </div>
 
     <?php wp_nav_menu([
@@ -38,6 +40,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const isBoringMenu = <?php echo json_encode(
+            my_theme_get_config("main-menu", "island") === "boring",
+        ); ?>;
+
         const toggle = document.querySelector('.menu-toggle');
         const close = document.querySelector('.menu-close');
         const overlay = document.querySelector('.menu-overlay');
@@ -62,14 +68,20 @@
 
             setTimeout(() => {
                 body.classList.remove('menu-open');
-                body.style.paddingRight = '';
-                if (header) header.style.marginRight = '';
+                if (!isBoringMenu) {
+                    body.style.paddingRight = '';
+                    if (header) header.style.marginRight = '';
+                }
             }, 400);
         }
 
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
-            openMenu();
+            if (panel.classList.contains('is-active')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         });
 
         close.addEventListener('click', closeMenu);

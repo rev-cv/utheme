@@ -1,0 +1,70 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+/**
+ * .dual-panel
+ * Нейтральный двухколоночный компонент для сравнения или вывода связанной информации.
+ *
+ * Использование в Gutenberg:
+ * 1. Создайте блок "Группа" (Group).
+ * 2. В дополнительных CSS-классах укажите "dual-panel".
+ * 3. Внутрь этой группы добавьте еще два блока "Группа", которые станут левой и правой колонкой.
+ * 4. Наполняйте внутренние группы контентом.
+ */
+.dual-panel {
+    margin: 2rem 0;
+    overflow: hidden;
+    border-radius: f.get-radius();
+
+    // Сетка для колонок.
+    // Учитываем структуру WP: .wp-block-group > .wp-block-group__inner-container > col1 + col2
+    & > .wp-block-group__inner-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px; // Тонкий разделитель, цвет которого задается фоном родителя
+        @include f.mode((
+            background-color: (conf.$color-border-light, conf.$color-border-dark)
+        ));
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    // Общие стили для дочерних групп (колонок)
+    // Это позволяет использовать обычные группы внутри .dual-panel
+    & > .wp-block-group__inner-container > .wp-block-group {
+        padding: conf.$default-space;
+        border: none; // Сбрасываем бордер, который может быть у группы по умолчанию
+        @include f.mode((
+            background: (conf.$color-section-light, conf.$color-section-dark)
+        ));
+
+        // Убираем верхний отступ у первого элемента
+        & > *:first-child {
+            margin-top: 0;
+        }
+
+        // Стилизация списка внутри колонок
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 1em 0 0;
+
+            li {
+                position: relative;
+                padding-left: 1.5em;
+                margin-bottom: 0.5em;
+
+                &::before {
+                    content: "•"; // Нейтральный маркер
+                    position: absolute;
+                    left: 0.5em;
+                    @include f.mode((
+                        color: (conf.$color-primary-light, conf.$color-primary-dark)
+                    ));
+                }
+            }
+        }
+    }
+}
