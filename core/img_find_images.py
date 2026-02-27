@@ -2,16 +2,17 @@ import os, sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 from collections import defaultdict
+from .img_normalize_names import normalize_and_rename_files
 
 def get_detailed_image_data(root_path: Path) -> list:
     results = []
-    
+
     # рекурсивный поиск HTML файлов
     for html_file in root_path.rglob("*.html"):
         try:
             with open(html_file, 'r', encoding='utf-8') as f:
                 soup = BeautifulSoup(f, 'html.parser')
-                
+
                 for img in soup.find_all('img'):
                     src = img.get('src')
                     if not src:
@@ -19,11 +20,11 @@ def get_detailed_image_data(root_path: Path) -> list:
 
                     # базовые данные
                     image_path = Path(src)
-                    
+
                     # извлечение SEO данных из атрибутов
                     alt_text = img.get('alt', '').strip()
                     title_attr = img.get('title', '').strip()
-                    
+
                     # поиск Caption (WP style: <figure><img /><figcaption>Text</figcaption></figure>)
                     caption = ""
                     parent_figure = img.find_parent('figure')
@@ -34,7 +35,7 @@ def get_detailed_image_data(root_path: Path) -> list:
 
                     # сбор дополнительных атрибутов (lazy loading, longdesc и т.д.)
                     description = img.get('longdesc', '').strip()
-                    
+
                     results.append({
                         "name": image_path.stem,
                         "html": html_file,
@@ -46,20 +47,20 @@ def get_detailed_image_data(root_path: Path) -> list:
                         },
                         "filename_full": image_path.name
                     })
-                    
+
         except Exception as e:
             print(f"Ошибка при обработке {html_file}: {e}")
-            
+
     return results
 
 
 def find_and_select_images(folder: Path, pics: list) -> list:
     print('\nВыявление картинок и проверка их наличия на диске.')
-    
+
     # Индекс для всех картинок в проекте для быстрого поиска
     project_images_index = defaultdict(list)
     valid_extensions = {'.avif', '.webp', '.jpg', '.jpeg', '.png', '.gif', '.svg'}
-    
+
     # индекс всех картинок в корневой папке проекта (например, 'spec').
     # это позволяет находить картинки в любой вложенной папке, включая 'spec/IMAGES'.
     if folder and folder.exists():
@@ -67,7 +68,7 @@ def find_and_select_images(folder: Path, pics: list) -> list:
         for file in folder.rglob("*"):
             if file.suffix.lower() in valid_extensions:
                 project_images_index[file.stem].append(file)
- 
+
     # словарь для сбора ненайденных картинок: { html_path: [img_name1, img_name2] }
     missing_report = defaultdict(set)
 
@@ -75,7 +76,7 @@ def find_and_select_images(folder: Path, pics: list) -> list:
         target_name = item['name']
         html_path = Path(item['html'])
         html_dir = html_path.parent
-        
+
         # Ищем все возможные файлы для этой картинки в проиндексированных
         found_paths = project_images_index.get(target_name, [])
 
@@ -109,18 +110,18 @@ def find_and_select_images(folder: Path, pics: list) -> list:
         print("\n" + "!" * 60)
         print("КРИТИЧЕСКАЯ ОШИБКА: Некоторые картинки не найдены на диске!")
         print("!" * 60)
-        
+
         for html_file, missing_imgs in missing_report.items():
             # вывод пути к HTML относительно текущей рабочей директории для краткости
             try:
                 rel_html = html_file.relative_to(Path.cwd())
             except ValueError:
                 rel_html = html_file
-                
+
             print(f"\nФайл: {rel_html}")
             for img in sorted(missing_imgs):
                 print(f"  - {img} (не найдено ни одного расширения)")
-        
+
         print("\n" + "!" * 60)
         print("Скрипт принудительно остановлен. Проверьте наличие ресурсов.")
         print("!" * 60 + "\n")
@@ -134,4 +135,5 @@ def find_and_select_images(folder: Path, pics: list) -> list:
 def get_all_images(folder: Path) -> list:
     pics = get_detailed_image_data(folder)
     pics = find_and_select_images(folder, pics)
+    pics = normalize_and_rename_files(pics)
     return pics

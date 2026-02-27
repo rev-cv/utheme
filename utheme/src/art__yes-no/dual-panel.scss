@@ -68,3 +68,61 @@
         }
     }
 }
+
+/**
+ * .triple-panel
+ * Аналогичный компонент с тремя колонками.
+ */
+.triple-panel {
+    margin: 2rem 0;
+    overflow: hidden;
+    border-radius: f.get-radius();
+
+    // Сетка для колонок.
+    & > .wp-block-group__inner-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        @include f.mode((
+            background-color: (conf.$color-border-light, conf.$color-border-dark)
+        ));
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    // Общие стили для дочерних групп (колонок)
+    & > .wp-block-group__inner-container > .wp-block-group {
+        padding: conf.$default-space;
+        border: none;
+        @include f.mode((
+            background: (conf.$color-section-light, conf.$color-section-dark)
+        ));
+
+        & > *:first-child {
+            margin-top: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 1em 0 0;
+
+            li {
+                position: relative;
+                padding-left: 1.5em;
+                margin-bottom: 0.5em;
+
+                &::before {
+                    content: "•";
+                    position: absolute;
+                    left: 0.5em;
+                    @include f.mode((
+                        color: (conf.$color-primary-light, conf.$color-primary-dark)
+                    ));
+                }
+            }
+        }
+    }
+}

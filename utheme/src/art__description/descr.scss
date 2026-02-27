@@ -6,20 +6,33 @@
     font-size: clamp(.8em, 2vw, 1.2em);
     line-height: 1.1em;
     max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
-    // font-style: italic;
     margin-bottom: 2em;
     text-wrap: balance;
     margin-top: 0 !important;
     font-style: italic;
+
+    @if conf.$is-left-align {
+        text-align: left;
+    }
+    @else {
+        text-align: center;
+        margin: 0 auto;
+    }
 }
 
 .head-tag {
     @include f.font-hd;
+
     font-size: clamp(.5em, 2vw, 1.1em);
-    text-align: center;
+
     @include f.mode(( //
-            color: (conf.$color-primary-light, conf.$color-primary-dark),
-        ));
+        color: (conf.$color-primary-light, conf.$color-primary-dark),
+    ));
+    
+    @if conf.$is-left-align {
+        text-align: left;
+    }
+    @else {
+        text-align: center;
+    }
 }

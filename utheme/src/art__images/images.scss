@@ -32,9 +32,16 @@ article {
             margin: 0;
             opacity: .7;
             font-size: .8em;
-            text-align: center;
             padding-top: .2em;
             text-wrap: balance;
+
+            @if conf.$is-left-align == "true" and conf.$is-img_contain == 'false' {
+                text-align: left;
+                align-self: self-start;
+            }
+            @else {
+                text-align: center;
+            }
         }
     }
 

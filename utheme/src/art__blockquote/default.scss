@@ -1,0 +1,59 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+article {
+    blockquote {
+        position: relative;
+        margin: 2rem 0;
+        padding: conf.$default-space;
+        // Делаем левый отступ чуть больше для визуального веса
+        padding-left: calc(conf.$default-space + 0.5rem);
+        
+        border-left: 4px solid;
+        border-radius: 0 f.get-radius() f.get-radius() 0;
+        
+        @include f.mode((
+            background-color: (rgba(conf.$color-primary-light, 0.06), rgba(conf.$color-primary-dark, 0.1)),
+            border-color: (conf.$color-primary-light, conf.$color-primary-dark),
+            color: (conf.$color-text-light, conf.$color-text-dark)
+        ));
+
+        // Декоративная кавычка на фоне
+        &::after {
+            content: "”";
+            position: absolute;
+            top: -0.15em;
+            right: 0.2em;
+            font-size: 6rem;
+            line-height: 1;
+            font-family: serif; // Используем serif для красивой кавычки
+            opacity: 0.1;
+            pointer-events: none;
+
+            @include f.mode((
+                color: (conf.$color-text-light, conf.$color-text-dark)
+            ));
+        }
+
+        p {
+            margin: 0;
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        // Подпись автора (cite)
+        cite {
+            display: block;
+            margin-top: 1rem;
+            font-size: 0.9em;
+            font-style: normal;
+            font-weight: 600;
+            text-align: right;
+            
+            @include f.mode((
+                color: (conf.$color-accent-light, conf.$color-accent-dark)
+            ));
+        }
+    }
+}

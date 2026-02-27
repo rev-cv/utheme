@@ -7,9 +7,10 @@
 @use "main-menu/marquee.scss" as marquee;
 @use "main-menu/boring.scss" as boring;
 @use "main-menu/docs.scss" as docs;
+@use "main-menu/circle.scss" as circle;
 
-@use 'footer-2column/footer.scss' as footer_2columns;
-@use 'footer-central/footer.scss'  as footer_central;
+@use 'footer/2column.scss' as footer_2columns;
+@use 'footer/central.scss' as footer_central;
 
 @use "page/page.scss";
 @use "scroll-to-top/scroll-to-top.scss";
@@ -41,6 +42,7 @@
 @use "art__code/code.scss";
 @use "art__yes-no/yesno.scss";
 @use "art__yes-no/dual-panel.scss";
+@use "art__blockquote/default.scss";
 
 // @use "header-box/header-box.scss";
 @use "header-section-box/header-box.scss";
@@ -67,6 +69,9 @@
 }
 @else if conf.$main-menu =='docs' {
     @include docs.styles;
+}
+@else if conf.$main-menu =='circle' {
+    @include circle.styles;
 }
 
 // блок стилизация оглавления

@@ -36,12 +36,18 @@ aside,
         @include f.font-hd;
         font-size: clamp(.9rem, 5vw, 3rem);
         text-wrap: balance;
-        text-align: center;
+
+        @if conf.$is-left-align {
+            text-align: left;
+        }
+        @else {
+            text-align: center;
+        }
 
         @include f.mode(( //
-                background: (conf.$color-H1-light, conf.$color-H1-dark),
-                // text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
-            ));
+            background: (conf.$color-H1-light, conf.$color-H1-dark),
+            // text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
+        ));
 
         -webkit-background-clip: text;
         background-clip: text;

@@ -53,13 +53,10 @@ article {
     }
 
     .center-box {
-        border: 3px solid conf.$color-accent-light;
-        background: rgba(conf.$color-accent-light, 0.1);
-        border-radius: conf.$default-radius;
-
-        @media (prefers-color-scheme: dark) {
-            border-color: conf.$color-accent-dark;
-        }
+        border-radius: f.get-radius();
+        @include f.mode(( //
+            background: (conf.$color-section-light, conf.$color-section-dark),
+        ));
 
         >* {
             text-align: center;
@@ -72,7 +69,6 @@ article {
             @media (prefers-color-scheme: dark) {
                 color: conf.$color-accent-dark;
             }
-
         }
     }
 
@@ -91,6 +87,9 @@ article {
         //     border-color: conf.$color-accent-dark;
         //     background-color: rgba(conf.$color-accent-dark, 0.1);
         // }
+        strong {
+            color: conf.$color-info;
+        }
     }
 
     .success-box {

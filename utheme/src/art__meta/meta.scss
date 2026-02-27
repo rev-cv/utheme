@@ -7,8 +7,15 @@ article {
     .article-meta {
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
+        // justify-content: center;
         gap: .25em 1em;
+
+        @if conf.$is-left-align {
+            justify-content: left;
+        }
+        @else {
+            justify-content: center;
+        }
 
         p,
         a,

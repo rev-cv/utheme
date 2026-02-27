@@ -12,7 +12,7 @@
 ////////////////////////////////////////////////////////
 
 // тип добавляемого меню на сайте
-$main-menu: "island";  // island, aside, marquee, boring, docs
+$main-menu: "boring";  // island, aside, marquee, boring, docs, circle
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
@@ -21,19 +21,22 @@ $toc-menu: "icon"; // circle, number, icon
 $is-not-section: "true"; // true, false
 
 // стилизация блока details
-$details: "arrow"; // arrow, plus
+$details: "plus"; // arrow, plus
 
 // тип используемой на сайте карточки статей
 $article-card: "slide"; // default, frame, slide, windows
 
 // картинки вписываются или занимают всю ширину страницы?
-$is-img_contain: "false"; // true, false
+$is-img_contain: "true"; // true, false
+
+// выравнивание элементо по левому краю ? Иначе - центральное выравнивание
+$is-left-align: "true"; // true, false
 
 // в блоках секций, карточек, меню, футера использовать бордер?
 $is-border: "false"; // true, false
 
 // какую шрифтовую пару выбрать для сайта?
-$font-vibe: 'engineer';
+$font-vibe: 'vogue';
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
 // какой радиус использовать для секций, меню, карточек и прочее?

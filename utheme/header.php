@@ -17,6 +17,8 @@
             get_template_part('components/main-menu-marquee');
         } elseif ($menu_type === 'docs') {
             get_template_part('components/main-menu-docs');
+        } elseif ($menu_type === 'circle') {
+            get_template_part('components/main-menu-circle');
         }else {
             get_template_part('components/main-menu-island');
         }
