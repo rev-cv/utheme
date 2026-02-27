@@ -14,7 +14,7 @@
                     </a>
                 </li>
                 <li class="is-right">
-                    <a href="<?php echo esc_url(get_permalink(get_option('page_for_posts'))); ?>" aria-label="Все статьи">
+                    <a href="<?php echo home_url('/articles/'); ?>" aria-label="Все статьи">
                         <svg fill="currentColor" width="800px" height="800px" viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg"><path d="M22.406 15.477A4.587 4.587 0 0 1 24 18.955c0 2.531-2.053 4.59-4.577 4.59H1.113a1.113 1.113 0 0 1 0-2.226h18.31a2.36 2.36 0 0 0 2.35-2.364 2.36 2.36 0 0 0-2.35-2.364H1.113a1.113 1.113 0 0 1 0-2.227h18.31A2.36 2.36 0 0 0 21.773 12a2.36 2.36 0 0 0-2.35-2.364H1.113a1.113 1.113 0 1 1 0-2.227h18.31c1.296 0 2.35-1.06 2.35-2.364s-1.054-2.364-2.35-2.364a1.113 1.113 0 0 1 0-2.227C21.947.454 24 2.514 24 5.045c0 1.389-.62 2.635-1.594 3.477A4.587 4.587 0 0 1 24 12c0 1.389-.62 2.635-1.594 3.477z"/></svg>
                     </a>
                 </li>
@@ -59,31 +59,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('circle-menu-container');
     const items = container.querySelectorAll('.circle-menu-list > li');
     const overlay = document.querySelector('.circle-menu-overlay');
-    
+    const mainCircle = container.querySelector('.main-circle');
+    const homeUrl = <?php echo json_encode(home_url('/')); ?>;
+
     // Configuration
     const radius = 80; // Distance from the center
-    
+
     items.forEach(item => {
         const isLeft = item.classList.contains('is-left');
         const angleDeg = isLeft ? 180 : 0;
         const angleRad = angleDeg * (Math.PI / 180);
-        
+
         const x = radius * Math.cos(angleRad);
         const y = radius * Math.sin(angleRad);
-        
+
         item.style.setProperty('--item-x', `${x}px`);
         item.style.setProperty('--item-y', `${y}px`);
     });
 
-    // Mobile / Click interaction
+    // --- Interaction Logic ---
+    let longPressTimer;
+    const longPressDuration = 400; // ms
+
     const toggleMenu = () => {
         container.classList.toggle('is-active');
         if (overlay) overlay.classList.toggle('is-active');
     };
 
-    container.querySelector('.main-circle').addEventListener('click', () => {
-        window.location.href = <?php echo json_encode(home_url('/')); ?>;
+    const goToHome = () => {
+        window.location.href = homeUrl;
+    };
+
+    mainCircle.addEventListener('pointerdown', (e) => {
+        // For touch devices, start a timer to detect a long press.
+        if (e.pointerType === 'touch') {
+            // Set a timer that will navigate to home if the user holds their finger down.
+            longPressTimer = setTimeout(() => {
+                longPressTimer = null; // Invalidate the timer to indicate the action has been taken.
+                goToHome();
+            }, longPressDuration);
+        }
     });
+
+    mainCircle.addEventListener('pointerup', (e) => {
+        if (e.pointerType === 'mouse') {
+            // A 'pointerup' from a mouse is a click. Navigate to home.
+            goToHome();
+        } else if (e.pointerType === 'touch') {
+            // If the long press timer is still active, it means it was a short tap.
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                toggleMenu();
+            }
+            // If the timer is null, the long press action already fired, so do nothing.
+        }
+    });
+
+    mainCircle.addEventListener('pointerleave', (e) => {
+        // If the finger/cursor leaves the button area, cancel the long press timer.
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+        }
+    });
+
     if (overlay) overlay.addEventListener('click', toggleMenu);
 });
 </script>

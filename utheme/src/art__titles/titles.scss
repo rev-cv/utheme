@@ -37,7 +37,7 @@ aside,
         font-size: clamp(.9rem, 5vw, 3rem);
         text-wrap: balance;
 
-        @if conf.$is-left-align {
+        @if conf.$is-left-align == 'true' {
             text-align: left;
         }
         @else {

@@ -5,13 +5,13 @@
     @include f.font-txt;
     font-size: clamp(.8em, 2vw, 1.2em);
     line-height: 1.1em;
-    max-width: 600px;
-    margin-bottom: 2em;
+    max-width: 700px;
+    margin-bottom: 2em !important;
     text-wrap: balance;
     margin-top: 0 !important;
     font-style: italic;
 
-    @if conf.$is-left-align {
+    @if conf.$is-left-align == 'true' {
         text-align: left;
     }
     @else {
@@ -29,7 +29,7 @@
         color: (conf.$color-primary-light, conf.$color-primary-dark),
     ));
     
-    @if conf.$is-left-align {
+    @if conf.$is-left-align == 'true' {
         text-align: left;
     }
     @else {

@@ -10,7 +10,7 @@ article {
         // justify-content: center;
         gap: .25em 1em;
 
-        @if conf.$is-left-align {
+        @if conf.$is-left-align == 'true' {
             justify-content: left;
         }
         @else {

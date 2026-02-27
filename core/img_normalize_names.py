@@ -22,9 +22,7 @@ def normalize_and_rename_files(pics: list) -> list:
             unique_seed = f"{original_name}_{html_path}_{occurrence_tracker[original_name]}"
             hash_suffix = hashlib.md5(unique_seed.encode()).hexdigest()[:8]
             new_name = f"{original_name}-{hash_suffix}"
-            item['normalized_name'] = new_name
         else:
-            item['normalized_name'] = None
             new_name = original_name
         
         plan[html_path].append({
@@ -70,6 +68,9 @@ def normalize_and_rename_files(pics: list) -> list:
                         c['pic_path'].rename(new_file_path)
                         # Обновляем путь в исходном объекте
                         c['item_ref']["selected_image"] = new_file_path
+
+                # Обновляем имя в исходном объекте, чтобы оно было уникальным для последующих шагов
+                c['item_ref']['name'] = c['new']
 
             # затем обнавляяются ссылки внутри HTML
             with open(html_path, 'r', encoding='utf-8') as f:
