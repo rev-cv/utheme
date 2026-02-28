@@ -68,7 +68,7 @@
                 font-weight: 700;
                 color: conf.$color-text-light;
                 
-                background: linear-gradient(to top, conf.$color-section-light 85%, transparent);
+                background: linear-gradient(to top, rgba(conf.$color-section-light, 85%) 85%, transparent);
 
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
@@ -79,14 +79,14 @@
 
                 @media (prefers-color-scheme: dark) {
                     color: conf.$color-text-dark;
-                    background: linear-gradient(to top, conf.$color-section-dark 85%, transparent);
+                    background: linear-gradient(to top, rgba(conf.$color-section-dark, 85%) 85%, transparent);
                 }
             }
 
             p {
                 margin: 0;
                 padding: 1.25rem;
-                background: conf.$color-section-light;
+                background: rgba(conf.$color-section-light, 85%);
                 font-size: 0.9rem;
                 line-height: 1.5;
                 color: rgba(conf.$color-text-light, 0.8);
@@ -103,7 +103,7 @@
                 max-height: 6.75rem;
 
                 @media (prefers-color-scheme: dark) {
-                    background: conf.$color-section-dark;
+                    background: rgba(conf.$color-section-dark, 85%);
                     color: rgba(conf.$color-text-dark, 0.8);
                 }
             }
