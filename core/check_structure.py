@@ -175,7 +175,7 @@ def bulk_rename(directory):
                 print(f"{file_path.parent.name}/{current_name} -> {target_name}")
                 renamed_count += 1
             except OSError as e:
-                print(f"❌ Ошибка при переименовании {file_path}: {e}")
+                print(f"Ошибка при переименовании {file_path}: {e}")
 
     print(f"Готово. Переименовано файлов: {renamed_count}")
     print('\n' + '='*50)
@@ -226,10 +226,49 @@ def bulk_rename_folders(directory):
             
             try:
                 folder_path.rename(target_path)
-                print(f"📂 {folder_path.parent.name}/{current_name} -> {target_name}")
+                print(f"{folder_path.parent.name}/{current_name} -> {target_name}")
                 renamed_count += 1
             except OSError as e:
-                print(f"❌ Ошибка при переименовании папки {folder_path}: {e}")
+                print(f"Ошибка при переименовании папки {folder_path}: {e}")
 
     print(f"Готово. Переименовано папок: {renamed_count}")
     print('\n' + '='*50)
+
+
+
+def clean_html_spacing(file_path: Path):
+    """Удаляет пробелы перед двоеточием в файле. Возвращает True, если были внесены изменения."""
+    try:
+        content = file_path.read_text(encoding='utf-8')
+        
+        # Регулярка: 
+        # \s+ — один или более пробельных символов (обычные, табы, неразрывные)
+        # (?=:) — lookahead, проверяет, что далее идет двоеточие, не включая его в замену
+        cleaned_content = re.sub(r'\s+(?=:)', '', content)
+        
+        if content != cleaned_content:
+            file_path.write_text(cleaned_content, encoding='utf-8')
+            return True
+    except Exception as e:
+        print(f"    Ошибка при обработке {file_path}: {e}")
+    return False
+
+def normalize_all_html_in_directory(directory: Path):
+    """
+    Рекурсивно ищет все .html файлы и применяет к ним `clean_html_spacing`.
+    """
+    root_path = Path(directory)
+    print(f"\nЗапуск нормализации HTML файлов в: {root_path}")
+
+    if not root_path.exists():
+        print(f"    Папка не найдена: {root_path}")
+        return
+
+    cleaned_count = 0
+    for file_path in root_path.rglob('*.html'):
+        if clean_html_spacing(file_path):
+            cleaned_count += 1
+
+    if cleaned_count > 0:
+        print(f"Готово. Нормализовано файлов: {cleaned_count}")
+        print('\n' + '='*50)

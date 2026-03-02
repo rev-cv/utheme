@@ -33,15 +33,14 @@
 @use "art__table/tables.scss";
 @use "art__images/images.scss";
 @use "art__box/box.scss";
+@use "art__card/card-grid.scss";
+@use "art__card/table-grid.scss";
+@use "art__card/yesno.scss";
 @use "art__meta/meta.scss";
 @use "art__description/descr.scss";
 @use "art__breadcrumbs/breadcrumbs.scss";
 @use "art__details/details-plus.scss" as details_plus;
 @use "art__details/details-arrow.scss" as details_arrow;
-@use "art__text-grid/text-grid.scss";
-@use "art__code/code.scss";
-@use "art__yes-no/yesno.scss";
-@use "art__yes-no/dual-panel.scss";
 @use "art__blockquote/default.scss";
 
 // @use "header-box/header-box.scss";

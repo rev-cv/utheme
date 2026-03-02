@@ -328,6 +328,16 @@ def publish_wp_pages(articles_list: list[dict]):
                 if img_tag:
                     img_tag['src'] = wp_image_data['url']
                     del fig['id']
+
+                    # Добавляем <figcaption> если он есть в данных
+                    caption_text = wp_image_data.get('seo', {}).get('caption', '')
+                    if caption_text:
+                        # Удаляем старый figcaption если он вдруг есть, и создаем новый
+                        if fig.figcaption:
+                            fig.figcaption.decompose()
+                        new_caption = soup.new_tag("figcaption", attrs={"class": "wp-element-caption"})
+                        new_caption.string = caption_text
+                        fig.append(new_caption)
                     
                     if featured_media_id is None:
                         featured_media_id = wp_image_data.get('original')
@@ -348,7 +358,9 @@ def publish_wp_pages(articles_list: list[dict]):
 
         # если это НЕ Utility Page - обновление slug на основе H1
         if not is_utility_page and article_h1:
-            new_slug = gslug.generate_slug(article_h1)
+            # new_slug = gslug.generate_slug(article_h1)
+            # new_slug = gslug.generate_universal_slug(article_h1)
+            new_slug = gslug.advanced_slugify(article_h1)
             update_payload['slug'] = new_slug
             # print(f"    Сгенерирован slug: {new_slug}")
 

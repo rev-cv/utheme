@@ -1,0 +1,63 @@
+@use "../conf" as conf;
+@use "../funcs" as f;
+
+.table-grid {
+    margin-block: 2.5rem;
+
+    & > .wp-block-group__inner-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1px;
+        
+        border-radius: f.get-radius();
+        overflow: hidden;
+
+        @include f.mode((
+            background-color: (conf.$color-border-light, conf.$color-border-dark),
+            
+        ));
+
+        @if conf.$is-border == 'true' {
+            @include f.mode((
+                border: (1px solid conf.$color-border-light, 1px solid conf.$color-border-dark),
+            ));
+        }
+    }
+}
+
+.table-grid-item {
+    flex: 1 1 12rem;
+    padding: clamp(1rem, 1.5vw, 1.5rem);
+    // Ячейки имеют цвет фона страницы, перекрывая фон контейнера
+    @include f.mode((
+        background-color: (conf.$color-bg-light, conf.$color-section-dark),
+    ));
+
+    p {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // Заголовок внутри ячейки
+    & > * > p:first-child strong,
+    & > p:first-child strong { 
+        @include f.font-hd;
+        display: block;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        
+        @include f.mode((
+            color: (conf.$color-accent-light, conf.$color-accent-dark),
+        ));
+    }
+
+    &:last-of-type {
+        grid-column-end: -1;
+    }
+}

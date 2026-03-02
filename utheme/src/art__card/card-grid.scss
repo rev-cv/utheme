@@ -1,0 +1,66 @@
+@use "../conf" as conf;
+@use "../funcs" as f;
+
+.card-grid {
+    margin-block: 2.5rem;
+
+    & > .wp-block-group__inner-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: clamp(0.3rem, 1.5vw, 1rem);
+    }
+}
+
+.card-grid-item {
+    border-radius: f.get-radius();
+    padding: clamp(1rem, 2vw, 1.75rem);
+    height: 100%; 
+    user-select: none;
+   
+    @include f.mode((
+        background-color: (conf.$color-section-light, conf.$color-section-dark),
+    ));
+
+    @if conf.$is-border == 'true' {
+        border: 1px solid conf.$color-border-light;
+        @media (prefers-color-scheme: dark) {
+            border-color: conf.$color-border-dark;
+        }
+    }
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: conf.$shadow-section-hover;
+        // @include f.mode((
+        //     box-shadow: (0 12px 24px rgba(0,0,0,0.06), 0 12px 24px rgba(0,0,0,0.3)),
+        // ));
+    }
+
+    // Типографика внутри карточки
+    p {
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        line-height: 1.6;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // Стилизация "Заголовка" (первый strong в первом параграфе)
+    // Используем селектор, который сработает даже через inner-container
+    & > * > p:first-child strong,
+    & > p:first-child strong { 
+        @include f.font-hd;
+        display: block;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        
+        @include f.mode((
+            color: (conf.$color-accent-light, conf.$color-accent-dark),
+        ));
+    }
+}

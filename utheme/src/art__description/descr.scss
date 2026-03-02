@@ -1,7 +1,25 @@
 @use "../funcs.scss" as f;
 @use "../conf.scss" as conf;
 
-.head-desc {
+
+.hero-label {
+    @include f.font-hd;
+
+    font-size: clamp(.5em, 2vw, 1.1em);
+
+    @include f.mode(( //
+        color: (conf.$color-primary-light, conf.$color-primary-dark),
+    ));
+    
+    @if conf.$is-left-align == 'true' {
+        text-align: left;
+    }
+    @else {
+        text-align: center;
+    }
+}
+
+.hero-subtitle {
     @include f.font-txt;
     font-size: clamp(.8em, 2vw, 1.2em);
     line-height: 1.1em;
@@ -20,19 +38,4 @@
     }
 }
 
-.head-tag {
-    @include f.font-hd;
 
-    font-size: clamp(.5em, 2vw, 1.1em);
-
-    @include f.mode(( //
-        color: (conf.$color-primary-light, conf.$color-primary-dark),
-    ));
-    
-    @if conf.$is-left-align == 'true' {
-        text-align: left;
-    }
-    @else {
-        text-align: center;
-    }
-}

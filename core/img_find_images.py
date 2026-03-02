@@ -27,11 +27,17 @@ def get_detailed_image_data(root_path: Path) -> list:
 
                     # поиск Caption (WP style: <figure><img /><figcaption>Text</figcaption></figure>)
                     caption = ""
-                    parent_figure = img.find_parent('figure')
+                    parent_figure = img.find_parent('figure') # ищем родительский figure
                     if parent_figure:
-                        figcaption = parent_figure.find('figcaption')
-                        if figcaption:
-                            caption = figcaption.get_text(strip=True)
+                        # Сначала ищем figcaption внутри figure
+                        figcaption_tag = parent_figure.find('figcaption')
+                        if figcaption_tag:
+                            caption = figcaption_tag.get_text(strip=True)
+                        else:
+                            # Если не нашли, ищем как следующий элемент после figure (для нестандартной верстки)
+                            next_sibling = parent_figure.find_next_sibling()
+                            if next_sibling and (next_sibling.name == 'figcaption' or 'wp-caption-text' in next_sibling.get('class', [])):
+                                caption = next_sibling.get_text(strip=True)
 
                     # сбор дополнительных атрибутов (lazy loading, longdesc и т.д.)
                     description = img.get('longdesc', '').strip()

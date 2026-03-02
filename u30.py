@@ -23,6 +23,7 @@ from core import wp_api
 from core import check_structure
 from core import enrich_with_schedule as schedule
 from core import assign_category_to_articles as cat
+from core import check_links
 
 SPEC_DIR = Path(__file__).parent / "spec"
 
@@ -38,6 +39,11 @@ if __name__ == "__main__":
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
 
+    # попытка исправить структуру проекта перед проверкой целостности
+    check_structure.bulk_rename_folders(SPEC_DIR)
+    check_structure.bulk_rename(SPEC_DIR)
+    check_structure.normalize_all_html_in_directory(SPEC_DIR)
+
     # ПРОВЕРКА ЦЕЛОСТНОСТИ СТРУКТУРЫ ПРОЕКТА НЕОБХОДИМОГО ДЛЯ ВЫПОЛНЕНИЯ СКРИПТА
     check_structure.check_structure_flexible(SPEC_DIR.parent, required_folders)
 
@@ -52,6 +58,9 @@ if __name__ == "__main__":
 
     # КОНВЕРТАЦИЯ HTML в WP-BLOCKS
     pages = conv.conversion_init(pages)
+
+    # ПРОВЕРКА НА БИТЫЕ ССЫЛКИ
+    check_links.check_links_in_articles(pages)
 
     # ПРИСВОЕНИЕ ДАТЫ ПУБЛИКАЦИИ НА ОСНОВАНИИ АЛГОРИТМА
     pages = schedule.enrich_with_schedule(pages, os.getenv("SCHEDULE_PATTERN", "3d 2-3p (10-21)"))

@@ -16,6 +16,10 @@ def _handle_heading(tag):
 def _handle_paragraph(tag):
     """Обработка параграфов (p)."""
     content = tag.decode_contents()
+    classes = tag.get('class', [])
+    if 'hero-subtitle' in classes:
+        return f'<!-- wp:paragraph {{"className":"hero-subtitle"}} -->\n<p class="hero-subtitle">{content}</p>\n<!-- /wp:paragraph -->'
+
     return f'<!-- wp:paragraph -->\n<p>{content}</p>\n<!-- /wp:paragraph -->'
 
 def _handle_image(tag):
@@ -68,11 +72,151 @@ def _handle_details(tag):
     
     return f'<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_blocks_content}</details>\n<!-- /wp:details -->'
 
+def _handle_div(tag):
+    if 'info-box' in tag.get('class', []) or 'fun-fact' in tag.get('class', []):
+        """Обработка .info-box."""
+        inner_blocks = []
+        for child in tag.children:
+            if isinstance(child, NavigableString) and not child.strip():
+                continue
+
+            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                handler = BLOCK_HANDLERS[child.name]
+                inner_blocks.append(handler(child))
+        
+        inner_content = '\n'.join(inner_blocks)
+        return f'<!-- wp:group {{"tagName":"section","className":"info-box","layout":{{"type":"constrained"}}}} -->\n<section class="wp-block-group info-box"><div class="wp-block-group__inner-container">{inner_content}</div></section>\n<!-- /wp:group -->'
+
+    elif "callout" in tag.get('class', []):
+        """Обработка .error-box."""
+        inner_blocks = []
+        for child in tag.children:
+            if isinstance(child, NavigableString) and not child.strip():
+                continue
+
+            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                handler = BLOCK_HANDLERS[child.name]
+                inner_blocks.append(handler(child))
+        
+        inner_content = '\n'.join(inner_blocks)
+        return f'<!-- wp:group {{"tagName":"section","className":"error-box","layout":{{"type":"constrained"}}}} -->\n<section class="wp-block-group error-box"><div class="wp-block-group__inner-container">{inner_content}</div></section>\n<!-- /wp:group -->'
+
+    elif 'card-grid' in tag.get('class', []):
+        """Обработка карточки внутри grid"""
+        grid_items = []
+        for card_div in tag.find_all('div', recursive=False):
+            card_blocks = []
+            for child in card_div.children:
+                if isinstance(child, NavigableString) and not child.strip():
+                    continue
+
+                if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                    handler = BLOCK_HANDLERS[child.name]
+                    card_blocks.append(handler(child))
+            
+            if card_blocks:
+                card_content = '\n'.join(card_blocks)
+                item_block = f'<!-- wp:group {{"className":"card-grid-item","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group card-grid-item">{card_content}</div>\n<!-- /wp:group -->'
+                grid_items.append(item_block)
+
+        inner_content = '\n'.join(grid_items)
+        
+        # Используем нативный Grid (type: grid) с минимальной шириной колонки для адаптивности
+        return f'<!-- wp:group {{"className":"card-grid","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group card-grid"><div class="wp-block-group__inner-container">{inner_content}</div></div>\n<!-- /wp:group -->'
+    
+    elif any(cls in tag.get('class', []) for cls in ['at-a-glance',]):
+        """Обработка карточек табличного вида"""
+        grid_items = []
+        for card_div in tag.find_all('div', recursive=False):
+            card_blocks = []
+            for child in card_div.children:
+                if isinstance(child, NavigableString) and not child.strip():
+                    continue
+
+                if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                    handler = BLOCK_HANDLERS[child.name]
+                    card_blocks.append(handler(child))
+            
+            if card_blocks:
+                card_content = '\n'.join(card_blocks)
+                item_block = f'<!-- wp:group {{"className":"table-grid-item","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group table-grid-item">{card_content}</div>\n<!-- /wp:group -->'
+                grid_items.append(item_block)
+
+        inner_content = '\n'.join(grid_items)
+        
+        # Используем 12rem (~192px), чтобы 5 карточек могли поместиться в ряд на широком экране (5*192 = 960px)
+        return f'<!-- wp:group {{"className":"table-grid","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group table-grid"><div class="wp-block-group__inner-container">{inner_content}</div></div>\n<!-- /wp:group -->'
+    
+    elif any(cls in tag.get('class', []) for cls in ['dos-donts',]):
+        """Обработка блоков yes/no"""
+        columns = tag.find_all('div', recursive=False)
+        if len(columns) != 2:
+            return ""
+
+        # Column 1 (YES)
+        yes_col = columns[0]
+        yes_blocks = []
+        for child in yes_col.children:
+            if isinstance(child, NavigableString) and not child.strip():
+                continue
+            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                handler = BLOCK_HANDLERS[child.name]
+                yes_blocks.append(handler(child))
+        
+        yes_content = '\n'.join(yes_blocks)
+        yes_block = f'<!-- wp:group {{"className":"yesno-box__yes","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group yesno-box__yes"><div class="wp-block-group__inner-container">{yes_content}</div></div>\n<!-- /wp:group -->'
+
+        # Column 2 (NO)
+        no_col = columns[1]
+        no_blocks = []
+        for child in no_col.children:
+            if isinstance(child, NavigableString) and not child.strip():
+                continue
+            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                handler = BLOCK_HANDLERS[child.name]
+                no_blocks.append(handler(child))
+
+        no_content = '\n'.join(no_blocks)
+        no_block = f'<!-- wp:group {{"className":"yesno-box__no","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group yesno-box__no"><div class="wp-block-group__inner-container">{no_content}</div></div>\n<!-- /wp:group -->'
+
+        # Main container
+        inner_content = f'{yes_block}\n{no_block}'
+        return f'<!-- wp:group {{"className":"yesno-box","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group yesno-box"><div class="wp-block-group__inner-container">{inner_content}</div></div>\n<!-- /wp:group -->'
+
+    elif any(cls in tag.get('class', []) for cls in ['odds-example', 'key-takeaways']):
+        """Обработка простых секционных div'ов (odds-example, key-takeaways)."""
+        tag_classes = tag.get('class', [])
+        # Находим первый совпавший класс, чтобы использовать его в выводе
+        section_classes = ['odds-example', 'key-takeaways']
+        matched_class = next(cls for cls in section_classes if cls in tag_classes)
+
+        inner_blocks = []
+        for child in tag.children:
+            if isinstance(child, NavigableString) and not child.strip():
+                continue
+
+            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                handler = BLOCK_HANDLERS[child.name]
+                inner_blocks.append(handler(child))
+        
+        inner_content = '\n'.join(inner_blocks)
+        return f'<!-- wp:group {{"tagName":"section","className":"{matched_class}","layout":{{"type":"constrained"}}}} -->\n<section class="wp-block-group {matched_class}"><div class="wp-block-group__inner-container">{inner_content}</div></section>\n<!-- /wp:group -->'
+
+    return ""
+
+def _handle_span(tag):
+    """Обработка span (превращение в p для hero-label)."""
+    classes = tag.get('class', [])
+    if 'hero-label' in classes:
+        content = tag.decode_contents()
+        return f'<!-- wp:paragraph {{"className":"hero-label"}} -->\n<p class="hero-label">{content}</p>\n<!-- /wp:paragraph -->'
+    return ""
+
 BLOCK_HANDLERS = {
     'h1': _handle_heading, 'h2': _handle_heading, 'h3': _handle_heading,
     'h4': _handle_heading, 'h5': _handle_heading, 'h6': _handle_heading,
     'p': _handle_paragraph, 'img': _handle_image, 'ul': _handle_list, 'ol': _handle_list,
-    'table': _handle_table, 'details': _handle_details,
+    'table': _handle_table, 'details': _handle_details, 'div': _handle_div, 'span': _handle_span,
 }
 
 # --- Основная логика ---
@@ -85,9 +229,28 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
     if not container:
         return ""
 
-    # Предварительно распаковываем структурные теги (div, section и т.д.),
-    # чтобы их содержимое стало прямыми потомками container
+    
+    # все DIV распаковываются и удаляются за исключением тех, что в этом списке
+    forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance', 'dos-donts', 'odds-example', 'key-takeaways']
+
     for tag in container.find_all(['div', 'section', 'main', 'figure']):
+        if tag.name == 'div' and any(cls in tag.get('class', []) for cls in forbidden_div):
+            continue
+        
+        # не находится ли тег внутри защищенного блока (например, div внутри card-grid) ?
+        is_protected = False
+        for parent in tag.parents:
+            if parent.name == 'div' and any(cls in parent.get('class', []) for cls in forbidden_div):
+                is_protected = True
+                break
+            if parent is container:
+                break
+        
+        if is_protected:
+            continue
+
+        # распаковывка структурных тегов (div, section и т.д.),
+        # чтобы их содержимое стало прямыми потомками container
         tag.unwrap()
 
     blocks = []

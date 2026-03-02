@@ -3,10 +3,12 @@ from datetime import datetime, timedelta
 
 def enrich_with_schedule(articles, rule_str):
     # парсинг правила
-    m = re.search(r"(\d+)d\s+(\d+(?:-\d+)?)p(?:\s+\((\d+)-(\d+)\))?", rule_str)
+    m = re.search(r"(\d+(?:-\d+)?)d\s+(\d+(?:-\d+)?)p(?:\s+\((\d+)-(\d+)\))?", rule_str)
     if not m: return articles
 
-    days_step = int(m.group(1)) + 1
+    d_range = [int(x) for x in m.group(1).split('-')]
+    min_d, max_d = d_range[0], d_range[-1]
+
     p_range = [int(x) for x in m.group(2).split('-')]
     min_p, max_p = p_range[0], p_range[-1]
     h_start, h_end = int(m.group(3) or 9), int(m.group(4) or 21)
@@ -27,6 +29,8 @@ def enrich_with_schedule(articles, rule_str):
                     dt = current_day + timedelta(minutes=minutes)
                     if dt > datetime.now(): # Только будущее время
                         temp_queue.append(dt)
+            
+            days_step = random.randint(min_d, max_d) + 1
             current_day += timedelta(days=days_step)
 
         # Берем первое время из очереди и "обогащаем" объект

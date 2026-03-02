@@ -20,6 +20,7 @@ from core import img_find_images
 from core import link_images_to_articles as linking
 from core import wp_api
 from core import check_structure
+from core import check_links
 
 SPEC_DIR = Path(__file__).parent / "spec"
 
@@ -75,10 +76,10 @@ required_folders = [
     SPEC_DIR / "ADD PAGES" / "cookie-policy.html",
     SPEC_DIR / "logo.png",
     SPEC_DIR / "CLUSTERS MAIN",
-    SPEC_DIR / "CLUSTERS MAIN" / "CL1", 
-    SPEC_DIR / "CLUSTERS MAIN" / "CL2", 
-    SPEC_DIR / "CLUSTERS MAIN" / "CL3", 
-    SPEC_DIR / "CLUSTERS MAIN" / "CL4", 
+    SPEC_DIR / "CLUSTERS MAIN" / "CL1",
+    SPEC_DIR / "CLUSTERS MAIN" / "CL2",
+    SPEC_DIR / "CLUSTERS MAIN" / "CL3",
+    SPEC_DIR / "CLUSTERS MAIN" / "CL4",
     SPEC_DIR / "CLUSTERS MAIN" / "CL5",
 ]
 
@@ -92,6 +93,7 @@ if __name__ == "__main__":
     # попытка исправить структуру проекта перед проверкой целостности
     check_structure.bulk_rename_folders(SPEC_DIR)
     check_structure.bulk_rename(SPEC_DIR)
+    check_structure.normalize_all_html_in_directory(SPEC_DIR)
 
     # ПРОВЕРКА ЦЕЛОСТНОСТИ СТРУКТУРЫ ПРОЕКТА НЕОБХОДИМОГО ДЛЯ ВЫПОЛНЕНИЯ СКРИПТА
     check_structure.check_structure_flexible(SPEC_DIR.parent, required_folders)
@@ -108,6 +110,9 @@ if __name__ == "__main__":
     # КОНВЕРТАЦИЯ HTML в WP-BLOCKS
     pages = conv.conversion_init(pages)
 
+    # ПРОВЕРКА НА БИТЫЕ ССЫЛКИ
+    check_links.check_links_in_articles(pages)
+
     # ЛИНКОВА КАРТИНОК СО СТАТЬЯМИ
     pages = linking.link_images_to_articles(pages, pics)
 
@@ -116,6 +121,6 @@ if __name__ == "__main__":
 
     # ПУБЛИКАЦИЯ СТАТЬИ НА WP
     pages = wp_api.publish_wp_pages(pages)
-    
+
     # УСТАНАВКА ФАВИКОНА И ЛОГО САЙТА
     wp_api.upload_and_set_logo(30)
