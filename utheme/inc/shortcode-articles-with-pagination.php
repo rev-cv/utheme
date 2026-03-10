@@ -45,6 +45,15 @@ function custom_articles_shortcode()
             elseif ($card_type === 'windows') {
                 get_template_part('components/card', 'article-windows', ['read_more_text' => $TEXT_READING]);
             }
+            elseif ($card_type === 'float') {
+                get_template_part('components/card', 'article-float');
+            }
+            elseif ($card_type === 'soft') {
+                get_template_part('components/card', 'article-soft');
+            }
+            elseif ($card_type === 'split') {
+                get_template_part('components/card', 'article-split');
+            }
 
             $output .= ob_get_clean();
         endwhile;

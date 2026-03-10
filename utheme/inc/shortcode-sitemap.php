@@ -3,28 +3,34 @@
 /* ГЕНЕРАЦИЯ HTML КАРТЫ САЙТА (Аналог Rank Math) */
 function get_custom_html_sitemap()
 {
-    // Получаем все публичные страницы
+    // Получаем ID текущей страницы, чтобы исключить её из списка
+    $current_page_id = get_the_ID();
+
+    // Получаем все публичные страницы (для проверки наличия, хотя wp_list_pages сделает это сам)
     $pages = get_pages([
         'sort_column'  => 'menu_order, post_title',
         'post_type'    => 'page',
         'post_status'  => 'publish',
+        'exclude'      => $current_page_id, // Исключаем текущую страницу
     ]);
 
     if (empty($pages)) return '';
 
     $output = '<div class="rank-math-html-sitemap">';
     $output .= '<div class="rank-math-html-sitemap__section rank-math-html-sitemap__section--post-type rank-math-html-sitemap__section--page">';
-    $output .= '<h2 class="rank-math-html-sitemap__title">' . get_site_translation('pages') . '</h2>';
+    
+    // Используем кастомную функцию перевода или обычный __()
+    $title_text = function_exists('get_site_translation') ? get_site_translation('pages') : __('Pages', 'text-domain');
+    $output .= '<h2 class="rank-math-html-sitemap__title">' . $title_text . '</h2>';
 
     $output .= '<ul class="rank-math-html-sitemap__list">';
 
-    // Используем встроенную функцию WP для построения иерархического списка, 
-    // но через фильтр приведем её к нужному формату HTML
     $output .= wp_list_pages([
         'title_li'    => '',
         'echo'        => 0,
         'show_date'   => 'modified',
         'date_format' => '(F j, Y)',
+        'exclude'     => $current_page_id, // ОБЯЗАТЕЛЬНО добавляем сюда
         'walker'      => new Custom_Sitemap_Walker()
     ]);
 

@@ -115,7 +115,7 @@ function my_theme_dynamic_content_injection($content)
         // Оборачиваем и шорткод (если он есть), и TOC в один контейнер.
         // Это делает вставку единым, цельным блоком, что более предсказуемо для верстки и предотвращает "разъезжание" элементов.
         $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $toc_html . '</div>';
-        $insertion = '' . $shortcode_html . $toc_html . '';
+        // $insertion = '' . $shortcode_html . $toc_html . '';
 
         $modified_content = substr_replace($modified_content, $insertion, $first_insertion_pos, 0);
     }

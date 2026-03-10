@@ -1,0 +1,132 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    $h: 30px;
+
+    body {
+        margin-top: $h !important;
+    }
+
+    #console-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: $h;
+        z-index: 10000;
+        font-family: monospace, sans-serif;
+        font-size: 13px;
+        line-height: 1;
+        backdrop-filter: blur(8px);
+        
+        @include f.mode((
+            background: (conf.$color-section-light, conf.$color-section-dark),
+            color: (conf.$color-text-light, conf.$color-text-dark),
+        ));
+
+        @if conf.$is-border == 'true' {
+            @include f.mode((
+                border-bottom: (1px solid conf.$color-border-light, 1px solid conf.$color-border-dark),
+            ));
+        }
+
+        .console-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 15px;
+            max-width: conf.$max-width;
+            margin: 0 auto;
+        }
+
+        .console-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .console-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            img, .custom-logo {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+                transform: translateY(-2px);
+            }
+
+            a {
+                display: block;
+                width: 100%;
+                height: 100%;
+                text-decoration: none;
+
+            }
+        }
+
+        .console-title {
+            font-weight: 700;
+            
+            a {
+                text-decoration: none;
+                color: inherit;
+                text-wrap: balance;
+                white-space: wrap;
+            }
+        }
+
+        .console-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .console-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            .link-icon {
+                display: none;
+                width: 16px;
+                height: 16px;
+
+                svg {
+                    width: 100%;
+                    height: 100%;
+                    display: block;
+                }
+            }
+        }
+
+        @media (max-width: 600px) {
+            .console-link {
+                .link-text {
+                    display: none;
+                }
+                .link-icon {
+                    display: block;
+                }
+            }
+        }
+    }
+}

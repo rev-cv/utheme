@@ -51,7 +51,7 @@ section.article-box {
 }
 
 main:has(.articles-grid) {
-    max-width: var(--max-width);
+    max-width: conf.$max-width;
     width: 100%;
 }
 

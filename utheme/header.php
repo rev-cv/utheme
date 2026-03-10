@@ -19,7 +19,13 @@
             get_template_part('components/main-menu-docs');
         } elseif ($menu_type === 'circle') {
             get_template_part('components/main-menu-circle');
-        }else {
+        } elseif ($menu_type === 'newspaper') {
+            get_template_part('components/main-menu-newspaper');
+        } elseif ($menu_type === 'console') {
+            get_template_part('components/main-menu-console');
+        } elseif ($menu_type === 'dynamic') {
+            get_template_part('components/main-menu-dynamic');
+        } else {
             get_template_part('components/main-menu-island');
         }
     ?>

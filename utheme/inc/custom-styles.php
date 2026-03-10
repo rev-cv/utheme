@@ -13,8 +13,23 @@ function mytheme_scripts()
         'mytheme-style' => '/src/style.css',
     ];
 
+    // foreach ($styles as $handle => $path) {
+    //     wp_enqueue_style($handle, $template_uri . $path, [], $theme_version);
+    // }
+
     foreach ($styles as $handle => $path) {
-        wp_enqueue_style($handle, $template_uri . $path, [], $theme_version);
+        $file_path = get_template_directory() . $path; // Физический путь к файлу
+        
+        if (file_exists($file_path)) {
+            $css_content = file_get_contents($file_path);
+            // Выводим CSS прямо в head
+            wp_register_style($handle, false);
+            wp_enqueue_style($handle);
+            wp_add_inline_style($handle, $css_content);
+        } else {
+            // Если файла нет, подключаем как обычно (на всякий случай)
+            wp_enqueue_style($handle, $template_uri . $path, [], $theme_version);
+        }
     }
 
     // 2. Подключаем скрипты
@@ -49,3 +64,9 @@ function mytheme_scripts()
     }
 }
 add_action('wp_enqueue_scripts', 'mytheme_scripts');
+
+
+function remove_default_theme_styles() {
+    wp_dequeue_style('my-theme-style'); 
+}
+add_action('wp_enqueue_scripts', 'remove_default_theme_styles', 20);

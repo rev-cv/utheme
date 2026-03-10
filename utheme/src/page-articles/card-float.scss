@@ -1,0 +1,80 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card {
+        display: block;
+        position: relative;
+        border-radius: f.get-radius("card");
+        overflow: hidden;
+        background: conf.$color-section-light;
+        transition: transform 0.2s, box-shadow 0.2s;
+
+        @media (prefers-color-scheme: dark) {
+            background: conf.$color-section-dark;
+        }
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid conf.$color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        a {
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+
+        picture img {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+        }
+
+        h3 {
+            background: #000;
+            color: #fff;
+            padding: 10px 15px;
+            
+            margin-top: -30px;
+            position: relative;
+            z-index: 2;
+            margin-left: 20px;
+            
+            font-size: 1rem;
+            line-height: 1.4;
+            border-radius: f.get-radius("small");
+
+            // Ограничение в 3 строки.
+            // Примечание: это делает фон блочным, а не облегающим текст как в прототиpe.
+            // Это компромисс для поддержки многострочных заголовков.
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-width: calc(100% - 40px); // Чтобы не вылезал за пределы карточки
+        }
+
+        p {
+            @include f.font-txt;
+            padding: 10px 20px 20px;
+            margin: 0;
+            font-size: 0.9rem;
+            color: rgba(conf.$color-text-light, 0.7);
+
+            @media (prefers-color-scheme: dark) {
+                color: rgba(conf.$color-text-dark, 0.7);
+            }
+        }
+    }
+}

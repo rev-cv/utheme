@@ -364,7 +364,7 @@ add_action('init', 'my_theme_disable_emojis');
 
 add_filter('intermediate_image_sizes_advanced', function($sizes) {
     // Оставляем только 'thumbnail', остальное удаляем из очереди генерации
-    unset($sizes['medium']);
+    // unset($sizes['medium']);
     unset($sizes['large']);
     unset($sizes['medium_large']); // 768px
     unset($sizes['1536x1536']);    // 2x medium_large
@@ -374,3 +374,15 @@ add_filter('intermediate_image_sizes_advanced', function($sizes) {
 
 // Отключаем создание масштабированных больших изображений (scaled)
 add_filter('big_image_size_threshold', '__return_false');
+
+add_filter('wp_editor_set_quality', function($quality) { return 75; });
+add_filter('webp_quality', function($quality) { return 75; });
+
+/**
+ * Оптимизация атрибута sizes для адаптивных изображений.
+ * Говорим браузеру, что картинка в контенте не будет шире 400px в сетке.
+ */
+add_filter('wp_calculate_image_sizes', function($sizes, $size) {
+    // Если это миниатюра в списке постов, ограничиваем её "аппетиты"
+    return '(max-width: 450px) 100vw, 400px';
+}, 10, 2);

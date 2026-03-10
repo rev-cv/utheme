@@ -11,7 +11,7 @@
         <div class="island-trigger">
             <button id="menu-toggle">
                 <span></span>
-                <div class="icon-dots"><span></span><span></span><span></span></div>
+                <span class="icon-dots"><span></span><span></span><span></span></span>
             </button>
         </div>
     </div>

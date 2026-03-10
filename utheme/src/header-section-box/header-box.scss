@@ -4,8 +4,6 @@
 
 .header-box {
     width: 100vw;
-    // background-color: yellowgreen;
-    // max-width: var(--max-width);
     position: relative;
     margin: clamp(1em, 3vw, 2em) auto 0 auto;
 
@@ -23,7 +21,7 @@
 
     h1 {
         margin-bottom: 16px;
-        max-width: var(--max-width);
+        max-width: conf.$max-width;
         padding-bottom: .5em;
 
         @include f.mode((//

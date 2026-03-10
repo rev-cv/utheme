@@ -1,0 +1,75 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+@use 'sass:color' as sys;
+
+@mixin styles {
+
+    .newspaper-brand {
+        margin: 20px auto;
+        padding: 0 conf.$default-space;
+        max-width: conf.$max-width;
+
+        a {
+            @include f.font-hd;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            text-decoration: none;
+            line-height: 1.1;
+            @include f.mode((
+                color: (conf.$color-text-light, conf.$color-text-dark),
+            ));
+        }
+    }
+
+    .newspaper-nav {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+
+        padding: 15px 0;
+
+        @include f.mode((
+            background: (rgba(conf.$color-bg-light, 0.95), rgba(conf.$color-bg-dark, 0.95)),
+        ));
+
+        backdrop-filter: blur(8px);
+
+        @if conf.$is-border == 'true' {
+            @include f.mode((
+                border-top: (1px solid conf.$color-border-light, 1px solid conf.$color-border-dark),
+                border-bottom: (1px solid conf.$color-border-light, 1px solid conf.$color-border-dark),
+            ));
+        }
+    }
+
+    .newspaper-menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        max-width: 700px;
+        margin: 0 auto;
+        gap: .5em clamp(1em, 1.5vw, 2em);
+        padding: 0 conf.$default-space;
+
+        li a {
+            @include f.font-txt;
+            font-style: italic;
+            text-decoration: none;
+            font-size: clamp(.7rem, 2vw, 1rem);
+            @include f.mode((
+                color: (rgba(conf.$color-text-light, .8), rgba(conf.$color-text-dark, .8)),
+            ));
+            transition: color 0.2s ease;
+
+            &:hover {
+                @include f.mode((
+                    color: (conf.$color-accent-light, conf.$color-accent-dark),
+                ));
+            }
+        }
+    }
+}

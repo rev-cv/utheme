@@ -35,31 +35,14 @@ function my_theme_enqueue_fonts()
     ];
 
     if (isset($font_map[$active_vibe])) {
-        // 1. Добавляем preconnect через фильтр (встроится в head выше стилей)
-        add_filter('wp_resource_hints', function ($urls, $relation_type) {
-            if ($relation_type === 'preconnect') {
-                $urls[] = 'https://fonts.googleapis.com';
-                $urls[] = [
-                    'href' => 'https://fonts.gstatic.com',
-                    'crossorigin',
-                ];
+        wp_enqueue_style('google-fonts', $font_map[$active_vibe], [], null, 'print');
+        add_filter('style_loader_tag', function($tag, $handle) {
+            if ('google-fonts' === $handle) {
+                // Заменяем любое media="..." на наше media="print" + onload
+                $tag = preg_replace('/media=(["\'])(.*?)\1/', 'media="print" onload="this.media=\'all\'"', $tag);
             }
-            return $urls;
-        }, 10, 2);
-
-        // 2. Подключаем сами шрифты
-        $url = "https://fonts.googleapis.com/css2?family=" . $font_map[$active_vibe] . "&display=swap";
-        wp_enqueue_style('google-fonts', $url, [], null);
-    }
-
-
-    if (isset($font_map[$active_vibe]) && !empty($font_map[$active_vibe])) {
-        wp_enqueue_style(
-            'google-fonts',
-            $font_map[$active_vibe],
-            [],
-            null
-        );
+            return $tag;
+        }, 999, 2);
     }
 }
 add_action('wp_enqueue_scripts', 'my_theme_enqueue_fonts');

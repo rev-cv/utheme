@@ -2,7 +2,6 @@
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
-// --max-width: 1200px;
 $panel-width: 380px;
 $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
 
@@ -32,7 +31,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             pointer-events: auto;
             /* Возвращаем кликабельность самому острову */
             width: 95%;
-            max-width: var(--max-width);
+            max-width: conf.$max-width;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             // border: 1px solid rgba(255, 255, 255, 0.3);

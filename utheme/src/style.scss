@@ -8,6 +8,9 @@
 @use "main-menu/boring.scss" as boring;
 @use "main-menu/docs.scss" as docs;
 @use "main-menu/circle.scss" as circle;
+@use "main-menu/newspaper.scss" as newspaper;
+@use "main-menu/console.scss" as console;
+@use "main-menu/dynamic.scss" as dynamic;
 
 @use 'footer/2column.scss' as footer_2columns;
 @use 'footer/central.scss' as footer_central;
@@ -20,6 +23,9 @@
 @use "page-articles/card-frame.scss" as card_frame;
 @use "page-articles/card-slide.scss" as card_slide;
 @use "page-articles/card-windows.scss" as card_windows;
+@use "page-articles/card-float.scss" as card_float;
+@use "page-articles/card-soft.scss" as card_soft;
+@use "page-articles/card-split.scss" as card_split;
 
 @use "pape-404/page-404.scss";
 @use 'page-sitemap/sitemap.scss';
@@ -72,6 +78,15 @@
 @else if conf.$main-menu =='circle' {
     @include circle.styles;
 }
+@else if conf.$main-menu =='newspaper' {
+    @include newspaper.styles;
+}
+@else if conf.$main-menu =='console' {
+    @include console.styles;
+}
+@else if conf.$main-menu =='dynamic' {
+    @include dynamic.styles;
+}
 
 // блок стилизация оглавления
 @if conf.$toc-menu =='number' {
@@ -96,6 +111,15 @@
 }
 @else if conf.$article-card =='windows' {
     @include card_windows.styles;
+}
+@else if conf.$article-card =='float' {
+    @include card_float.styles;
+}
+@else if conf.$article-card =='soft' {
+    @include card_soft.styles;
+}
+@else if conf.$article-card =='split' {
+    @include card_split.styles;
 }
 
 // блок стилизация футера

@@ -45,7 +45,7 @@ body {
 }
 
 .container {
-    max-width: var(--max-width);
+    max-width: conf.$max-width;
     margin: 0 auto;
 }
 
@@ -53,24 +53,14 @@ article,
 aside {
 
     p {
-        font-size: inherit;
         font-size: clamp(.8rem, 3vw, 1rem);
         margin-bottom: $space;
 
         strong {
-            color: var(--color-text);
             font-weight: 700;
         }
 
         mark {
-            // background: $mark-light;
-            // padding: 0.02em .2em;
-            // border-radius: 4px;
-
-            // @media (prefers-color-scheme: dark) {
-            //     background: $mark-dark;
-            //     color: $tx-light;
-            // }
             @include f.mode(( //
                     background: (conf.$color-primary-light, conf.$color-primary-dark), //
                     color: (conf.$color-bg-light, conf.$color-bg-dark) //
@@ -126,7 +116,7 @@ main {
     flex-grow: 1;
     margin: 1rem auto;
     padding: clamp(1rem, 3vw, 2rem);
-    max-width: var(--max-width);
+    max-width: conf.$max-width;
     border-radius: 0;
 
     width: 100%;
