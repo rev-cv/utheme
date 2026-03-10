@@ -2,34 +2,38 @@
 @use "../conf.scss" as conf;
 
 article {
+    p:has(.article-meta) {
+        display: flex;
+        justify-content: if(conf.$is-left-align == "true", flex-start, center);
+    }
 
-    .meta>div,
+    .meta > div,
     .article-meta {
         display: flex;
         flex-wrap: wrap;
-        // justify-content: center;
         gap: .25em 1em;
 
-        @if conf.$is-left-align == 'true' {
-            justify-content: left;
-        }
-        @else {
+        // Используем проверку строки "true"
+        @if conf.$is-left-align == "true" {
+            justify-content: flex-start; 
+        } @else {
             justify-content: center;
         }
 
-        p,
-        a,
-        div,
-        time,
-        span {
+        p, a, div, time, span {
             @include f.font-txt;
             font-size: clamp(14px, 2vw, 18px);
-            text-wrap: none;
-            text-align: center;
+            text-wrap: nowrap; 
             user-select: none;
             text-decoration: none;
             line-height: 1em;
             color: conf.$color-text-light;
+
+            @if conf.$is-left-align == "true" {
+                text-align: left;
+            } @else {
+                text-align: center;
+            }
 
             @media (prefers-color-scheme: dark) {
                 color: conf.$color-text-dark;
@@ -46,7 +50,13 @@ article {
 
         @media (max-width: 550px) {
             flex-direction: column;
-            align-content: center;
+            
+            // В колонке за горизонтальное выравнивание отвечает align-items
+            @if conf.$is-left-align == "true" {
+                align-items: flex-start;
+            } @else {
+                align-items: center;
+            }
         }
     }
 }

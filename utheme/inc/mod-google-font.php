@@ -36,13 +36,13 @@ function my_theme_enqueue_fonts()
 
     if (isset($font_map[$active_vibe])) {
         wp_enqueue_style('google-fonts', $font_map[$active_vibe], [], null, 'print');
-        add_filter('style_loader_tag', function($tag, $handle) {
-            if ('google-fonts' === $handle) {
-                // Заменяем любое media="..." на наше media="print" + onload
-                $tag = preg_replace('/media=(["\'])(.*?)\1/', 'media="print" onload="this.media=\'all\'"', $tag);
-            }
-            return $tag;
-        }, 999, 2);
+        // add_filter('style_loader_tag', function($tag, $handle) {
+        //     if ('google-fonts' === $handle) {
+        //         // Заменяем любое media="..." на наше media="print" + onload
+        //         $tag = preg_replace('/media=(["\'])(.*?)\1/', 'media="print" onload="this.media=\'all\'"', $tag);
+        //     }
+        //     return $tag;
+        // }, 999, 2);
     }
 }
 add_action('wp_enqueue_scripts', 'my_theme_enqueue_fonts');

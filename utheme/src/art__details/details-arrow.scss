@@ -4,28 +4,16 @@
 /* =========================================
    1. ПЕРЕМЕННЫЕ (VARIABLES)
    ========================================= */
-
-// Цвета фона
 $det-bg-light: conf.$color-section-light;
 $det-bg-dark: conf.$color-section-dark;
-
-// Цвета границ
 $det-border-light: rgba(0, 0, 0, 0.08);
 $det-border-dark: rgba(255, 255, 255, 0.1);
-
-// Цвета текста
 $det-text-main: conf.$color-text-light;
 $det-text-main-dark: conf.$color-text-dark;
-
-// Акцентный цвет (стрелки, ховер)
 $det-accent: conf.$color-accent-light;
 $det-accent-dark: conf.$color-accent-dark;
-
-// Размеры и отступы
 $det-padding-y: 1rem;
 $det-padding-x: 1.25rem;
-
-// Анимация
 $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
 
 /* =========================================
@@ -34,17 +22,18 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
 
 @mixin styles {
     .wp-block-details {
+        // КРИТИЧНО: разрешаем анимацию слова "auto"
+        interpolate-size: allow-keywords; 
+        
         display: block;
         margin-bottom: 1.5rem;
-
         background-color: $det-bg-light;
         border-radius: f.get-radius();
-
         overflow: hidden;
         transition: box-shadow $det-transition, border-color $det-transition;
         user-select: none;
 
-        @if conf.$is-border =='true' {
+        @if conf.$is-border == 'true' {
             border: 1px solid $det-border-light;
         }
 
@@ -53,45 +42,43 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
             border-color: $det-border-dark;
         }
 
-        // Эффект при наведении на весь блок
-        &:hover {
-            border-color: rgba($det-accent, 0.4);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        /* --- КОНТЕНТ (НОВЫЙ СТАНДАРТ) --- */
+        &::details-content {
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            // Используем твою переменную $det-transition
+            transition: 
+                height $det-transition, 
+                opacity $det-transition, 
+                content-visibility $det-transition;
+            transition-behavior: allow-discrete;
+        }
 
-            @media (prefers-color-scheme: dark) {
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-
-                @if conf.$is-border =='true' {
-                    border-color: rgba($det-accent-dark, 0.4);
-                }
+        &[open]::details-content {
+            height: auto;
+            opacity: 1;
+            
+            @starting-style {
+                height: 0;
+                opacity: 0;
             }
         }
 
-        // Состояние: Открыто
-        &[open] {
-            border-color: rgba($det-accent, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-
-            @media (prefers-color-scheme: dark) {
-                border-color: rgba($det-accent-dark, 0.3);
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            }
+        /* --- ВНУТРЕННИЕ ЭЛЕМЕНТЫ --- */
+        & > *:not(summary) {
+            padding: $det-padding-y $det-padding-x;
+            margin: 0;
         }
 
         /* --- ЗАГОЛОВОК (SUMMARY) --- */
         summary {
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: $det-padding-y $det-padding-x;
-
             font-weight: 600;
-            font-size: 1.05em;
-            line-height: 1.4;
             color: $det-text-main;
-
             cursor: pointer;
             list-style: none;
             outline: none;
@@ -101,18 +88,13 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
                 color: $det-text-main-dark;
             }
 
-            // Скрываем стандартный маркер
-            &::-webkit-details-marker {
-                display: none;
-            }
+            &::-webkit-details-marker { display: none; }
 
-            // Кастомная стрелка
             &::after {
                 content: '';
                 display: block;
                 width: 0.5em;
                 height: 0.5em;
-                margin-left: 1rem;
                 border-right: 2px solid $det-accent;
                 border-bottom: 2px solid $det-accent;
                 transform: rotate(45deg);
@@ -127,83 +109,41 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
             &:hover {
                 background-color: rgba(0, 0, 0, 0.02);
                 color: $det-accent;
-
                 @media (prefers-color-scheme: dark) {
-                    background-color: rgba(255, 255, 255, 0.02);
                     color: $det-accent-dark;
                 }
             }
         }
 
-        /* --- ОТКРЫТЫЙ ЗАГОЛОВОК --- */
         &[open] summary {
             border-bottom: 1px solid $det-border-light;
-
             @media (prefers-color-scheme: dark) {
                 border-bottom-color: $det-border-dark;
             }
+            &::after { transform: rotate(225deg); }
+        }
 
-            // Поворот стрелки вверх
-            &::after {
-                transform: rotate(225deg);
-                margin-top: 0.2em;
+        // Ховер на весь блок
+        &:hover {
+            border-color: rgba($det-accent, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            @media (prefers-color-scheme: dark) {
+                @if conf.$is-border == 'true' {
+                    border-color: rgba($det-accent-dark, 0.4);
+                }
             }
         }
 
-        /* --- КОНТЕНТ --- */
-         &::details-content {
-            transition: 
-                opacity 300ms ease, 
-                height 300ms ease, 
-                content-visibility 300ms ease;
-            transition-behavior: allow-discrete;
-            
-            height: 0;
-            opacity: 0;
-            overflow: hidden;
-        }
-
-        &[open]::details-content {
-            height: auto;
-            opacity: 1;
-            
-            /* Это магия для плавного открытия из "ниоткуда" */
-            @starting-style {
-                height: 0;
-                opacity: 0;
-            }
-        }
-
-        &>*:not(summary) {
-            padding: $det-padding-y $det-padding-x;
-            margin: 0;
-        }
-
-        p:not(:last-child) {
-            margin-bottom: 1em;
-        }
-
-        section {
-            margin-left: 14px !important;
-            margin-right: 14px !important;
-        }
-
+        /* --- ФОЛБЕК ДЛЯ СТАРЫХ БРАУЗЕРОВ (Safari) --- */
         @supports not selector(::details-content) {
             &[open] > *:not(summary) {
-                animation: detSlideDown 300ms ease-out forwards;
+                animation: detSlideDown $det-transition ease-out forwards;
             }
         }
     }
 
     @keyframes detSlideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-8px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 }

@@ -183,11 +183,11 @@ def _handle_div(tag):
         inner_content = f'{yes_block}\n{no_block}'
         return f'<!-- wp:group {{"className":"yesno-box","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group yesno-box"><div class="wp-block-group__inner-container">{inner_content}</div></div>\n<!-- /wp:group -->'
 
-    elif any(cls in tag.get('class', []) for cls in ['odds-example', 'key-takeaways']):
+    elif any(cls in tag.get('class', []) for cls in ['odds-example', 'key-takeaways', 'worked-example']):
         """Обработка простых секционных div'ов (odds-example, key-takeaways)."""
         tag_classes = tag.get('class', [])
         # Находим первый совпавший класс, чтобы использовать его в выводе
-        section_classes = ['odds-example', 'key-takeaways']
+        section_classes = ['odds-example', 'key-takeaways', 'worked-example']
         matched_class = next(cls for cls in section_classes if cls in tag_classes)
 
         inner_blocks = []
@@ -231,7 +231,8 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
 
     
     # все DIV распаковываются и удаляются за исключением тех, что в этом списке
-    forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance', 'dos-donts', 'odds-example', 'key-takeaways']
+    forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance', 
+    'dos-donts', 'odds-example', 'key-takeaways', 'worked-example']
 
     for tag in container.find_all(['div', 'section', 'main', 'figure']):
         if tag.name == 'div' and any(cls in tag.get('class', []) for cls in forbidden_div):
