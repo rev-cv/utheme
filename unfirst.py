@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 load_dotenv(interpolate=True)
 
 from core import convertation_to_wp as conv
+from core import convertation_images as cimg
 from core import extract_meta_from_html as extraction
 from core import img_find_images
 from core import link_images_to_articles as linking
@@ -89,6 +90,8 @@ if __name__ == "__main__":
 
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
+
+    cimg.resize_image(SPEC_DIR / "logo-lg.png", SPEC_DIR / "logo.png")
 
     # попытка исправить структуру проекта перед проверкой целостности
     check_structure.bulk_rename_folders(SPEC_DIR)

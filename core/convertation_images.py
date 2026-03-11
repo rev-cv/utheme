@@ -112,3 +112,26 @@ def ensure_image_size(file_path, max_size_kb):
         else:
             resize_factor *= 0.9
             quality = 90
+
+def resize_image(input_path, output_path=None, size=(100, 100)):
+    """
+    Изменяет размер изображения.
+    Если output_path не указан, убирает '-lg' из имени исходного файла.
+    """
+    # Если выходной путь не задан, генерируем его автоматически
+    if not output_path:
+        directory, filename = os.path.split(input_path)
+        new_filename = filename.replace("-lg", "")
+        output_path = os.path.join(directory, new_filename)
+
+    try:
+        with Image.open(input_path) as img:
+            # Используем высококачественный фильтр ресайза
+            resized_img = img.resize(size, Image.Resampling.LANCZOS)
+            
+            # Сохраняем (формат определится по расширению в output_path)
+            resized_img.save(output_path)
+            print(f"Успех: {input_path} -> {output_path}")
+            
+    except Exception as e:
+        print(f"Ошибка при обработке {input_path}: {e}")

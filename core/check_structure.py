@@ -31,6 +31,7 @@ RENAME_RULES = {
         "politique-de-confidentialite.html",
         "privacy.html",
         "privacybeleid.html",
+        "datenschutz.html",
     ],
     "about-us.html": [
         "sobre-nosotros.html",
