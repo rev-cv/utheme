@@ -22,9 +22,6 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
 
 @mixin styles {
     .wp-block-details {
-        // КРИТИЧНО: разрешаем анимацию слова "auto"
-        interpolate-size: allow-keywords; 
-        
         display: block;
         margin-bottom: 1.5rem;
         background-color: $det-bg-light;
@@ -43,27 +40,27 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         /* --- КОНТЕНТ (НОВЫЙ СТАНДАРТ) --- */
-        &::details-content {
-            height: 0;
-            opacity: 0;
-            overflow: hidden;
-            // Используем твою переменную $det-transition
-            transition: 
-                height $det-transition, 
-                opacity $det-transition, 
-                content-visibility $det-transition;
-            transition-behavior: allow-discrete;
-        }
+        // &::details-content {
+        //     height: 0;
+        //     opacity: 0;
+        //     overflow: hidden;
+        //     // Используем твою переменную $det-transition
+        //     transition: 
+        //         height $det-transition, 
+        //         opacity $det-transition, 
+        //         content-visibility $det-transition;
+        //     transition-behavior: allow-discrete;
+        // }
 
-        &[open]::details-content {
-            height: auto;
-            opacity: 1;
+        // &[open]::details-content {
+        //     height: auto;
+        //     opacity: 1;
             
-            @starting-style {
-                height: 0;
-                opacity: 0;
-            }
-        }
+        //     @starting-style {
+        //         height: 0;
+        //         opacity: 0;
+        //     }
+        // }
 
         /* --- ВНУТРЕННИЕ ЭЛЕМЕНТЫ --- */
         & > *:not(summary) {
@@ -135,11 +132,11 @@ $det-transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         /* --- ФОЛБЕК ДЛЯ СТАРЫХ БРАУЗЕРОВ (Safari) --- */
-        @supports not selector(::details-content) {
-            &[open] > *:not(summary) {
-                animation: detSlideDown $det-transition ease-out forwards;
-            }
-        }
+        // @supports not selector(::details-content) {
+        //     &[open] > *:not(summary) {
+        //         animation: detSlideDown $det-transition ease-out forwards;
+        //     }
+        // }
     }
 
     @keyframes detSlideDown {

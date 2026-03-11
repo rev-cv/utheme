@@ -15,9 +15,16 @@
             font-weight: 700;
             text-decoration: none;
             line-height: 1.1;
+            display: block;
+            text-wrap: balance;
+
             @include f.mode((
                 color: (conf.$color-text-light, conf.$color-text-dark),
             ));
+
+            @if conf.$is-left-align == 'false' {
+                text-align: center;
+            }
         }
     }
 
