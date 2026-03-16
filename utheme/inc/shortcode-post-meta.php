@@ -63,12 +63,14 @@ function post_meta_info_shortcode($atts)
     ob_start();
 ?>
     <span class="article-meta">
-        <a
-            rel="author"
-            class="author"
-            href="<?php echo get_author_posts_url($post->post_author); ?>"
-            title="<?php echo esc_html($author); ?>"><?php echo esc_html($author); ?>
-        </a>
+        <?php if (!empty($author)): ?>
+            <a
+                rel="author"
+                class="author"
+                href="<?php echo get_author_posts_url($post->post_author); ?>"
+                title="<?php echo esc_html($author); ?>"><?php echo esc_html($author); ?>
+            </a>
+        <?php endif; ?>
         <time datetime="<?php echo esc_attr($iso_date); ?>"><?php echo esc_html($formatted_date); ?></time>
         <span>
             <?php echo get_site_translation('reading_time'); ?>:

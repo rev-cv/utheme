@@ -72,7 +72,6 @@ aside {
     * {
         @include f.font-txt;
         color: sys.adjust($tx-light, $blackness: 15%);
-        font-size: 1em;
         line-height: 1.5em;
 
         @media (prefers-color-scheme: dark) {

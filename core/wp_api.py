@@ -381,11 +381,12 @@ def publish_wp_pages(articles_list: list[dict]):
         # обновление SEO (Title и Description)
         seo_title = article.get('title', '')
         seo_desc = article.get('description', '')
-        update_page_seo(page_id, seo_title, seo_desc)
+        seo_headline = article.get('headline', '')
+        update_page_seo(page_id, seo_title, seo_desc, seo_headline)
 
         print("    ok")
 
-def update_page_seo(page_id, title, description):
+def update_page_seo(page_id, title, description, headline):
     """Обновляет SEO-данные страницы через кастомные мета-поля."""
     if not API_URL or not AUTH: return
     
@@ -395,7 +396,8 @@ def update_page_seo(page_id, title, description):
     payload = {
         'meta': {
             '_custom_seo_title': title, 
-            '_custom_seo_desc': description
+            '_custom_seo_desc': description,
+            '_custom_seo_headline': headline
         }
     }
     
@@ -410,7 +412,7 @@ def update_page_seo(page_id, title, description):
     except Exception as e:
         print(f"    Ошибка соединения при обновлении SEO: {e}")
 
-def set_site_identity(media_id):
+def set_site_identity(icon_id=None, logo_id=None):
     """Устанавливает изображение как Site Icon и Logo (если поддерживается)."""
     if not API_URL or not AUTH: return
 
@@ -418,42 +420,63 @@ def set_site_identity(media_id):
     
     try:
         # 1. Установка site_icon (стандарт WP)
-        resp_icon = requests.post(settings_url, auth=AUTH, json={'site_icon': media_id}, verify=False)
-        if resp_icon.status_code == 200:
-            print("    Site Icon установлен.")
+        if icon_id:
+            resp_icon = requests.post(settings_url, auth=AUTH, json={'site_icon': icon_id}, verify=False)
+            if resp_icon.status_code == 200:
+                print("    Site Icon установлен.")
             
         # 2. Установка site_logo (для блочных тем)
-        resp_logo = requests.post(settings_url, auth=AUTH, json={'site_logo': media_id}, verify=False)
-        if resp_logo.status_code == 200:
-            print("    Site Logo установлен.")
+        if logo_id:
+            resp_logo = requests.post(settings_url, auth=AUTH, json={'site_logo': logo_id}, verify=False)
+            if resp_logo.status_code == 200:
+                print("    Site Logo установлен.")
     except Exception as e:
         print(f"    Ошибка при обновлении настроек сайта: {e}")
 
 def upload_and_set_logo(max_kb: int = 30):
     """
-    Ищет spec/logo.png, загружает его в WP и устанавливает как логотип и фавикон.
+    Ищет spec/logo.png и spec/icon.png.
+    Если есть оба: logo.png -> Logo, icon.png -> Icon.
+    Если есть одно: оно устанавливается везде.
     """
 
     print("\nЗагрузка и установка Site Icon и Site Logo...")
-    # Попытка найти файл относительно корня проекта (core/../spec/logo.png)
-    logo_path = Path(__file__).parent.parent / "spec" / "logo.png"
+    spec_dir = Path(__file__).parent.parent / "spec"
     
-    if not logo_path.exists():
-        print(f"    ОШИБКА: Логотип не найден по пути: {logo_path}")
+    logo_path = spec_dir / "logo.png"
+    icon_path = spec_dir / "icon.png"
+    
+    if not logo_path.exists() and not icon_path.exists():
+        print(f"    ОШИБКА: Логотип или иконка не найдены в: {spec_dir}")
         return
 
-    img_obj = {
-        'name': 'site-logo',
-        'selected_image': logo_path,
-        'seo': {
-            'alt': 'Site Logo',
-            'title': 'Site Logo',
+    def _up(path, name):
+        if not path.exists(): return None
+        img_obj = {
+            'name': name,
+            'selected_image': path,
+            'seo': {'alt': name, 'title': name}
         }
-    }
+        res = upload_single_image(img_obj, max_kb=max_kb)
+        return res.get('original')
 
-    result = upload_single_image(img_obj, max_kb=max_kb)
-    if result.get('original'):
-        set_site_identity(result['original'])
+    logo_id = None
+    icon_id = None
+
+    if logo_path.exists() and icon_path.exists():
+        print("    Найдены и logo.png и icon.png -> раздельная установка.")
+        logo_id = _up(logo_path, 'site-logo')
+        icon_id = _up(icon_path, 'site-icon')
+    elif logo_path.exists():
+        print("    Найден только logo.png -> используется везде.")
+        logo_id = _up(logo_path, 'site-logo')
+        icon_id = logo_id
+    elif icon_path.exists():
+        print("    Найден только icon.png -> используется везде.")
+        icon_id = _up(icon_path, 'site-icon')
+        logo_id = icon_id
+
+    set_site_identity(icon_id=icon_id, logo_id=logo_id)
 
 def check_local():
     if WP_URL:

@@ -1,10 +1,85 @@
-.rank-math-html-sitemap {
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
-    .rank-math-html-sitemap__list {
-        padding-left: 1em;
+.sitemap-container {
+    max-width: conf.$max-width;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    @include f.mode(( 
+        color: (conf.$color-text-light, conf.$color-text-dark),
+    ));
+
+    a {
+        @include f.font-txt;
     }
 
-    ul ul {
-        margin-left: 1em;
+    .sitemap-section {
+        margin-top: 2rem;
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+                display: flex;
+                flex-wrap: wrap; // Позволяет вложенному списку упасть на новую строку
+                justify-content: space-between;
+                align-items: baseline;
+                gap: 0 1em;
+
+                > a {
+                    text-decoration: none;
+                    font-size: 1rem;
+
+                    @include f.mode(( 
+                        color: (
+                            sys.mix(conf.$color-text-light, conf.$color-accent-light, 60%), 
+                            sys.mix(conf.$color-accent-dark, conf.$color-text-dark, 50%)
+                        ),
+                    ));
+
+                    &:hover {
+                        @include f.mode(( 
+                            color: (conf.$color-accent-light, conf.$color-accent-dark),
+                        ));
+                    }
+                }
+
+                // Дата (если есть)
+                > time {
+                    flex: 1; 
+                    font-size: 0.85em;
+                    @include f.mode(( 
+                        color: (
+                            sys.mix(conf.$color-text-light, conf.$color-bg-light, 60%), 
+                            sys.mix(conf.$color-text-dark, conf.$color-bg-dark, 50%)
+                        ),
+                    ));
+                }
+
+                ul.children {
+                    flex: 0 0 100%; 
+                    padding-left: 1em;
+                    @include f.mode(( 
+                        border-left: (
+                            1px solid sys.mix(conf.$color-text-light, conf.$color-bg-light, 50%), 
+                            1px solid sys.mix(conf.$color-text-dark, conf.$color-bg-dark, 50%)
+                        ),
+                    ));
+                    
+                    li {
+                        display: flex; 
+                        justify-content: space-between;
+                        flex-wrap: nowrap; 
+
+                        time {
+                            margin-left: auto;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

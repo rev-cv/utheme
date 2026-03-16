@@ -1,7 +1,9 @@
-@use 'sass:color' as sys;
+@use 'sass:color';
+@use "sass:math";
 @use "sass:string";
 @use "sass:map";
 @use "scheme.fonts.scss" as font;
+@use "scheme.color.scss" as gen;
 
 ////////////////////////////////////////////////////////
 ///  ВАЖНО!!!
@@ -11,73 +13,79 @@
 ///
 ////////////////////////////////////////////////////////
 
+$font-size: 19px;
+
 // тип добавляемого меню на сайте
-$main-menu: "dynamic";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
+$main-menu: "console";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
 $toc-menu: "icon"; // circle, number, icon
 // меню должно быть в секции или располагаться открыто?
-$is-not-section: "true"; // true, false
+$is-not-section: "false"; // true, false
 
 // стилизация блока details
-$details: "plus"; // arrow, plus
+$details: "arrow"; // arrow, plus
 
 // тип используемой на сайте карточки статей
-$article-card: "split"; // default, frame, slide, windows, float, soft, split
+$article-card: "soft"; // default, frame, slide, windows, float, soft, split
 
 // картинки вписываются или занимают всю ширину страницы?
-$is-img_contain: "true"; // true, false
+$is-img_contain: "false"; // true, false
 
 // выравнивание элементо по левому краю ? Иначе - центральное выравнивание
 $is-left-align: "true"; // true, false
 
 // в блоках секций, карточек, меню, футера использовать бордер?
-$is-border: "true"; // true, false
+$is-border: "false"; // true, false
 
 // какую шрифтовую пару выбрать для сайта?
-$font-vibe: 'vogue';
+$font-vibe: "startup";
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
 // какой радиус использовать для секций, меню, карточек и прочее?
 $radius-vibe: "neutral";
 
 // токен плотности: 'compact' = 0.75, 'standard' = 1, 'spacious' = 1.5
-$density-factor: .5;
+$density-factor: 1.04;
 
-// --- Светлая тема (Light Theme) ---
-$color-primary-light: #2D8C3C;
-$color-accent-light: #2D8C3C;
-$color-text-light: #1A1A1A;
-$color-bg-light: #FAFAF8;
-$color-section-light: #F0F0EC;
+// =========================================================
+// ЦВЕТА (COLOR SCHEME)
+// =========================================================
+$seed-hue: 175; 
+// "luxury", "minimalist", "vibrant", "bold-dark"
+// "graphite", "pastoral", "japane" 
+$style: "pastoral"; 
+$scheme: gen.generate-scheme($seed-hue, $style);
 
-// --- Темная тема (Dark Theme) ---
-$color-primary-dark: #2D8C3C;
-$color-accent-dark: #2D8C3C;
-$color-text-dark: #E8E8E6;
-$color-bg-dark: #141414;
-$color-section-dark: #1E1E1E;
+$color-primary-light: map-get($scheme, "pr-l");
+$color-accent-light:  map-get($scheme, "ac-l");
+$color-text-light:    map-get($scheme, "tx-l");
+$color-bg-light:      map-get($scheme, "bg-l");
+$color-section-light: color.adjust($color-bg-light, $lightness: -4%);
 
-// $color-H1-light: linear-gradient(75deg, $color-accent-light, $color-primary-dark);
-// $color-H1-dark: linear-gradient(75deg, $color-primary-dark, $color-accent-dark);
-$color-H1-light: #2D8C3C;
-$color-H1-dark: #2D8C3C;
+$color-primary-dark:  map-get($scheme, "pr-d");
+$color-accent-dark:   map-get($scheme, "ac-d");
+$color-text-dark:     map-get($scheme, "tx-d");
+$color-bg-dark:       map-get($scheme, "bg-d");
+$color-section-dark:  color.adjust($color-bg-dark, $lightness: 6%);
 
-$color-border-light: sys.scale($color-section-light, $lightness: -15%);
-$color-border-dark: sys.scale($color-section-dark, $lightness: 10%);
+$color-H1-light:      map-get($scheme, "h1-l");
+$color-H1-dark:       map-get($scheme, "pr-d");
+
+$color-border-light:  map-get($scheme, "brd-l");
+$color-border-dark:   map-get($scheme, "brd-d");
 
 $color-success: #5db97a;
 $color-warning: #fcd34d;
-$color-error: #dc2f02;
-$color-info: #4fc3f7;
+$color-error:   #dc2f02;
+$color-info:    #4fc3f7;
 
 // ============================================================================
 // ТИПОГРАФИКА (TYPOGRAPHY)
 // ============================================================================
 :root {
-    font-size: 18px; // Базовый размер шрифта (1rem)
-    // interpolate-size: allow-keywords; // Разрешает анимацию до auto
+    font-size: $font-size;
 }
 
 // ============================================================================

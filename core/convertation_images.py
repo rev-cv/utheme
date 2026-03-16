@@ -113,12 +113,12 @@ def ensure_image_size(file_path, max_size_kb):
             resize_factor *= 0.9
             quality = 90
 
-def resize_image(input_path, output_path=None, size=(100, 100)):
+def resize_image(input_path, output_path=None, height=None, size=None):
     """
     Изменяет размер изображения.
-    Если output_path не указан, убирает '-lg' из имени исходного файла.
+    - Если указан height: сохраняет пропорции, подгоняя под высоту.
+    - Если указан size (w, h): изменяет размер строго под эти параметры.
     """
-    # Если выходной путь не задан, генерируем его автоматически
     if not output_path:
         directory, filename = os.path.split(input_path)
         new_filename = filename.replace("-lg", "")
@@ -126,12 +126,24 @@ def resize_image(input_path, output_path=None, size=(100, 100)):
 
     try:
         with Image.open(input_path) as img:
-            # Используем высококачественный фильтр ресайза
-            resized_img = img.resize(size, Image.Resampling.LANCZOS)
+            original_width, original_height = img.size
             
-            # Сохраняем (формат определится по расширению в output_path)
+            # Логика изменения размера
+            if height:
+                # Вычисляем пропорциональную ширину
+                # Ratio = W_old / H_old
+                ratio = original_width / original_height
+                new_width = int(height * ratio)
+                target_size = (new_width, height)
+            elif size:
+                target_size = size
+            else:
+                # Если ничего не указано, оставим как есть или зададим дефолт
+                target_size = (100, 100)
+
+            resized_img = img.resize(target_size, Image.Resampling.LANCZOS)
             resized_img.save(output_path)
-            print(f"Успех: {input_path} -> {output_path}")
+            print(f"Успех: {input_path} -> {output_path} (Размер: {target_size})")
             
     except Exception as e:
         print(f"Ошибка при обработке {input_path}: {e}")

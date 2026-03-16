@@ -67,7 +67,7 @@ def check_structure_flexible(root_directory, required_items):
     """
     Универсальная проверка структуры.
     :param root_directory: Корень проекта (Path или str)
-    :param required_items: Список (строки или Path объекты)
+    :param required_items: Список (строки, Path объекты, или списки Path объектов)
     """
     print(f"\nПроверка структуры проекта в: {root_directory}")
     
@@ -75,6 +75,23 @@ def check_structure_flexible(root_directory, required_items):
     missing_items = []
 
     for item in required_items:
+        # 3. Проверка списка альтернатив (должен существовать хотя бы один)
+        if isinstance(item, list):
+            if not any(p.exists() for p in item):
+                # Формируем красивое сообщение об ошибке
+                paths_str_list = []
+                for p in item:
+                    try:
+                        display_path = p.relative_to(Path.cwd())
+                    except ValueError:
+                        display_path = p
+                    paths_str_list.append(str(display_path))
+                
+                error_msg = "Не найден ни один из обязательных элементов:\n" + \
+                            "\n".join([f"            - {p_str}" for p_str in paths_str_list])
+                missing_items.append(error_msg)
+            continue
+
         # Преобразуем всё в строку для удобства работы с шаблонами и логами
         item_str = str(item)
         

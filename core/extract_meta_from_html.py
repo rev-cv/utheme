@@ -5,15 +5,14 @@ from bs4 import BeautifulSoup
 def fetch_meta_data(pages_list: list[dict]) -> list[dict]:
     """
     Принимается список объектов с полем 'resource' (Path к .html файлу) 
-    Извлекает данные и дополняет объекты полями h1, title и description.
+    Извлекает данные и дополняет объекты полями h1, title, description и headline.
     """
     enriched_list = []
     
     for item in pages_list:
         new_item = item.copy()
         file_path = item.get("resource")
-        
-        meta = {"title": "", "description": "", "h1": ""}
+        meta = {"title": "", "description": "", "h1": "", "headline": ""}
         
         if isinstance(file_path, Path) and file_path.exists():
             try:
@@ -41,6 +40,13 @@ def fetch_meta_data(pages_list: list[dict]) -> list[dict]:
                     meta["description"] = desc_tag.get('content', '').strip()
                 else:
                     print("ВАЖНО! description не найден!")
+                
+                # Поиск Headline для соцсетей (og:title, twitter:title и т.д.)
+                headline_tag = (soup.find('meta', attrs={'name': 'headline'}) or
+                                soup.find('meta', attrs={'property': 'og:title'}) or
+                                soup.find('meta', attrs={'name': 'twitter:title'}))
+                if headline_tag:
+                    meta["headline"] = headline_tag.get('content', '').strip()
                     
             except Exception as e:
                 print(f"Ошибка чтения {file_path}: {e}")

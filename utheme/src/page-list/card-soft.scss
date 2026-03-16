@@ -1,0 +1,71 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card {
+        // Neumorphism variables derived from theme config
+        $bg-light: conf.$color-section-light;
+        $shadow-dark-light: sys.adjust($bg-light, $lightness: -15%);
+        $shadow-light-light: sys.adjust($bg-light, $lightness: 10%, $saturation: -5%);
+
+        $bg-dark: conf.$color-section-dark;
+        $shadow-dark-dark: sys.adjust($bg-dark, $lightness: -8%);
+        $shadow-light-dark: sys.adjust($bg-dark, $lightness: 8%);
+
+        border-radius: 30px;
+        padding: 20px;
+        transition: box-shadow 0.3s ease-in-out;
+        
+        // Light mode styles
+        background: $bg-light;
+        box-shadow: 10px 10px 20px $shadow-dark-light, -10px -10px 20px $shadow-light-light;
+
+        // &:hover {
+        //     box-shadow: inset 5px 5px 10px $shadow-dark-light, inset -5px -5px 10px $shadow-light-light;
+        // }
+
+        // Dark mode styles
+        @media (prefers-color-scheme: dark) {
+            background: $bg-dark;
+            box-shadow: 10px 10px 20px $shadow-dark-dark, -10px -10px 20px $shadow-light-dark;
+
+            // &:hover {
+            //     box-shadow: inset 5px 5px 10px $shadow-dark-dark, inset -5px -5px 10px $shadow-light-dark;
+            // }
+        }
+
+        a {
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
+
+        picture img {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            @include f.font-hd;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            margin: 0;
+            padding: 0 5px;
+            text-align: center;
+            // Truncate long titles to a single line
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        // No <p> tag in this card style
+        p {
+            display: none;
+        }
+    }
+}

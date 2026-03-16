@@ -1,0 +1,98 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        border-radius: f.get-radius("card");
+        background: conf.$color-section-light;
+        aspect-ratio: 3 / 4; // Соотношение сторон для предсказуемой высоты
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        padding-bottom: 1em;
+
+        @media (prefers-color-scheme: dark) {
+            background: conf.$color-section-dark;
+        }
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid conf.$color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
+        &:hover {
+            // transform: translateY(-5px) scale(1.02);
+            box-shadow: conf.$shadow-section-hover;
+
+            // описание при наведении
+            p {
+                max-height: 10em; 
+                padding-top: 0.5em;
+                padding-bottom: 1em;
+            }
+        }
+
+        picture {
+            display: block;
+            width: 100%;
+            flex-grow: 1; 
+            flex-shrink: 1; 
+            min-height: 0; 
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+            }
+        }
+
+        h3 {
+            flex-shrink: 0; 
+            padding: 1em 1em 0 1em;
+            margin: 0;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            line-height: 1.3;
+            display: -webkit-box; 
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 800;
+        }
+
+        p {
+            flex-shrink: 0; 
+            margin: 0;
+            padding: 0 1em;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: rgba(conf.$color-text-light, 0.7);
+            max-height: 0; 
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            display: -webkit-box; 
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 5;
+            text-overflow: ellipsis;
+
+            @media (prefers-color-scheme: dark) {
+                color: rgba(conf.$color-text-dark, 0.7);
+            }
+        }
+
+        a {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            font-size: 0; 
+            text-indent: -9999px;
+        }
+    }
+}

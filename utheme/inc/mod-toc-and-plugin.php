@@ -123,4 +123,4 @@ function my_theme_dynamic_content_injection($content)
     return $modified_content;
 }
 
-add_filter('the_content', 'my_theme_dynamic_content_injection');
+// add_filter('the_content', 'my_theme_dynamic_content_injection');

@@ -75,7 +75,10 @@ required_folders = [
     SPEC_DIR / "ADD PAGES" / "legal-notice.html",
     SPEC_DIR / "ADD PAGES" / "privacy-policy.html",
     SPEC_DIR / "ADD PAGES" / "cookie-policy.html",
-    SPEC_DIR / "logo.png",
+    [
+        SPEC_DIR / "logo.png", 
+        SPEC_DIR / "icon.png"
+    ],
     SPEC_DIR / "CLUSTERS MAIN",
     SPEC_DIR / "CLUSTERS MAIN" / "CL1",
     SPEC_DIR / "CLUSTERS MAIN" / "CL2",
@@ -91,7 +94,8 @@ if __name__ == "__main__":
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
 
-    cimg.resize_image(SPEC_DIR / "logo-lg.png", SPEC_DIR / "logo.png")
+    cimg.resize_image(SPEC_DIR / "logo-lg.png", height=100)
+    cimg.resize_image(SPEC_DIR / "icon-lg.png", height=100)
 
     # попытка исправить структуру проекта перед проверкой целостности
     check_structure.bulk_rename_folders(SPEC_DIR)

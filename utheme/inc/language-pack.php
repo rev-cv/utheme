@@ -30,6 +30,7 @@ function get_site_translation($key = 'read_more')
     // Получаем код языка (первые 2 буквы, например 'en', 'ru')
     $lang = substr(get_bloginfo('language'), 0, 2);
     $siteName = get_bloginfo('name');
+    $aboutUrl = home_url('/about-us/');
 
     $cookie_url = '#';
     if ($key === 'cookie_notice') {
@@ -257,29 +258,29 @@ function get_site_translation($key = 'read_more')
             'ru' => 'Мы используем куки для улучшения вашего опыта, анализа трафика и персонализации рекламы. Пожалуйста, примите их или настройте свои предпочтения.',
             'el' => 'Χρησιμοποιούμε cookies για να βελτιώσουμε την εμπειρία σας, να αναλύσουμε την κίνηση και να εξατομικεύσουμε τις διαφημίσεις. Παρακαλούμε αποδεχτείτε ή ρυθμίστε τις προτιμήσεις σας.'
         ],
-        'expert_checked' => [
-            'es' => 'Verificado por un experto',
-            'fr' => 'Vérifié par un expert',
-            'de' => 'Von Experten geprüft',
-            'pl' => 'Zweryfikowane przez eksperta',
-            'pt' => 'Verificado por um especialista',
-            'nl' => 'Geverifieerd door een expert',
-            'sk' => 'Overené odborníkom',
-            'it' => 'Verificato da un esperto',
-            'et' => 'Eksperdi poolt kontrollitud',
-            'lv' => 'Eksperta pārbaudīts',
-            'ro' => 'Verificat de un expert',
-            'sv' => 'Granskad av en expert',
-            'lt' => 'Patikrinta eksperto',
-            'bg' => 'Проверено от експерт',
-            'sl' => 'Preveril strokovnjak',
-            'hu' => 'Szakértő által ellenőrizve',
-            'fi' => 'Asiantuntijan tarkistama',
-            'en' => 'Expertly verified',
-            'cs' => 'Ověřeno odborníkem',
-            'da' => 'Verificeret af en ekspert',
-            'ru' => 'Проверено экспертом',
-            'el' => 'Επαληθεύτηκε από ειδικό'
+        'created_by_editorial' => [
+            'es' => 'Creado por la redacción de <a href="' . $aboutUrl . '" title="Sobre nosotros">«' . $siteName . '»</a>',
+            'fr' => 'Créé par la rédaction de <a href="' . $aboutUrl . '" title="À propos de nous">« ' . $siteName . ' »</a>',
+            'de' => 'Erstellt von der Redaktion von <a href="' . $aboutUrl . '" title="Über uns">„' . $siteName . '“</a>',
+            'pl' => 'Opracowane przez redakcję <a href="' . $aboutUrl . '" title="O nas">„' . $siteName . '”</a>',
+            'pt' => 'Criado pela redação de <a href="' . $aboutUrl . '" title="Sobre nós">«' . $siteName . '»</a>',
+            'nl' => 'Gemaakt door de redactie van <a href="' . $aboutUrl . '" title="Over ons">\'' . $siteName . '\'</a>',
+            'sk' => 'Vytvorené redakciou <a href="' . $aboutUrl . '" title="O nás">„' . $siteName . '“</a>',
+            'it' => 'Creato dalla redazione di <a href="' . $aboutUrl . '" title="Chi siamo">«' . $siteName . '»</a>',
+            'et' => 'Koostatud <a href="' . $aboutUrl . '" title="Meist">«' . $siteName . '»</a> toimetuse poolt',
+            'lv' => 'Sagatavojusi <a href="' . $aboutUrl . '" title="Par mums">«' . $siteName . '»</a> redakcija',
+            'ro' => 'Creat de redacția <a href="' . $aboutUrl . '" title="Despre noi">„' . $siteName . '”</a>',
+            'sv' => 'Skapad av redaktionen på <a href="' . $aboutUrl . '" title="Om oss">”' . $siteName . '”</a>',
+            'lt' => 'Parengta <a href="' . $aboutUrl . '" title="Apie mus">„' . $siteName . '“</a> redakcijos',
+            'bg' => 'Създадено от редакцията на <a href="' . $aboutUrl . '" title="За нас">„' . $siteName . '“</a>',
+            'sl' => 'Pripravilo uredništvo <a href="' . $aboutUrl . '" title="O nas">»' . $siteName . '«</a>', 
+            'hu' => 'A(z) <a href="' . $aboutUrl . '" title="Rólunk">„' . $siteName . '”</a> szerkesztősége készítette',
+            'fi' => 'Kirjoittanut <a href="' . $aboutUrl . '" title="Tietoa meistä">”' . $siteName . '”</a> -sivuston toimitus',
+            'en' => 'Created by the <a href="' . $aboutUrl . '" title="About us">"' . $siteName . '"</a> editorial team',
+            'cs' => 'Vytvořeno redakcí <a href="' . $aboutUrl . '" title="O nás">„' . $siteName . '“</a>',
+            'da' => 'Skabt af redaktionen på <a href="' . $aboutUrl . '" title="Om os">”' . $siteName . '”</a>',
+            'ru' => 'Подготовлено редакцией <a href="' . $aboutUrl . '" title="О проекте">«' . $siteName . '»</a>',
+            'el' => 'Δημιουργήθηκε από τη συντακτική ομάδα του <a href="' . $aboutUrl . '" title="Σχετικά με εμάς">«' . $siteName . '»</a>'
         ],
         'affiliate_disclosure' => [
             'es' => 'Este sitio contiene enlaces de afiliados. Podemos recibir una comisión si realiza una compra a través de ellos, sin costo adicional para usted.',
@@ -641,6 +642,30 @@ function get_site_translation($key = 'read_more')
             'ru' => 'Страницы',
             'el' => 'Σελίδες'
         ],
+        'news' => [
+            'es' => 'Noticias',
+            'fr' => 'Actualités',
+            'de' => 'Neuigkeiten',
+            'pl' => 'Aktualności',
+            'pt' => 'Notícias',
+            'nl' => 'Nieuws',
+            'sk' => 'Novinky',
+            'it' => 'Notizie',
+            'et' => 'Uudised',
+            'lv' => 'Ziņas',
+            'ro' => 'Știri',
+            'sv' => 'Nyheter',
+            'lt' => 'Naujienos',
+            'bg' => 'Новини',
+            'sl' => 'Novice',
+            'hu' => 'Hírek',
+            'fi' => 'Uutiset',
+            'en' => 'News',
+            'cs' => 'Novinky',
+            'da' => 'Nyheder',
+            'ru' => 'Новости',
+            'el' => 'Νέα'
+        ],
         'home' => [
             'es' => 'Inicio',
             'fr' => 'Accueil',
@@ -725,9 +750,6 @@ add_shortcode('txt_legal_disclaimer', function () {
 });
 add_shortcode('txt_cookie_notice', function () {
     return get_site_translation('cookie_notice');
-});
-add_shortcode('txt_expert_checked', function () {
-    return get_site_translation('expert_checked');
 });
 add_shortcode('txt_affiliate_disclosure', function () {
     return get_site_translation('affiliate_disclosure');

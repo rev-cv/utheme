@@ -18,14 +18,14 @@
 @use "page/page.scss";
 @use "scroll-to-top/scroll-to-top.scss";
 
-@use "page-articles/page-articles.scss";
-@use "page-articles/card-default.scss" as card_default;
-@use "page-articles/card-frame.scss" as card_frame;
-@use "page-articles/card-slide.scss" as card_slide;
-@use "page-articles/card-windows.scss" as card_windows;
-@use "page-articles/card-float.scss" as card_float;
-@use "page-articles/card-soft.scss" as card_soft;
-@use "page-articles/card-split.scss" as card_split;
+@use "page-list/page-articles.scss";
+@use "page-list/card-default.scss" as card_default;
+@use "page-list/card-frame.scss" as card_frame;
+@use "page-list/card-slide.scss" as card_slide;
+@use "page-list/card-windows.scss" as card_windows;
+@use "page-list/card-float.scss" as card_float;
+@use "page-list/card-soft.scss" as card_soft;
+@use "page-list/card-split.scss" as card_split;
 
 @use "pape-404/page-404.scss";
 @use 'page-sitemap/sitemap.scss';
