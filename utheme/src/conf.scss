@@ -13,71 +13,71 @@
 ///
 ////////////////////////////////////////////////////////
 
-$font-size: 19px;
+$font-size: 16px;
 
 // тип добавляемого меню на сайте
-$main-menu: "console";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
+$main-menu: "boring";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
 $is-menu-title: "false"; // отображать название сайта в главном меню? true, false 
 // поддержка: boring
 
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
-$toc-menu: "icon"; // circle, number, icon
+$toc-menu: "circle"; // circle, number, icon
 // меню должно быть в секции или располагаться открыто?
-$is-not-section: "false"; // true, false
+$is-not-section: "true"; // true, false
 
 // стилизация блока details
 $details: "arrow"; // arrow, plus
 
 // тип используемой на сайте карточки статей
-$article-card: "soft"; // default, frame, slide, windows, float, soft, split
+$article-card: "float"; // default, frame, slide, windows, float, soft, split
 
 // картинки вписываются или занимают всю ширину страницы?
-$is-img_contain: "false"; // true, false
+$is-img_contain: "true"; // true, false
 
 // выравнивание элементо по левому краю ? Иначе - центральное выравнивание
-$is-left-align: "true"; // true, false
+$is-left-align: "false"; // true, false
 
 // в блоках секций, карточек, меню, футера использовать бордер?
 $is-border: "false"; // true, false
 
 // какую шрифтовую пару выбрать для сайта?
-$font-vibe: "startup";
+$font-vibe: "neo-swiss";
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
 // какой радиус использовать для секций, меню, карточек и прочее?
 $radius-vibe: "neutral";
 
 // токен плотности: 'compact' = 0.75, 'standard' = 1, 'spacious' = 1.5
-$density-factor: 1.04;
+$density-factor: 0.85;
 
 // =========================================================
 // ЦВЕТА (COLOR SCHEME)
 // =========================================================
-$seed-hue: 175; 
+$seed-hue: 59; 
 // "luxury", "minimalist", "vibrant", "bold-dark"
 // "graphite", "pastoral", "japane" 
-$style: "pastoral"; 
+$style: "luxury"; 
 $scheme: gen.generate-scheme($seed-hue, $style);
 
-$color-primary-light: map-get($scheme, "pr-l");
-$color-accent-light:  map-get($scheme, "ac-l");
-$color-text-light:    map-get($scheme, "tx-l");
-$color-bg-light:      map-get($scheme, "bg-l");
+$color-primary-light: map.get($scheme, "pr-l");
+$color-accent-light:  map.get($scheme, "ac-l");
+$color-text-light:    map.get($scheme, "tx-l");
+$color-bg-light:      map.get($scheme, "bg-l");
 $color-section-light: color.adjust($color-bg-light, $lightness: -4%);
 
-$color-primary-dark:  map-get($scheme, "pr-d");
-$color-accent-dark:   map-get($scheme, "ac-d");
-$color-text-dark:     map-get($scheme, "tx-d");
-$color-bg-dark:       map-get($scheme, "bg-d");
+$color-primary-dark:  map.get($scheme, "pr-d");
+$color-accent-dark:   map.get($scheme, "ac-d");
+$color-text-dark:     map.get($scheme, "tx-d");
+$color-bg-dark:       map.get($scheme, "bg-d");
 $color-section-dark:  color.adjust($color-bg-dark, $lightness: 6%);
 
-$color-H1-light:      map-get($scheme, "h1-l");
-$color-H1-dark:       map-get($scheme, "pr-d");
+$color-H1-light:      map.get($scheme, "h1-l");
+$color-H1-dark:       map.get($scheme, "pr-d");
 
-$color-border-light:  map-get($scheme, "brd-l");
-$color-border-dark:   map-get($scheme, "brd-d");
+$color-border-light:  map.get($scheme, "brd-l");
+$color-border-dark:   map.get($scheme, "brd-d");
 
 $color-success: #5db97a;
 $color-warning: #fcd34d;

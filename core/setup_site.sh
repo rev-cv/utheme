@@ -639,7 +639,7 @@ NEWS_ID=$(wp post create \
     --post_title="$NEWS_TITLE" \
     --post_name="news" \
     --post_status=publish \
-    --page_template="page-list.php" \
+    --page_template="page-sitemap.php" \
     --post_author="$ADMIN_ID" \
     --porcelain \
 )
@@ -649,7 +649,14 @@ echo "Created '$NEWS_TITLE' page (ID: $NEWS_ID)"
 # Create first news post
 WELCOME_TITLE="${T_WELCOME_NEWS_TITLE[$SITE_LANG]:-Welcome! We Have Launched!}"
 WELCOME_CONTENT="${T_WELCOME_NEWS_CONTENT[$SITE_LANG]:-Welcome to our new site!}"
-WELCOME_POST_ID=$(wp post create --post_type=post --post_title="$WELCOME_TITLE" --post_content="$WELCOME_CONTENT" --post_status=publish --post_author="$ADMIN_ID" --porcelain)
+WELCOME_POST_ID=$(wp post create \
+    --post_type=post \
+    --post_title="$WELCOME_TITLE" \
+    --post_content="$WELCOME_CONTENT" \
+    --post_status=publish \
+    --post_author="$ADMIN_ID" \
+    --porcelain \
+)
 wp post term set $WELCOME_POST_ID category "news"
 echo "Created welcome news post '$WELCOME_TITLE' (ID: $WELCOME_POST_ID)"
 

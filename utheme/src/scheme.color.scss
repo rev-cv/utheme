@@ -8,7 +8,7 @@
 }
 
 @function generate-scheme($hue, $style) {
-    $sat: if($style == "luxury", 35%, if($style == "neon" or $style == "japane", 95%, 65%));
+    $sat: if($style == "luxury", 35%, if($style == "neon" or $style == "japane" or $style == "vibrant", 95%, 65%));
     $lgt: if($style == "luxury", 35%, 50%);
 
     $p-gen: hsl($hue, $sat, $lgt);
@@ -17,23 +17,27 @@
     // Инициализация базы
     $bg-l: #fff; $tx-l: #1a1a1a; $pr-l: $p-gen; $ac-l: $a-gen;
     $bg-d: #0d0d0d; $tx-d: #f0f0f0; $pr-d: color.adjust($p-gen, $lightness: 15%);
+    $ac-d: null;
 
     @if $style == "luxury"{
-        $_bg-l: color.mix($p-gen, #FAFAF8, 3%);
-        $_tx-l: color.mix($p-gen, #1A1A1A, 15%);
-        $_bg-d: color.mix($p-gen, #0D0D0D, 12%);
+        $bg-l: color.mix($p-gen, #FAFAF8, 3%);
+        $tx-l: color.mix($p-gen, #1A1A1A, 15%);
+        $bg-d: color.mix($p-gen, #0D0D0D, 12%);
+    } @else if $style == "bold-dark" {
+        $bg-l: #121212; $tx-l: #e0e0e0; $pr-l: hsl($hue, 85%, 60%);
+        $bg-d: #000000; 
     } @else if $style == "graphite" {
-        $_bg-l: #F9F9F9; $_tx-l: hsl($hue, 15%, 20%); $_pr-l: hsl($hue, 10%, 25%);
-        $_bg-d: hsl($hue, 8%, 12%); $_pr-d: hsl($hue, 5%, 85%);
+        $bg-l: #F9F9F9; $tx-l: hsl($hue, 15%, 20%); $pr-l: hsl($hue, 10%, 25%);
+        $bg-d: hsl($hue, 8%, 12%); $pr-d: hsl($hue, 5%, 85%);
     } @else if $style == "pastoral" {
-        $_bg-l: #F2EDE4; $_tx-l: #4A3F35; $_pr-l: color.mix($p-gen, #7D6B5D, 60%);
-        $_bg-d: #35322D; $_tx-d: #D9D2C5;
+        $bg-l: #F2EDE4; $tx-l: #4A3F35; $pr-l: color.mix($p-gen, #7D6B5D, 60%);
+        $bg-d: #35322D; $tx-d: #D9D2C5;
     } @else if $style == "japane" {
-        $_bg-l: #FDFCF0; $_tx-l: #080808; $_pr-l: #E63946; 
-        $_bg-d: #050505; $_pr-d: hsl($hue, 100%, 60%); $_ac-d: hsl(($hue + 60) % 360, 100%, 55%);
+        $bg-l: #FDFCF0; $tx-l: #080808; $pr-l: #E63946; 
+        $bg-d: #050505; $pr-d: hsl($hue, 100%, 60%); $ac-d: hsl(($hue + 60) % 360, 100%, 55%);
     } @else if $style == "minimalist" {
-        $_bg-l: #ffffff; $_pr-l: #111111; $_ac-l: $p-gen;
-        $_bg-d: #050505; $_pr-d: #ffffff;
+        $bg-l: #ffffff; $pr-l: #111111; $ac-l: $p-gen;
+        $bg-d: #050505; $pr-d: #ffffff;
     }
 
     @return (
@@ -42,7 +46,7 @@
         "tx-l": $tx-l,
         "bg-l": $bg-l,
         "pr-d": $pr-d,
-        "ac-d": color.adjust($ac-l, $lightness: 10%),
+        "ac-d": if($ac-d, $ac-d, color.adjust($ac-l, $lightness: 10%)),
         "tx-d": $tx-d,
         "bg-d": $bg-d,
         "h1-l": if($style == "bold-dark", #fff, $pr-l),

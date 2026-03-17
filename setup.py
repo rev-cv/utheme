@@ -14,6 +14,7 @@ import json
 import re
 from pathlib import Path
 from dotenv import load_dotenv
+import socket
 
 load_dotenv(interpolate=True)
 
@@ -197,8 +198,7 @@ def process_temp_credentials():
 def run_setup_script():
     print("\n=== 3/3: Настройка сайта (setup_site.sh) ===")
     
-    # 1. Запуск скрипта настройки
-    # Собираем переменные из .env для передачи внутрь контейнера
+    # сбор переменных из .env для передачи внутрь контейнера
     env_vars_to_pass = [
         "ADMIN_USER", "ADMIN_EMAIL", "SITE_LANG", 
         "SITE_TITLE", "SITE_URL", "THEME_SLUG"
@@ -215,13 +215,73 @@ def run_setup_script():
         "Скрипт setup_site.sh завершился с ошибкой."
     )
 
-    # Обработка учетных данных после выполнения скрипта
+    # обработка учетных данных после выполнения скрипта
     process_temp_credentials()
+
+
+def is_port_in_use(port: int) -> bool:
+    """Проверяет, занят ли TCP порт на localhost."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) == 0
+
+def find_free_port_and_update_env():
+    """
+    Проверяет HOST_PORT из .env. Если занят — ищет свободный 
+    и обновляет .env файл.
+    """
+    print("\n=== 0/3: Проверка доступности порта ===")
+    
+    host_port_str = os.getenv("HOST_PORT")
+    if not host_port_str:
+        print("HOST_PORT не найден в .env. Используем стандартный анализ Docker.")
+        return
+
+    try:
+        current_port = int(host_port_str)
+    except ValueError:
+        print(f"Ошибка: HOST_PORT '{host_port_str}' не является числом.")
+        return
+
+    original_port = current_port
+    
+    # рекурсивный поиск свободного порта
+    while is_port_in_use(current_port):
+        print(f"   [!] Порт {current_port} занят. Пробую {current_port + 1}...")
+        current_port += 1
+
+    if current_port != original_port:
+        print(f"   -> Найден свободный порт: {current_port}. Обновляю .env...")
+        
+        env_path = Path.cwd() / ".env"
+        if env_path.exists():
+            content = env_path.read_text(encoding='utf-8')
+            # замена значения HOST_PORT
+            new_content = re.sub(
+                r'^(HOST_PORT\s*=\s*).*$', 
+                f'HOST_PORT={current_port}', 
+                content, 
+                flags=re.MULTILINE
+            )
+            env_path.write_text(new_content, encoding='utf-8')
+            
+            # обновляем переменные окружения в текущем процессе 
+            # чтобы os.getenv("SITE_URL") выдал верный результат позже
+            os.environ["HOST_PORT"] = str(current_port)
+            # перезагружаем dotenv, чтобы интерполяция SITE_URL=...${HOST_PORT} сработала
+            load_dotenv(interpolate=True, override=True) 
+        else:
+            print("Ошибка: Файл .env не найден для записи порта.")
+    else:
+        print(f"   -> Порт {current_port} свободен.")
 
 def main():
     print("=====================================================")
     print("Настройка Docker + WordPress")
     print("=====================================================")
+
+    # проверка свободного порта ПЕРЕД запуском Docker
+    # если занято, то +1
+    find_free_port_and_update_env()
 
     start_docker()
     run_setup_script()

@@ -53,7 +53,7 @@ article,
 aside {
 
     p {
-        font-size: clamp(.8rem, 3vw, 1rem);
+        font-size: clamp(14px, 3vw, 1rem);
         margin-bottom: $space;
 
         strong {
@@ -103,7 +103,7 @@ aside {
 
         &:hover {
             @include f.mode(( //
-                color: (conf.$color-primary-light, conf.$color-primary-dark),
+                color: (conf.$color-accent-light, conf.$color-accent-dark),
             ));
         }
     }
