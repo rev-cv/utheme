@@ -229,6 +229,11 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
     if not container:
         return ""
 
+    # модификация всех ссылок для открытия в новой вкладке
+    for a_tag in container.find_all('a', href=True):
+        a_tag['target'] = '_blank'
+        a_tag['rel'] = 'noopener'
+
     
     # все DIV распаковываются и удаляются за исключением тех, что в этом списке
     forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance', 

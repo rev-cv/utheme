@@ -17,6 +17,9 @@ $font-size: 19px;
 
 // тип добавляемого меню на сайте
 $main-menu: "console";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
+$is-menu-title: "false"; // отображать название сайта в главном меню? true, false 
+// поддержка: boring
+
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье

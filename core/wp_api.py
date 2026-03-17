@@ -239,7 +239,7 @@ def _create_wp_page(article_data: dict) -> int | None:
         'title': title,
         'status': 'draft', 
         'parent': ARTICLES_PAGE_ID,
-        'template': 'article.php' # имя файла шаблона
+        'template': 'page.php' # имя файла шаблона
     }
 
     # присвоение категории статье

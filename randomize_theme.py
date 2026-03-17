@@ -3,7 +3,7 @@ import random
 from pathlib import Path
 
 # путь к файлу конфигурации
-SCSS_FILE_PATH = Path(__file__).parent / "utheme" / "src" / "conf.scss
+SCSS_FILE_PATH = Path(__file__).parent / "utheme" / "src" / "conf.scss"
 
 # Словарь переменных.
 # Ключ: имя переменной в SCSS (без знака $).

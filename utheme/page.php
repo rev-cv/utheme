@@ -1,4 +1,4 @@
-<?php /* Template Name: ARTICLE */ ?>
+<?php /* Template Name: PAGE */ ?>
 <?php get_header() ?>
 
 <?php while (have_posts()) : the_post(); ?>
