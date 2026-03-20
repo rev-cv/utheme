@@ -54,23 +54,6 @@ def run_command(command, error_message, check_output=False):
         print(f"\nОШИБКА: {e}")
         sys.exit(1)
 
-def start_sass_watch():
-    print("\n=== 1.5/3: Запуск SASS Watch (в новом окне) ===")
-    theme_src_path = Path.cwd() / "utheme" / "src"
-    
-    if not theme_src_path.exists():
-        print(f"Папка {theme_src_path} не найдена. Пропуск запуска SASS.")
-        return
-
-    sass_cmd = "sass style.scss:style.css --style=compressed --watch --no-source-map"
-    
-    print(f"Запускаю SASS в папке: {theme_src_path}")
-    
-    if sys.platform.startswith('win'):
-        subprocess.Popen(f'start "SASS Watch" /D "{theme_src_path}" cmd /k "{sass_cmd}"', shell=True)
-    else:
-        print(f"Запуск в новом окне не поддерживается. Выполните вручную: cd {theme_src_path} && {sass_cmd}")
-
 def start_docker():
     print("\n=== 2/3: Запуск Docker и настройка прав ===")
     
@@ -274,6 +257,38 @@ def find_free_port_and_update_env():
     else:
         print(f"   -> Порт {current_port} свободен.")
 
+def fix_docker_compose_paths():
+    """
+    Заменяет относительные пути (./) в docker-compose.yml на абсолютные пути ХОСТА.
+    Это необходимо для DooD (Docker out of Docker), чтобы демон на хосте нашел файлы.
+    """
+    print("\n=== 1.8/3: Исправление путей в docker-compose.yml ===")
+    host_root = os.getenv("HOST_PROJECT_ROOT")
+    if not host_root:
+        host_root = os.getcwd().replace("\\", "/")
+        print(f"INFO: Ручной запуск. Используем текущий путь: {host_root}")
+        print("WARN: HOST_PROJECT_ROOT не задан. Используем относительные пути (может не сработать в DooD).")
+        # return
+
+    dc_path = Path("docker-compose.yml")
+    if not dc_path.exists():
+        print("docker-compose.yml не найден.")
+        return
+
+    content = dc_path.read_text(encoding="utf-8")
+    # Добавляем слеш, если его нет
+    if not host_root.endswith("/"):
+        host_root += "/"
+    
+    # Заменяем "- ./" на "- E:/path/to/project/"
+    new_content = content.replace("- ./", f"- {host_root}")
+    
+    if new_content != content:
+        dc_path.write_text(new_content, encoding="utf-8")
+        print(f"Пути обновлены на абсолютные: {host_root}")
+    else:
+        print("Изменения путей не требуются.")
+
 def main():
     print("=====================================================")
     print("Настройка Docker + WordPress")
@@ -283,19 +298,15 @@ def main():
     # если занято, то +1
     find_free_port_and_update_env()
 
+    # Исправляем пути перед запуском
+    fix_docker_compose_paths()
+
     start_docker()
     run_setup_script()
-
-    start_sass_watch()
 
     print("\n=====================================================")
     print("УСПЕШНОЕ ЗАВЕРШЕНИЕ!")
     print("=====================================================")
-    
-    if sys.platform.startswith('win'):
-        os.system("pause")
-    else:
-        input("Нажмите Enter, чтобы завершить...")
 
 if __name__ == "__main__":
     main()

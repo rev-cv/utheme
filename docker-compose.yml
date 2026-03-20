@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   db:
     image: mariadb:10.6
@@ -55,6 +54,18 @@ services:
       retries: 5           # Повторить 5 раз
       start_period: 10s    # Дать контейнеру 10 секунд на запуск
     # === КОНЕЦ: HEALTHCHECK ДЛЯ WORDPRESS ===
+
+  sass:
+    image: node:alpine
+    working_dir: /src
+    volumes:
+      - ./utheme/src:/src
+    # profiles:
+    #   - dev
+    # Устанавливаем sass внутри контейнера при запуске и включаем watch
+    command: >
+      sh -c "npm install -g sass && 
+             sass --watch --poll --style=compressed --no-source-map style.scss:style.css"
 
 volumes:
   db_data: {}
