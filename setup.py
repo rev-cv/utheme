@@ -56,6 +56,14 @@ def run_command(command, error_message, check_output=False):
 
 def start_docker():
     print("\n=== 2/3: Запуск Docker и настройка прав ===")
+
+    # создание внутренней сети, если она отсутствует
+    try:
+        subprocess.run(["docker", "network", "inspect", "web_network"], 
+                       check=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        print("Creating web_network...")
+        subprocess.run(["docker", "network", "create", "web_network"])
     
     # 1. Попытка запуска контейнеров с перехватом ошибок порта
     try:
@@ -90,11 +98,30 @@ def start_docker():
     time.sleep(10)
 
     # 2. Исправление прав
-    fix_perm_cmd = "chown -R www-data:www-data /var/www/html/wp-content"
-    run_command(
-        DOCKER_COMPOSE_COMMAND + ["exec", "-u", "root", WORDPRESS_SERVICE, "bash", "-c", fix_perm_cmd],
-        "Не удалось изменить права доступа."
+    # fix_perm_cmd = "chown -R www-data:www-data /var/www/html/wp-content"
+    # run_command(
+    #     DOCKER_COMPOSE_COMMAND + ["exec", "-u", "root", WORDPRESS_SERVICE, "bash", "-c", fix_perm_cmd],
+    #     "Не удалось изменить права доступа."
+    # )
+    print("\n=== 2.5/3: Тонкая настройка прав внутри контейнера ===")
+    
+    # Объединяем команды в одну строку для bash -c
+    # 1. меняем владельца на www-data (чтобы работал WP)
+    # 2. даем права группе на запись (для доступа)
+    # 3. даем права на выполнение скриптам (если нужно)
+    commands = (
+        "chown -R www-data:www-data /var/www/html/wp-content && "
+        "chmod -R 775 /var/www/html/wp-content" # 775 = rwxrwxr-x (владелец и группа могут всё)
     )
+
+    try:
+        run_command(
+            DOCKER_COMPOSE_COMMAND + ["exec", "-u", "root", WORDPRESS_SERVICE, "bash", "-c", commands],
+            "Не удалось настроить права доступа внутри контейнера."
+        )
+        print("   -> Права успешно синхронизированы.")
+    except Exception as e:
+        print(f"   -> [!] Предупреждение по правам: {e} (на Windows это иногда нормально)")
 
     # 3. Установка WP-CLI
     print("   -> Установка WP-CLI...")
@@ -174,8 +201,11 @@ def process_temp_credentials():
     except Exception as e:
         print(f"Непредвиденная ошибка при обработке учетных данных: {e}")
     finally:
-        # Удаляем файл в любом случае
-        os.remove(json_path)
+        # os.remove(json_path)
+        run_command(
+            DOCKER_COMPOSE_COMMAND + ["exec", "-u", "root", WORDPRESS_SERVICE, "rm", "/var/www/html/wp-content/uploads/temp_wp.json"],
+            "Не удалось удалить временный JSON файл через Docker."
+        )
         print(f"Временный файл {json_path.name} удален.")
 
 def run_setup_script():

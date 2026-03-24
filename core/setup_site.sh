@@ -1,8 +1,13 @@
 # алиас с разрешением запускать wp от root
 alias wp='wp --allow-root'
 
-# Принимаем переменные из окружения (передаются через setup.py -> docker compose exec -e)
-# Используем синтаксис ${VAR:-default} для установки значений по умолчанию
+# патч wp-config.php для работы с HTTPS прокси (Nginx Proxy Manager)
+if ! grep -q "HTTP_X_FORWARDED_PROTO" wp-config.php; then
+    echo "Patching wp-config.php for HTTPS proxy..."
+    sed -i "2i // Proxy SSL Fix\nif (isset(\$_SERVER['HTTP_X_FORWARDED_PROTO']) && \$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') { \$_SERVER['HTTPS'] = 'on'; }\n" wp-config.php
+fi
+
+# переменные из окружения (передаются через setup.py -> docker compose exec -e)
 SITE_URL="${SITE_URL:-http://localhost:8080}"
 THEME_SLUG="${THEME_SLUG:-utheme}"
 ADMIN_USER="${ADMIN_USER:-admin}"
@@ -161,6 +166,14 @@ wp theme list --status=inactive --field=name | xargs wp theme delete
 # удаление дефолтного мусора (Привет мир, Пример страницы)
 echo "Cleaning up default content..."
 wp post delete $(wp post list --post_type=post,page --format=ids) --force
+
+echo "Hard reset of AUTO_INCREMENT..."
+wp eval "global \$wpdb; 
+    \$wpdb->query(\"TRUNCATE TABLE {\$wpdb->prefix}posts\");
+    \$wpdb->query(\"TRUNCATE TABLE {\$wpdb->prefix}postmeta\");
+    \$wpdb->query(\"TRUNCATE TABLE {\$wpdb->prefix}terms\");
+    \$wpdb->query(\"TRUNCATE TABLE {\$wpdb->prefix}term_taxonomy\");
+    \$wpdb->query(\"TRUNCATE TABLE {\$wpdb->prefix}term_relationships\");"
 
 # ===========================================================================
 # 2. НАСТРОЙКА АДМИНКИ
@@ -617,6 +630,9 @@ for PAGE_KEY in "${LEGAL_PAGES[@]}"; do
     wp post term set $PAGE_ID category "Utility Pages"
     echo "Created '$PAGE_TITLE' page (ID: $PAGE_ID)"
 done
+
+wp option update wp_page_for_privacy_policy $PRIVACY_ID
+wp post edit $PRIVACY_ID --post_status=publish
 
 # Sitemap (Шаблон ARTICLE, шорткод [rank_math_html_sitemap])
 SITEMAP_TITLE="${T_SITEMAP[$SITE_LANG]:-Sitemap}"

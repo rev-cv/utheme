@@ -147,3 +147,42 @@ def resize_image(input_path, output_path=None, height=None, size=None):
             
     except Exception as e:
         print(f"Ошибка при обработке {input_path}: {e}")
+
+
+def search_branding_images(search_root: Path, spec_dir: Path):
+    """
+    Ищет logo, favicon, icon в папке search_root и копирует/конвертирует их в spec_dir.
+    favicon переименовывается в icon.
+    Все растровые изображения конвертируются в .png.
+    """
+    print(f"\nПоиск Branding-изображений (logo, icon) в: {search_root}")
+    
+    targets = {'logo': 'logo', 'favicon': 'icon', 'icon': 'icon'}
+    valid_exts = {'.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico'}
+    found_items = {}
+
+    for file_path in search_root.rglob("*"):
+        if file_path.is_file() and file_path.suffix.lower() in valid_exts:
+            stem = file_path.stem.lower()
+            if stem in targets:
+                target_name = targets[stem]
+                # Сохраняем первый найденный вариант
+                if target_name not in found_items:
+                    found_items[target_name] = file_path
+
+    if not found_items:
+        print("    Брендинг не найден.")
+        return
+
+    for target_name, source_file in found_items.items():
+        try:
+            dest_file = spec_dir / f"{target_name}.png"
+            if source_file.suffix.lower() == '.svg':
+                shutil.copy2(source_file, spec_dir / f"{target_name}.svg")
+                print(f"    Скопирован SVG: {source_file.name} -> {target_name}.svg")
+            else:
+                with Image.open(source_file) as img:
+                    img.convert('RGBA').save(dest_file, format='PNG')
+                print(f"    Сконвертирован: {source_file.name} -> {dest_file.name}")
+        except Exception as e:
+            print(f"    Ошибка обработки {source_file}: {e}")

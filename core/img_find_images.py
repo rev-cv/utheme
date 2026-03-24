@@ -12,6 +12,8 @@ def get_detailed_image_data(root_path: Path) -> list:
         try:
             with open(html_file, 'r', encoding='utf-8') as f:
                 soup = BeautifulSoup(f, 'html.parser')
+                
+                seen_images = set()
 
                 for img in soup.find_all('img'):
                     src = img.get('src')
@@ -20,6 +22,10 @@ def get_detailed_image_data(root_path: Path) -> list:
 
                     # базовые данные
                     image_path = Path(src)
+                    
+                    if image_path.stem in seen_images:
+                        continue
+                    seen_images.add(image_path.stem)
 
                     # извлечение SEO данных из атрибутов
                     alt_text = img.get('alt', '').strip()
@@ -143,3 +149,6 @@ def get_all_images(folder: Path) -> list:
     pics = find_and_select_images(folder, pics)
     pics = normalize_and_rename_files(pics)
     return pics
+
+
+

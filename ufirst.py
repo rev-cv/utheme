@@ -28,43 +28,43 @@ SPEC_DIR = Path(__file__).parent / "spec"
 U5_DICT = [
     {
         "resource": "PILLAR",
+        "post": 1
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL1",
+        "post": 3
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL2",
         "post": 4
     },
     {
-        "resource": "CL1",
+        "resource": "CLUSTERS MAIN/CL3",
+        "post": 5
+    },
+    {
+        "resource": "CLUSTERS MAIN/CL4",
         "post": 6
     },
     {
-        "resource": "CL2",
+        "resource": "CLUSTERS MAIN/CL5",
         "post": 7
     },
     {
-        "resource": "CL3",
+        "resource": "ADD PAGES/about-us",
         "post": 8
     },
     {
-        "resource": "CL4",
+        "resource": "ADD PAGES/cookie-policy",
         "post": 9
     },
     {
-        "resource": "CL5",
+        "resource": "ADD PAGES/privacy-policy",
         "post": 10
     },
     {
-        "resource": "ADD PAGES/about-us",
-        "post": 11
-    },
-    {
-        "resource": "ADD PAGES/cookie-policy",
-        "post": 12
-    },
-    {
-        "resource": "ADD PAGES/privacy-policy",
-        "post": 13
-    },
-    {
         "resource": "ADD PAGES/legal-notice",
-        "post": 14
+        "post": 11
     },
 ]
 
@@ -87,8 +87,14 @@ required_folders = [
 ]
 
 if __name__ == "__main__":
+    skip_check = "--docker-mode" in sys.argv
+
     # ПРОВЕРКА: ДАННЫЙ СКРИПТ ПРЕДНАЗНАЧЕН ТОЛЬКО ДЛЯ ЛОКАЛЬНОГО САЙТА
-    wp_api.check_local()
+    # Проводим проверку только если нет флага --docker-mode
+    if not skip_check:
+        wp_api.check_local()
+    else:
+        print("--- Пропуск проверки локального окружения (флаг --docker-mode) ---")
 
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()

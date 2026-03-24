@@ -18,6 +18,7 @@ $includes = array(
     'shortcode-about-autor.php',
     // 'shortcode-duplicate-toc.php',
     'shortcode-breadcrumbs.php',
+    "shortcode-inline.php",
     // 'shortcode-sitemap.php',
     'mod-google-font.php',
     'mod-seo.php',
