@@ -1,0 +1,145 @@
+.u-config-wrapper { background: #f0f0f1; padding: 20px; }
+
+/* Tabs Navigation */
+.tabs-nav { display: flex; align-items: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #ccd0d4; padding-bottom: 10px; }
+.tabs-nav-spacer { flex: 1; }
+.tabs-save-btn { margin-left: auto; }
+.tab-btn { padding: 10px 20px; border: 1px solid #ccd0d4; background: #fff; cursor: pointer; border-radius: 4px 4px 0 0; font-weight: 600; transition: all 0.2s; }
+.tab-btn:hover { background: #f9f9f9; }
+.tab-btn.active { background: #2271b1; color: #fff; border-color: #2271b1; }
+
+/* Tab Panes */
+.tab-pane { display: none; animation: fadeIn 0.3s ease-in-out; }
+.tab-pane.active { display: block; }
+
+/* Cards */
+.u-card, .u-component-card { background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px; margin-bottom: 20px; }
+/* Только прямые label внутри u-card (не вложенные в u-checkbox-label и не в u-basic-field) */
+.u-card > label { display: block; margin-bottom: 15px; font-weight: 600; }
+
+/* Dirty indicator */
+.tab-btn.dirty::after { content: "●"; color: #d63638; margin-left: 8px; font-size: 14px; vertical-align: middle; }
+
+/* Two-column body (Basic + Components shared) */
+.u-card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+.u-card-left  { display: flex; flex-direction: column; gap: 16px; }
+.u-card-right { display: flex; flex-direction: column; }
+
+/* Preview image */
+.u-preview { background: #f9f9f9; height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #eee; border-radius: 4px; }
+.u-preview--tall { height: 280px; }
+.u-preview img { max-width: 100%; max-height: 100%; object-fit: cover; }
+
+/* ── Basic tab fields ────────────────────────────────────────────────────── */
+.u-basic-field { display: flex; flex-direction: column; gap: 5px; }
+.u-basic-field-label { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.u-basic-field-label output { font-weight: 700; color: #2271b1; min-width: 32px; }
+.u-basic-field-control select,
+.u-basic-field-control input[type="range"] { display: block; }
+.u-basic-checkboxes { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Checkboxes ──────────────────────────────────────────────────────────── */
+.u-checkbox-label { display: flex; align-items: flex-start; gap: 8px; font-weight: 500; cursor: pointer; font-weight: normal; }
+.u-checkbox-label input[type="checkbox"],
+.u-checkbox-label input[type="radio"] { margin-top: 3px; flex-shrink: 0; }
+.u-checkbox-label > span { display: flex; flex-direction: column; gap: 2px; }
+.u-checkbox-label strong { display: block; font-weight: 600; }
+
+/* ── Component Cards ─────────────────────────────────────────────────────── */
+.u-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+.u-component-select { min-width: 150px; padding: 5px 10px; }
+
+/* ── TOC Icon custom dropdown ────────────────────────────────────────────── */
+.u-icon-select-wrap { display: flex; flex-direction: column; gap: 6px; }
+
+.u-icon-dropdown { position: relative; display: inline-block; min-width: 160px; }
+
+/* Кнопка-триггер */
+.u-icon-trigger {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 6px 10px;
+    background: #fff; border: 1px solid #ccd0d4; border-radius: 4px;
+    cursor: pointer; font-size: 13px; text-align: left;
+    transition: border-color 0.15s;
+}
+.u-icon-trigger:hover { border-color: #2271b1; }
+.u-icon-dropdown.is-open .u-icon-trigger { border-color: #2271b1; border-bottom-color: transparent; border-radius: 4px 4px 0 0; }
+.u-icon-chevron { margin-left: auto; font-size: 11px; color: #888; transition: transform 0.2s; }
+.u-icon-dropdown.is-open .u-icon-chevron { transform: rotate(180deg); }
+.u-icon-trigger-name { color: #333; }
+
+/* Список опций */
+.u-icon-list {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 999;
+    background: #fff; border: 1px solid #2271b1; border-top: none;
+    border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
+}
+.u-icon-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; cursor: pointer; font-size: 13px;
+    transition: background 0.1s;
+}
+.u-icon-item:hover { background: #f0f6ff; }
+.u-icon-item.is-selected { background: #e7f3ff; color: #2271b1; font-weight: 600; }
+.u-icon-item-name { color: inherit; }
+
+/* Inline SVG иконка */
+.u-icon-svg { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 18px; height: 18px; }
+.u-icon-svg svg { width: 18px; height: 18px; fill: currentColor; display: block; }
+
+/* ── Descriptions ────────────────────────────────────────────────────────── */
+.u-desc { font-size: 12px; color: #777; line-height: 1.5; margin: 0; }
+
+/* ── Color Mode Switcher ─────────────────────────────────────────────────── */
+.color-mode-switcher { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ccd0d4; border-radius: 4px; }
+.switcher-label { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+
+/* Toggle Switch */
+.switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 28px; }
+.slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+input:checked + .slider { background-color: #2271b1; }
+input:checked + .slider:before { transform: translateX(24px); }
+
+/* Switcher Status */
+.switcher-status { padding: 6px 12px; border-radius: 4px; font-size: 13px; font-weight: 600; }
+.switcher-status.auto   { background: #e7f3ff; color: #2271b1; }
+.switcher-status.manual { background: #fff3cd; color: #856404; }
+
+/* Color Mode Content */
+.color-mode-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+.color-mode-content.active { display: block; }
+
+/* Color Table */
+.color-table { background: #fff; border: 1px solid #ccd0d4; border-radius: 4px; }
+.color-table-header { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; padding: 12px 15px; background: #f9f9f9; border-bottom: 1px solid #ccd0d4; font-weight: 600; }
+.color-table-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; padding: 12px 15px; border-bottom: 1px solid #eee; align-items: center; }
+.color-table-row:last-child { border-bottom: none; }
+.color-label { font-weight: 600; }
+.color-input-wrapper { display: flex; align-items: center; }
+
+/* ── Нативный цветовой пикер ─────────────────────────────────────────────── */
+.u-color-field { display: inline-flex; align-items: center; gap: 6px; }
+.u-color-swatch { width: 32px; height: 32px; border-radius: 4px; border: 2px solid #ccd0d4; cursor: pointer; flex-shrink: 0; transition: border-color 0.15s; }
+.u-color-swatch:hover { border-color: #2271b1; }
+.u-color-native { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; border: none; padding: 0; }
+.u-color-hex { width: 80px; padding: 5px 6px; font-size: 13px; font-family: monospace; border: 1px solid #ccd0d4; border-radius: 4px; text-transform: uppercase; }
+.u-color-hex:focus { border-color: #2271b1; outline: none; box-shadow: 0 0 0 1px #2271b1; }
+.u-color-picker { display: none !important; }
+
+/* System Colors Grid */
+.system-colors-section { margin-top: 25px; padding-top: 20px; border-top: 2px solid #ccd0d4; }
+.system-colors-section h4 { margin-bottom: 15px; font-size: 16px; }
+.system-colors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+.system-color-item { background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px; }
+.system-color-item label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 13px; }
+
+/* Range inputs */
+input[type="range"] { width: 200px; vertical-align: middle; }
+
+/* Seed Hue Preview */
+.seed-hue-preview { display: inline-block; width: 24px; height: 24px; border-radius: 4px; border: 2px solid #ccd0d4; margin-right: 8px; vertical-align: middle; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }

@@ -4,6 +4,7 @@
 @use "sass:map";
 @use "scheme.fonts.scss" as font;
 @use "scheme.color.scss" as gen;
+@use "scheme.icons.scss" as ico;
 
 ////////////////////////////////////////////////////////
 ///  ВАЖНО!!!
@@ -16,34 +17,36 @@
 $font-size: 16px;
 
 // тип добавляемого меню на сайте
-$main-menu: "boring";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
-$is-menu-title: "false"; // отображать название сайта в главном меню? true, false 
+$main-menu: "docs";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
+$is-menu-title: "true"; // отображать название сайта в главном меню? true, false 
 // поддержка: boring
 
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
-$toc-menu: "circle"; // circle, number, icon
+$toc-menu: "icon"; // circle, number, icon
 // меню должно быть в секции или располагаться открыто?
 $is-not-section: "true"; // true, false
+$toc-icon: "bike";
+$toc-icon-select: map.get(ico.$icon-tuple, $toc-icon);
 
 // стилизация блока details
 $details: "arrow"; // arrow, plus
 
 // тип используемой на сайте карточки статей
-$article-card: "float"; // default, frame, slide, windows, float, soft, split
+$article-card: "frame"; // default, frame, slide, windows, float, soft, split
 
 // картинки вписываются или занимают всю ширину страницы?
-$is-img_contain: "true"; // true, false
+$is-img_contain: "false"; // true, false
 
 // выравнивание элементо по левому краю ? Иначе - центральное выравнивание
-$is-left-align: "false"; // true, false
+$is-left-align: "true"; // true, false
 
 // в блоках секций, карточек, меню, футера использовать бордер?
 $is-border: "false"; // true, false
 
 // какую шрифтовую пару выбрать для сайта?
-$font-vibe: "neo-swiss";
+$font-vibe: "interface";
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
 // какой радиус использовать для секций, меню, карточек и прочее?
@@ -55,10 +58,10 @@ $density-factor: 0.85;
 // =========================================================
 // ЦВЕТА (COLOR SCHEME)
 // =========================================================
-$seed-hue: 59; 
+$seed-hue: 360; 
 // "luxury", "minimalist", "vibrant", "bold-dark"
 // "graphite", "pastoral", "japane" 
-$style: "luxury"; 
+$style: "pastoral"; 
 $scheme: gen.generate-scheme($seed-hue, $style);
 
 $color-primary-light: map.get($scheme, "pr-l");
@@ -100,3 +103,6 @@ $max-width: 1200px;
 
 $shadow-section: 0 4px 12px rgba(0, 0, 0, 0.1);
 $shadow-section-hover: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+$breadcrumbs-separator: "/";
+

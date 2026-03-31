@@ -27,7 +27,7 @@ temp_wp.json
 # --- Docker & WordPress Data ---
 db_data/
 uploads/
-plugins/
+# plugins/
 
 # --- Runtime State & Logs ---
 created_pages.json

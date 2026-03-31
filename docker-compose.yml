@@ -12,16 +12,14 @@ services:
     networks:
       - default # внутренняя сеть для связи с WP
     
-    # === НАЧАЛО: HEALTHCHECK ДЛЯ БАЗЫ ДАННЫХ ===
     healthcheck:
-      # Проверяем, что сервер MariaDB доступен, используя утилиту mysqladmin.
-      # Важно: root_password здесь используется та, что задана в MYSQL_ROOT_PASSWORD.
+      # прповерка доступности сервера MariaDB
+      # root_password используется тот, что задан в MYSQL_ROOT_PASSWORD.
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
       interval: 5s         # Проверять каждые 5 секунд
       timeout: 3s          # Ждать ответ 3 секунды
       retries: 10          # Повторить 10 раз, прежде чем объявить unhealthy
       start_period: 20s    # Дать контейнеру 20 секунд на запуск, прежде чем начать отсчет retries
-    # === КОНЕЦ: HEALTHCHECK ДЛЯ БАЗЫ ДАННЫХ ===
 
   wordpress:
     image: wordpress:latest
@@ -35,31 +33,28 @@ services:
       WORDPRESS_DB_PASSWORD: wp_password
       WORDPRESS_DB_NAME: wordpress
     volumes:
-      # ... маппинги ...
       - ./utheme:/var/www/html/wp-content/themes/utheme
       - ./uploads:/var/www/html/wp-content/uploads
       - ./plugins:/var/www/html/wp-content/plugins
       - ./core/setup_site.sh:/var/www/html/setup_site.sh
       - ./core/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     networks:
-      - default
-      - web_network # Добавляем внешнюю сеть для NPM
+      - default     # внутренняя сеть для связи с WP
+      - web_network # внешняя сеть для NPM
       
-    # дополнительная настройка:
     depends_on:
       db:
-        condition: service_healthy # Запустить WordPress только после того, как DB станет healthy
+        condition: service_healthy # запустить WordPress только после того, как DB станет healthy
         
     # === НАЧАЛО: HEALTHCHECK ДЛЯ WORDPRESS ===
     healthcheck:
-      # Проверяем, что веб-сервер отвечает на HTTP-запросы.
+      # прповерка доступности сервера WordPress
       # 'curl -f' вернет ошибку, если код ответа >= 400.
       test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 10s        # Проверять каждые 10 секунд
       timeout: 5s          # Ждать ответ 5 секунд
       retries: 5           # Повторить 5 раз
       start_period: 10s    # Дать контейнеру 10 секунд на запуск
-    # === КОНЕЦ: HEALTHCHECK ДЛЯ WORDPRESS ===
 
   sass:
     image: node:alpine
@@ -68,10 +63,9 @@ services:
       - ./utheme/src:/src
     # profiles:
     #   - dev
-    # Устанавливаем sass внутри контейнера при запуске и включаем watch
     command: >
       sh -c "npm install -g sass && 
-             sass --watch --poll --style=compressed --no-source-map style.scss:style.css"
+        sass --quiet-deprecation=if-function --watch --poll --style=compressed style.scss:style.css"
     networks:
       - default
 
