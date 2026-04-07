@@ -34,3 +34,4 @@ created_pages.json
 *.log
 *.txt
 utheme/src/*.css
+utheme/src/*.map

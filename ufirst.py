@@ -31,23 +31,23 @@ U5_DICT = [
         "post": 1
     },
     {
-        "resource": "CLUSTERS MAIN/CL1",
+        "resource": "CL1",
         "post": 3
     },
     {
-        "resource": "CLUSTERS MAIN/CL2",
+        "resource": "CL2",
         "post": 4
     },
     {
-        "resource": "CLUSTERS MAIN/CL3",
+        "resource": "CL3",
         "post": 5
     },
     {
-        "resource": "CLUSTERS MAIN/CL4",
+        "resource": "CL4",
         "post": 6
     },
     {
-        "resource": "CLUSTERS MAIN/CL5",
+        "resource": "CL5",
         "post": 7
     },
     {

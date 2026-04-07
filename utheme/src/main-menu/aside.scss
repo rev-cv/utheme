@@ -185,12 +185,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 opacity: 1;
                 transform: translateY(0);
 
-                /* Задержки для первых 6 элементов (каскадный эффект) */
-                @for $i from 1 through 6 {
-                    &:nth-child(#{$i}) {
-                        transition-delay: 0.05s + ($i * 0.05s);
-                    }
-                }
+                transition-delay: var(--item-delay, 0s);
             }
         }
 
@@ -329,6 +324,4 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             cursor: pointer;
         }
     }
-
-
 }

@@ -1,0 +1,328 @@
+@use "sass:color";
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// ============================================================
+// Single Post — two layouts:
+//   .post-news   : H1 → featured image → content
+//   .post-event  : scoreboard + countdown + analysis
+// ============================================================
+
+// ── News ─────────────────────────────────────────────────────
+.post-news {
+    width: 100%;
+
+    > h1 {
+        margin: 0 0 1.25rem;
+    }
+}
+
+// ── Event ────────────────────────────────────────────────────
+.post-event {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 3vw, 1.5rem);
+
+    // ── Title row + timer ───────────────────────────────────
+    .match-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 0.75rem;
+
+        > h1 {
+            @include f.font-hd;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            line-height: 1.05;
+            margin: 0;
+            flex: 1 1 200px;
+
+            @include f.mode((color: (conf.$color-H1-light, conf.$color-H1-dark)));
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-radius: 6px;
+            padding: 0.4rem 0.9rem;
+            flex-shrink: 0;
+
+            @include f.mode((
+                background: (conf.$color-section-light, color.adjust(conf.$color-bg-dark, $lightness: 6%)),
+                border:     (1px solid conf.$color-border-light, 1px solid conf.$color-border-dark),
+            ));
+
+            .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: conf.$color-success;
+                animation: post-pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+                flex-shrink: 0;
+            }
+
+            .inner {
+                display: flex;
+                flex-direction: column;
+
+                .label {
+                    @include f.font-txt;
+                    font-size: 9px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: .12em;
+                    line-height: 1;
+                    opacity: .6;
+
+                    @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+                }
+
+                .value {
+                    @include f.font-hd;
+                    font-size: 1rem;
+                    line-height: 1.2;
+                    font-variant-numeric: tabular-nums;
+
+                    @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+                }
+            }
+        }
+
+        .expired {
+            @include f.font-txt;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .12em;
+            opacity: .5;
+
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+        }
+    }
+
+    // ── Scoreboard — тёмный, blurred featured image сзади ───
+    .scoreboard {
+        position: relative;
+        overflow: hidden;
+        background: rgba(19, 19, 19, 0.6);
+        border-radius: conf.$default-radius;
+        padding: clamp(1.25rem, 4vw, 2.5rem);
+
+        .bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(12px) brightness(.3) saturate(1.2);
+            transform: scale(1.15);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+
+            @media (min-width: 640px) {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .team {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                flex: 1;
+                gap: .4rem;
+
+                @media (min-width: 640px) {
+                    &.home { align-items: flex-end;   text-align: right; }
+                    &.away { align-items: flex-start; text-align: left;  }
+                }
+
+                .logo {
+                    width: clamp(3.5rem, 8vw, 6rem);
+                    height: clamp(3.5rem, 8vw, 6rem);
+                    object-fit: contain;
+                }
+
+                .name {
+                    @include f.font-hd;
+                    font-size: clamp(1.1rem, 3vw, 1.75rem);
+                    color: conf.$color-text-dark;
+                    margin: 0;
+                    line-height: 1.1;
+                }
+
+                .role {
+                    @include f.font-txt;
+                    font-size: .7rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: .1em;
+                    color: rgba(conf.$color-text-dark, .55);
+                }
+            }
+
+            .versus {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: .25rem;
+                flex-shrink: 0;
+
+                .text {
+                    @include f.font-hd;
+                    font-size: clamp(2rem, 6vw, 4rem);
+                    color: conf.$color-text-dark;
+                    opacity: .25;
+                    margin: 0;
+                    line-height: 1;
+                }
+
+                .league {
+                    @include f.font-txt;
+                    font-size: .65rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: .4em;
+                    color: rgba(conf.$color-text-dark, .5);
+                }
+
+                .date {
+                    @include f.font-txt;
+                    font-size: .75rem;
+                    font-weight: 700;
+                    color: conf.$color-primary-dark;
+                    text-align: center;
+                    display: block;
+                }
+
+                .time {
+                    @include f.font-txt;
+                    font-size: .7rem;
+                    font-weight: 500;
+                    color: rgba(conf.$color-text-dark, .55);
+                    text-align: center;
+                    display: block;
+                    margin-top: .1rem;
+                }
+            }
+        }
+    }
+
+    // ── Pick banner ─────────────────────────────────────────
+    $_on: color.adjust(conf.$color-success, $lightness: -38%);
+
+    .pick {
+        background: conf.$color-success;
+        border-radius: conf.$default-radius;
+        padding: clamp(.9rem, 3vw, 1.4rem) clamp(1rem, 4vw, 1.75rem);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .3);
+
+        .content {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+
+            .icon {
+                font-family: 'Material Symbols Outlined';
+                font-size: 2rem;
+                font-weight: normal;
+                font-style: normal;
+                line-height: 1;
+                font-variation-settings: 'FILL' 1;
+                color: $_on;
+                flex-shrink: 0;
+                display: inline-block;
+            }
+
+            .info {
+                display: flex;
+                flex-direction: column;
+                gap: .1rem;
+
+                .label {
+                    @include f.font-txt;
+                    font-size: 9px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    letter-spacing: .2em;
+                    color: $_on;
+                    opacity: .7;
+                }
+
+                .value {
+                    @include f.font-hd;
+                    font-size: clamp(1rem, 2.5vw, 1.4rem);
+                    letter-spacing: -.02em;
+                    color: $_on;
+                    line-height: 1.1;
+                }
+            }
+        }
+    }
+
+    // ── Analysis block ───────────────────────────────────────
+    .analysis {
+        border-radius: conf.$default-radius;
+        padding: clamp(1.25rem, 4vw, 2rem);
+
+        @include f.mode((background: (conf.$color-section-light, conf.$color-section-dark)));
+
+        .head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: 1.25rem;
+
+            h2 {
+                @include f.font-hd;
+                font-size: clamp(1.1rem, 3vw, 1.5rem);
+                margin: 0;
+
+                @include f.mode((color: (conf.$color-H1-light, conf.$color-H1-dark)));
+            }
+        }
+
+        .body {
+            @include f.font-txt;
+            line-height: 1.7;
+
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+            p {
+                margin-bottom: 1rem;
+                &:last-child { margin-bottom: 0; }
+            }
+
+            h2, h3, h4 {
+                @include f.font-hd;
+                margin: 1.5rem 0 .5rem;
+
+                @include f.mode((color: (conf.$color-H1-light, conf.$color-H1-dark)));
+            }
+        }
+    }
+}
+
+// ── Keyframes ─────────────────────────────────────────────────
+@keyframes post-pulse {
+    0%, 100% { opacity: 1;  }
+    50%       { opacity: .4; }
+}

@@ -39,6 +39,10 @@
 </div>
 
 <script>
+    document.querySelectorAll('.menu-item-card').forEach((item, i) => {
+        item.style.setProperty('--item-delay', `${((i + 2) * 0.05).toFixed(2)}s`);
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const isBoringMenu = <?php echo json_encode(
             my_theme_get_config("main-menu", "island") === "boring",
