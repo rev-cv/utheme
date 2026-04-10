@@ -1,0 +1,44 @@
+# BEGIN WordPress
+# Las directivas (líneas) entre «BEGIN WordPress» y «END WordPress» son
+# generadas dinámicamente y solo deberían ser modificadas mediante filtros de WordPress.
+# Cualquier cambio en las directivas que hay entre esos marcadores serán sobrescritas.
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+
+<FilesMatch "^(wp-login\.php|.*)$">
+    <If "%{REQUEST_URI} =~ m#/(wp-admin/|wp-login\.php)# && %{REQUEST_URI} !~ m#admin-ajax\.php#">
+        <RequireAny>
+            Require all granted
+            # Require ip 1.2.3.4
+            # Require ip 1.2.3.5
+            # Require ip 1.2.3.6
+        </RequireAny>
+    </If>
+</FilesMatch>
+
+<FilesMatch "^(\.htaccess|wp-config.*|setup_site\.sh|license\.txt|readme\.html|install\.php|upgrade\.php|xmlrpc\.php|wp-signup\.php|wp-activate\.php|wp-trackback\.php|.*\.log|.*\.sql|.*\.bak|.*\.sh)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteCond %{QUERY_STRING} (^|&)author=([0-9]+) [NC]
+    RewriteRule ^(.*)$ /? [L,R=403]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+Options -Indexes

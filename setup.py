@@ -54,6 +54,169 @@ def run_command(command, error_message, check_output=False):
         print(f"\nОШИБКА: {e}")
         sys.exit(1)
 
+def add_volume_to_compose(volume_line):
+    """
+    Добавляет строку volume в секцию volumes сервиса wordpress в docker-compose.yml.
+    Вставляет перед первой строкой, которая НЕ начинается с '      - ' после 'volumes:'.
+    Пропускает добавление, если volume уже есть.
+    """
+    dc_path = Path("docker-compose.yml")
+    content = dc_path.read_text(encoding="utf-8")
+    
+    # Проверяем, есть ли уже такой volume (по ключевой части пути назначения)
+    # Извлекаем путь назначения (часть после ':')
+    dest_path = volume_line.split(":")[-1].strip()
+    if dest_path in content:
+        print(f"   -> Volume для {dest_path} уже существует в docker-compose.yml")
+        return False
+    
+    lines = content.split("\n")
+    new_lines = []
+    in_wordpress = False
+    in_volumes = False
+    inserted = False
+    
+    for i, line in enumerate(lines):
+        new_lines.append(line)
+        
+        # Отслеживаем, что мы внутри сервиса wordpress
+        if line.strip().startswith("wordpress:"):
+            in_wordpress = True
+            continue
+        
+        # Выходим из wordpress при встрече другого сервиса на том же уровне
+        if in_wordpress and re.match(r'^  \S', line) and not line.strip().startswith("wordpress"):
+            in_wordpress = False
+            in_volumes = False
+        
+        # Нашли секцию volumes внутри wordpress
+        if in_wordpress and line.strip() == "volumes:":
+            in_volumes = True
+            continue
+        
+        # Внутри volumes — ищем последний элемент списка
+        if in_wordpress and in_volumes and not inserted:
+            # Текущая строка — элемент volumes (начинается с "      - ")
+            # Проверяем, что следующая строка НЕ элемент volumes
+            next_line = lines[i + 1] if i + 1 < len(lines) else ""
+            if line.strip().startswith("- ") and not next_line.strip().startswith("- "):
+                # Определяем отступ из текущей строки
+                indent = line[:len(line) - len(line.lstrip())]
+                new_lines.append(f"{indent}- {volume_line}")
+                inserted = True
+                in_volumes = False
+    
+    if inserted:
+        dc_path.write_text("\n".join(new_lines), encoding="utf-8")
+        print(f"   -> Volume добавлен в docker-compose.yml: {volume_line}")
+        return True
+    else:
+        print(f"   [!] Не удалось найти место для вставки volume в docker-compose.yml")
+        return False
+
+
+def remove_volume_from_compose(dest_path):
+    """
+    Удаляет строку volume из docker-compose.yml по пути назначения.
+    Например: remove_volume_from_compose("/var/www/html/wp-config.php")
+    """
+    dc_path = Path("docker-compose.yml")
+    content = dc_path.read_text(encoding="utf-8")
+    
+    if dest_path not in content:
+        return False
+    
+    lines = content.split("\n")
+    new_lines = []
+    removed = False
+    
+    for line in lines:
+        # Пропускаем строку, которая содержит mount с указанным путём назначения
+        if dest_path in line and line.strip().startswith("- "):
+            print(f"   -> Удалён volume из docker-compose.yml: {line.strip()}")
+            removed = True
+            continue
+        new_lines.append(line)
+    
+    if removed:
+        dc_path.write_text("\n".join(new_lines), encoding="utf-8")
+    
+    return removed
+
+
+def clean_wp_config_volume():
+    """
+    Перед первым запуском убирает volume для wp-config.php из docker-compose.yml,
+    если локального файла ./core/wp-config.php ещё не существует.
+    Это предотвращает ситуацию, когда Docker монтирует пустоту.
+    """
+    config_path = Path("core/wp-config.php")
+    if not config_path.exists():
+        removed = remove_volume_from_compose("/var/www/html/wp-config.php")
+        if removed:
+            print("   -> wp-config.php volume удалён (файла ещё нет, будет добавлен после извлечения)")
+        # Также удаляем сам файл если Docker создал пустую директорию
+        if config_path.exists() and config_path.is_dir():
+            config_path.rmdir()
+
+
+def extract_wp_config():
+    """
+    Извлекает wp-config.php из контейнера WordPress наружу в ./core/wp-config.php,
+    добавляет volume в docker-compose.yml и пересоздаёт контейнер.
+    """
+    print("\n=== 4/4: Извлечение wp-config.php ===")
+    
+    config_path = Path("core/wp-config.php")
+    
+    # Если файл уже существует — значит уже извлекали ранее
+    if config_path.exists():
+        print(f"   -> {config_path} уже существует. Пропуск извлечения.")
+        # Убеждаемся что volume есть в docker-compose
+        add_volume_to_compose("./core/wp-config.php:/var/www/html/wp-config.php")
+        return
+    
+    # Убеждаемся что папка core существует
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    container_name = os.getenv("CONTAINER_NAME", "wp_site")
+    
+    # 1. Копируем wp-config.php из контейнера
+    print(f"   -> Копирование wp-config.php из контейнера {container_name}...")
+    try:
+        subprocess.run(
+            ["docker", "cp", f"{container_name}:/var/www/html/wp-config.php", str(config_path)],
+            check=True, capture_output=True, text=True
+        )
+        print(f"   -> wp-config.php скопирован в {config_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"   [!] Ошибка при копировании wp-config.php: {e.stderr}")
+        return
+    
+    # 2. Добавляем volume в docker-compose.yml
+    added = add_volume_to_compose("./core/wp-config.php:/var/www/html/wp-config.php")
+    
+    if not added:
+        return
+    
+    # 3. Пересоздаём контейнер WordPress с новым volume
+    print("   -> Пересоздание контейнера WordPress с проброшенным wp-config.php...")
+    try:
+        process = subprocess.Popen(
+            DOCKER_COMPOSE_COMMAND + ["up", "-d", WORDPRESS_SERVICE],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        stdout, stderr = process.communicate()
+        if process.returncode != 0:
+            print(f"   [!] Ошибка пересоздания: {stderr}")
+        else:
+            print("   -> Контейнер пересоздан с проброшенным wp-config.php")
+    except Exception as e:
+        print(f"   [!] Ошибка: {e}")
+
+
 def start_docker():
     print("\n=== 2/3: Запуск Docker и настройка прав ===")
 
@@ -69,7 +232,7 @@ def start_docker():
     try:
         # Используем Popen, чтобы "прочитать" ошибку до того, как скрипт упадет
         process = subprocess.Popen(
-            DOCKER_COMPOSE_COMMAND + ["up", "-d"],
+            DOCKER_COMPOSE_COMMAND + ["--profile", "dev", "up", "-d"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
@@ -287,37 +450,6 @@ def find_free_port_and_update_env():
     else:
         print(f"   -> Порт {current_port} свободен.")
 
-def fix_docker_compose_paths():
-    """
-    Заменяет относительные пути (./) в docker-compose.yml на абсолютные пути ХОСТА.
-    Это необходимо для DooD (Docker out of Docker), чтобы демон на хосте нашел файлы.
-    """
-    print("\n=== 1.8/3: Исправление путей в docker-compose.yml ===")
-    host_root = os.getenv("HOST_PROJECT_ROOT")
-    if not host_root:
-        host_root = os.getcwd().replace("\\", "/")
-        print(f"INFO: Ручной запуск. Используем текущий путь: {host_root}")
-        print("WARN: HOST_PROJECT_ROOT не задан. Используем относительные пути (может не сработать в DooD).")
-        # return
-
-    dc_path = Path("docker-compose.yml")
-    if not dc_path.exists():
-        print("docker-compose.yml не найден.")
-        return
-
-    content = dc_path.read_text(encoding="utf-8")
-    # Добавляем слеш, если его нет
-    if not host_root.endswith("/"):
-        host_root += "/"
-    
-    # Заменяем "- ./" на "- E:/path/to/project/"
-    new_content = content.replace("- ./", f"- {host_root}")
-    
-    if new_content != content:
-        dc_path.write_text(new_content, encoding="utf-8")
-        print(f"Пути обновлены на абсолютные: {host_root}")
-    else:
-        print("Изменения путей не требуются.")
 
 def main():
     print("=====================================================")
@@ -328,11 +460,15 @@ def main():
     # если занято, то +1
     find_free_port_and_update_env()
 
-    # Исправляем пути перед запуском
-    fix_docker_compose_paths()
+    # Убираем volume для wp-config.php если файла ещё нет
+    # (предотвращает монтирование пустоты при первом запуске)
+    clean_wp_config_volume()
 
     start_docker()
     run_setup_script()
+
+    # Извлекаем wp-config.php и пересоздаём контейнер с volume
+    extract_wp_config()
 
     print("\n=====================================================")
     print("УСПЕШНОЕ ЗАВЕРШЕНИЕ!")

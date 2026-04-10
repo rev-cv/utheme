@@ -28,6 +28,7 @@ temp_wp.json
 db_data/
 uploads/
 # plugins/
+core/wp-config.php
 
 # --- Runtime State & Logs ---
 created_pages.json
@@ -35,3 +36,4 @@ created_pages.json
 *.txt
 utheme/src/*.css
 utheme/src/*.map
+

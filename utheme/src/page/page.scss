@@ -31,17 +31,14 @@ html {
 body {
     line-height: 1.7;
     background-color: $bg-light;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 
     @media (prefers-color-scheme: dark) {
         background-color: $bg-dark;
     }
-
-    overflow-x: hidden;
-
-    display: flex;
-    flex-direction: column;
-
-    min-height: 100vh;
 }
 
 .container {

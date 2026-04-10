@@ -100,8 +100,16 @@ if __name__ == "__main__":
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
 
-    cimg.resize_image(SPEC_DIR / "logo-lg.png", height=100)
-    cimg.resize_image(SPEC_DIR / "icon-lg.png", height=100)
+    logo_lg = SPEC_DIR / "logo-lg.png"
+    icon_lg = SPEC_DIR / "icon-lg.png"
+
+    if logo_lg.exists():
+        cimg.resize_image(logo_lg, height=100)
+
+    if icon_lg.exists():
+        cimg.resize_image(icon_lg, height=100)
+
+    cimg.stupid_extractor(SPEC_DIR)
 
     # попытка исправить структуру проекта перед проверкой целостности
     check_structure.bulk_rename_folders(SPEC_DIR)

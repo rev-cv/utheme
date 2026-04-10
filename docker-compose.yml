@@ -38,6 +38,7 @@ services:
       - ./plugins:/var/www/html/wp-content/plugins
       - ./core/setup_site.sh:/var/www/html/setup_site.sh
       - ./core/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./core/.htaccess:/var/www/html/.htaccess
     networks:
       - default     # внутренняя сеть для связи с WP
       - web_network # внешняя сеть для NPM
@@ -61,11 +62,11 @@ services:
     working_dir: /src
     volumes:
       - ./utheme/src:/src
-    # profiles:
-    #   - dev
+    profiles:
+      - dev
     command: >
-      sh -c "npm install -g sass && 
-        sass --quiet-deprecation=if-function --watch --poll --style=compressed style.scss:style.css"
+      sh -c "npm install -g sass@1.77.8 && 
+      sass --watch --poll --style=compressed style.scss:style.css"
     networks:
       - default
 

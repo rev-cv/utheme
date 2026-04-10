@@ -186,3 +186,64 @@ def search_branding_images(search_root: Path, spec_dir: Path):
                 print(f"    Сконвертирован: {source_file.name} -> {dest_file.name}")
         except Exception as e:
             print(f"    Ошибка обработки {source_file}: {e}")
+
+
+def stupid_extractor(spec_dir: Path):
+    """
+    Ищет favicon и logo в папке SPEC_DIR/PILLAR.
+    1. Переименовывает оригинал, добавляя .st. перед расширением.
+    2. Конвертирует его в PNG и сохраняет в SPEC_DIR как icon.png и logo.png.
+    """
+    pillar_dir = spec_dir / "PILLAR"
+    print(f"\nЗапуск 'дебильного экстрактора' в: {pillar_dir}")
+    
+    if not pillar_dir.exists():
+        print(f"    Пропуск: Папка {pillar_dir} не найдена.")
+        return
+
+    # Карта поиска: что ищем -> как называем итоговый файл
+    targets = {
+        'favicon': 'icon.png',
+        'logo': 'logo.png'
+    }
+    
+    valid_extensions = ['.png', '.jpg', '.jpeg', '.webp', '.ico', '.svg']
+
+    for search_name, target_name in targets.items():
+        found = False
+        for ext in valid_extensions:
+            file_path = pillar_dir / f"{search_name}{ext}"
+            
+            if file_path.exists():
+                try:
+                    # 1. Переименовываем оригинал: logo.png -> logo.st.png
+                    st_name = f"{file_path.stem}.st{file_path.suffix}"
+                    st_path = file_path.parent / st_name
+                    
+                    # Чтобы не переименовывать бесконечно при повторных запусках
+                    if not file_path.name.contains(".st."):
+                        file_path.rename(st_path)
+                        source_for_conversion = st_path
+                        print(f"    [OK] Оригинал переименован: {st_name}")
+                    else:
+                        source_for_conversion = file_path
+
+                    # 2. Конвертация в PNG в корень SPEC_DIR
+                    dest_path = spec_dir / target_name
+                    
+                    if source_for_conversion.suffix.lower() == '.svg':
+                        shutil.copy2(source_for_conversion, spec_dir / f"{target_name.replace('.png', '.svg')}")
+                        print(f"    [OK] Скопирован SVG: {target_name.replace('.png', '.svg')}")
+                    else:
+                        with Image.open(source_for_conversion) as img:
+                            # Сохраняем максимум качества с прозрачностью
+                            img.convert('RGBA').save(dest_path, 'PNG', optimize=True)
+                        print(f"    [OK] Создан {target_name} из {st_name}")
+                    
+                    found = True
+                    break 
+                except Exception as e:
+                    print(f"    [!] Ошибка при обработке {file_path.name}: {e}")
+        
+        if not found:
+            print(f"    [?] Файл {search_name} в PILLAR не обнаружен.")
