@@ -45,6 +45,11 @@
 
                 a {
                     text-decoration: none;
+                    color: conf.$color-text-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-text-dark;
+                    }
                 }
             }
 
