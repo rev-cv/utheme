@@ -52,5 +52,12 @@
                 wrapper.classList.remove('is-open');
             });
         });
+
+        document.addEventListener('click', function(e) {
+            if (wrapper.classList.contains('is-open') && !wrapper.contains(e.target)) {
+                wrapper.classList.remove('is-open');
+                btn.querySelector('span').textContent = '';
+            }
+        });
     });
 </script>

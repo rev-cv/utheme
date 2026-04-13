@@ -15,7 +15,7 @@
 
     body:not(:has(.header-box)) {
         main {
-            margin-top: 4rem !important;
+            margin-top: 5rem !important;
         }
     }
 
@@ -54,14 +54,40 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Эффект при наведении на весь остров */
-        &:hover {
+        /* Десктоп: открытие по наведению */
+        @media (min-width: 769px) {
+            &:hover {
+                border-radius: f.get-radius();
+
+                .island-dropdown {
+                    max-height: 500px;
+                    opacity: 1;
+                    padding: 20px;
+                }
+            }
+        }
+
+        /* Открытие по кнопке (все устройства) */
+        &.is-open {
             border-radius: f.get-radius();
 
             .island-dropdown {
                 max-height: 500px;
                 opacity: 1;
                 padding: 20px;
+
+                /* Мобильный: только дропдаун скролится, шапка острова остаётся на месте */
+                @media (max-width: 768px) {
+                    max-height: calc(100dvh - 100px);
+                    overflow-y: auto;
+                    overscroll-behavior: contain;
+                    -webkit-overflow-scrolling: touch;
+                }
+            }
+
+            /* Визуальная обрезка без создания scroll-контейнера (Safari 16+, Chrome 90+) */
+            @media (max-width: 768px) {
+                overflow: clip;
             }
         }
 
@@ -105,6 +131,11 @@
         }
 
         .island-name {
+            @if conf.$is-menu-title == 'false' {
+                visibility: hidden;
+                pointer-events: none;
+            }
+
             a {
                 @include f.font-txt;
                 font-weight: 700;
@@ -164,14 +195,6 @@
             opacity: 0;
             transition: all 0.4s ease;
             padding: 0 20px;
-
-            @media (max-width: 768px) {
-                max-height: none;
-                /* Снимаем ограничение высоты */
-                opacity: 1;
-                display: none;
-                /* Управляем видимостью через JS */
-            }
         }
 
         /* Сетка ссылок-карточек */
@@ -235,52 +258,11 @@
             }
         }
 
-        /* Адаптивность для мобильных (до 768px) */
         @media (max-width: 768px) {
             width: 90%;
-            /* Остров становится шире */
             min-width: unset;
-            top: auto;
-            bottom: 20px;
-            /* Переносим вниз — так удобнее тянуться пальцем */
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-            /* Когда меню открыто на мобилке */
-            &.is-open {
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 100vh;
-                /* Разворачиваем на весь экран */
-                border-radius: 0 !important;
-                transform: translateX(0);
-                overflow-y: auto;
-
-                .island-dropdown {
-                    display: block;
-                    padding: 30px 20px;
-                }
-            }
-
-            /* Отключаем hover-эффекты для тач-скринов, чтобы избежать багов */
-            &:hover {
-                border-radius: 50px;
-                /* Оставляем как было */
-            }
         }
     }
 
-    @media (max-width: 768px) {
-
-        main {
-            margin-top: 0 !important;
-        }
-
-        #scrollToTopBtn {
-            margin-bottom: 8em;
-            display: none !important;
-        }
-    }
 
 }

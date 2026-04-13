@@ -58,11 +58,11 @@ aside {
         }
 
         mark {
+            border-radius: 2px;
             @include f.mode(( //
                     background: (conf.$color-primary-light, conf.$color-primary-dark), //
                     color: (conf.$color-bg-light, conf.$color-bg-dark) //
                 ));
-            border-radius: 2px;
         }
     }
 
@@ -92,11 +92,11 @@ aside {
         $color-light: sys.mix(conf.$color-accent-light, conf.$color-text-light, 60%);
         $color-dark: sys.mix(conf.$color-accent-dark, conf.$color-text-dark, 50%);
         text-decoration: none;;
+        transition: color 300ms ease-in-out;
 
         @include f.mode(( //
                 color: ($color-light, $color-dark),
             ));
-        transition: color 300ms ease-in-out;
 
         &:hover {
             @include f.mode(( //

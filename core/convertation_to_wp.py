@@ -183,11 +183,11 @@ def _handle_div(tag):
         inner_content = f'{yes_block}\n{no_block}'
         return f'<!-- wp:group {{"className":"yesno-box","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group yesno-box"><div class="wp-block-group__inner-container">{inner_content}</div></div>\n<!-- /wp:group -->'
 
-    elif any(cls in tag.get('class', []) for cls in ['odds-example', 'key-takeaways', 'worked-example']):
-        """Обработка простых секционных div'ов (odds-example, key-takeaways)."""
+    elif any(cls in tag.get('class', []) for cls in ['odds-example', 'key-takeaways', 'worked-example', 'key-takeaway', 'glossary-term', 'pre-bet-checklist']):
+        """Обработка простых секционных div'ов (odds-example, key-takeaways, glossary-term и др.)."""
         tag_classes = tag.get('class', [])
         # Находим первый совпавший класс, чтобы использовать его в выводе
-        section_classes = ['odds-example', 'key-takeaways', 'worked-example']
+        section_classes = ['odds-example', 'key-takeaways', 'worked-example', 'key-takeaway', 'glossary-term', 'pre-bet-checklist']
         matched_class = next(cls for cls in section_classes if cls in tag_classes)
 
         inner_blocks = []
@@ -198,9 +198,26 @@ def _handle_div(tag):
             if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
                 handler = BLOCK_HANDLERS[child.name]
                 inner_blocks.append(handler(child))
-        
+
         inner_content = '\n'.join(inner_blocks)
         return f'<!-- wp:group {{"tagName":"section","className":"{matched_class}","layout":{{"type":"constrained"}}}} -->\n<section class="wp-block-group {matched_class}"><div class="wp-block-group__inner-container">{inner_content}</div></section>\n<!-- /wp:group -->'
+
+    elif 'faq-item' in tag.get('class', []):
+        """Обработка FAQ-элемента как аккордеона (wp:details)."""
+        btn = tag.find('button')
+        summary_text = btn.get_text(strip=True) if btn else ''
+
+        faq_a_div = tag.find('div', class_='faq-a')
+        inner_blocks = []
+        if faq_a_div:
+            for child in faq_a_div.children:
+                if isinstance(child, NavigableString) and not child.strip():
+                    continue
+                if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+                    inner_blocks.append(BLOCK_HANDLERS[child.name](child))
+
+        inner_content = '\n'.join(inner_blocks)
+        return f'<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_content}</details>\n<!-- /wp:details -->'
 
     return ""
 
@@ -212,10 +229,28 @@ def _handle_span(tag):
         return f'<!-- wp:paragraph {{"className":"hero-label"}} -->\n<p class="hero-label">{content}</p>\n<!-- /wp:paragraph -->'
     return ""
 
+def _handle_figure(tag):
+    """Обработка figure (img + опциональный figcaption)."""
+    img_tag = tag.find('img')
+    if not img_tag:
+        return ""
+
+    src = img_tag.get('src', '')
+    alt = img_tag.get('alt', '')
+    img_id = Path(src).stem
+
+    figcaption_tag = tag.find('figcaption')
+    if figcaption_tag:
+        caption_text = figcaption_tag.get_text(strip=True)
+        return f'<!-- wp:image -->\n<figure id="{img_id}" class="wp-block-image"><img src="" alt="{alt}"/><figcaption class="wp-element-caption">{caption_text}</figcaption></figure>\n<!-- /wp:image -->'
+
+    return f'<!-- wp:image -->\n<figure id="{img_id}" class="wp-block-image"><img src="" alt="{alt}"/></figure>\n<!-- /wp:image -->'
+
 BLOCK_HANDLERS = {
     'h1': _handle_heading, 'h2': _handle_heading, 'h3': _handle_heading,
     'h4': _handle_heading, 'h5': _handle_heading, 'h6': _handle_heading,
-    'p': _handle_paragraph, 'img': _handle_image, 'ul': _handle_list, 'ol': _handle_list,
+    'p': _handle_paragraph, 'img': _handle_image, 'figure': _handle_figure,
+    'ul': _handle_list, 'ol': _handle_list,
     'table': _handle_table, 'details': _handle_details, 'div': _handle_div, 'span': _handle_span,
 }
 
@@ -236,10 +271,17 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
 
     
     # все DIV распаковываются и удаляются за исключением тех, что в этом списке
-    forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance', 
-    'dos-donts', 'odds-example', 'key-takeaways', 'worked-example']
+    forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance',
+    'dos-donts', 'odds-example', 'key-takeaways', 'worked-example',
+    'faq-item', 'key-takeaway', 'glossary-term', 'pre-bet-checklist']
 
-    for tag in container.find_all(['div', 'section', 'main', 'figure']):
+    # удаляем оглавления (nav с data-content="toc") до любой обработки
+    for toc in container.find_all('nav', attrs={'data-content': 'toc'}):
+        toc.decompose()
+
+    # figure не распаковывается — обрабатывается через _handle_figure (сохраняет figcaption)
+    # nav распаковывается, чтобы его содержимое (p, ol) попало в основной поток
+    for tag in container.find_all(['div', 'section', 'main', 'nav']):
         if tag.name == 'div' and any(cls in tag.get('class', []) for cls in forbidden_div):
             continue
         

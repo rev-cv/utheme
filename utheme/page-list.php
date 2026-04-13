@@ -19,7 +19,7 @@ if ($current_slug === 'news') {
     $args = array(
         'post_type'      => 'post',      // Тянем посты
         'category_name'  => 'news',      // Категория news
-        'posts_per_page' => 9,
+        'posts_per_page' => 12,
         'paged'          => $paged,
     );
 } else {
@@ -27,7 +27,7 @@ if ($current_slug === 'news') {
     $home_id = get_option('page_on_front');
     $args = array(
         'post_type'      => 'page',      // Тянем страницы
-        'posts_per_page' => 3,
+        'posts_per_page' => 12,
         'paged'          => $paged,
         'post__not_in'   => array($home_id),
         'tax_query'      => array(

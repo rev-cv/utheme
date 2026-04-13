@@ -6,11 +6,11 @@
 
 @mixin mode($map) {
     @each $prop, $values in $map {
-        & {
-            #{$prop}: list.nth($values, 1); // первое значение (light)
-        }
+        #{$prop}: list.nth($values, 1); // первое значение (light)
+    }
 
-        @media (prefers-color-scheme: dark) {
+    @media (prefers-color-scheme: dark) {
+        @each $prop, $values in $map {
             #{$prop}: list.nth($values, 2); // второе значение (dark)
         }
     }

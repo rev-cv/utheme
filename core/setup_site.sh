@@ -641,7 +641,7 @@ SITEMAP_ID=$(wp post create \
     --post_title="$SITEMAP_TITLE" \
     --post_name="sitemap" \
     --post_status=publish \
-    --page_template="page-list.php" \
+    --page_template="page-sitemap.php" \
     --post_author="$ADMIN_ID" \
     --porcelain \
 )
@@ -655,7 +655,7 @@ NEWS_ID=$(wp post create \
     --post_title="$NEWS_TITLE" \
     --post_name="news" \
     --post_status=publish \
-    --page_template="page-sitemap.php" \
+    --page_template="page-list.php" \
     --post_author="$ADMIN_ID" \
     --porcelain \
 )

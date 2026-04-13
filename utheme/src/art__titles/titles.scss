@@ -46,27 +46,25 @@ aside,
             text-align: center;
         }
 
-        @include f.mode(( //
-            background: (conf.$color-H1-light, conf.$color-H1-dark),
-            // text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
-        ));
-
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
+        @include f.mode(( //
+            background-color: (conf.$color-H1-light, conf.$color-H1-dark),
+            // text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
+        ));
 
         strong {
             @include f.font-hd;
             font-weight: 700;
             // color: conf.$color-primary-light;
 
-            @include f.mode(( //
-                    background: (conf.$color-H1-light, conf.$color-H1-dark),
-                ));
-
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            @include f.mode(( //
+                    background-color: (conf.$color-H1-light, conf.$color-H1-dark),
+                ));
         }
 
         em {
@@ -85,13 +83,12 @@ aside,
         // width: 100%;
         width: fit-content;
 
-        @include f.mode(( //
-                background: (conf.$color-accent-light, conf.$color-accent-dark),
-            ));
-
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
+        @include f.mode(( //
+                background-color: (conf.$color-accent-light, conf.$color-accent-dark),
+            ));
 
         // &::after {
         //     content: "";

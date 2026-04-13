@@ -221,7 +221,7 @@ def stupid_extractor(spec_dir: Path):
                     st_path = file_path.parent / st_name
                     
                     # Чтобы не переименовывать бесконечно при повторных запусках
-                    if not file_path.name.contains(".st."):
+                    if ".st." not in file_path.name:
                         file_path.rename(st_path)
                         source_for_conversion = st_path
                         print(f"    [OK] Оригинал переименован: {st_name}")

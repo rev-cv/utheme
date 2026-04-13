@@ -75,6 +75,11 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
 
         /* Название сайта */
         .site-name {
+            @if conf.$is-menu-title == 'false' {
+                visibility: hidden;
+                pointer-events: none;
+            }
+
             a {
                 @include f.font-logo;
                 text-decoration: none;

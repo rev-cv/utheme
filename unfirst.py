@@ -88,14 +88,19 @@ required_folders = [
 ]
 
 if __name__ == "__main__":
-    skip_check = "--docker-mode" in sys.argv
+    # skip_check = "--docker-mode" in sys.argv
 
-    # ПРОВЕРКА: ДАННЫЙ СКРИПТ ПРЕДНАЗНАЧЕН ТОЛЬКО ДЛЯ ЛОКАЛЬНОГО САЙТА
-    # Проводим проверку только если нет флага --docker-mode
-    if not skip_check:
-        wp_api.check_local()
-    else:
-        print("--- Пропуск проверки локального окружения (флаг --docker-mode) ---")
+    # # ПРОВЕРКА: ДАННЫЙ СКРИПТ ПРЕДНАЗНАЧЕН ТОЛЬКО ДЛЯ ЛОКАЛЬНОГО САЙТА
+    # # Проводим проверку только если нет флага --docker-mode
+    # if not skip_check:
+    #     wp_api.check_local()
+    # else:
+    #     print("--- Пропуск проверки локального окружения (флаг --docker-mode) ---")
+
+    # удаление мусорной страницы
+    (SPEC_DIR / "PILLAR" / "404.html").unlink(missing_ok=True)
+
+    cimg.stupid_extractor(SPEC_DIR)
 
     # ПОИСК РОДИТЕЛЬСКОЙ СТРАНИЦЫ ДЛЯ СТАТЕЙ
     wp_api.find_articles_parent_page()
@@ -108,8 +113,6 @@ if __name__ == "__main__":
 
     if icon_lg.exists():
         cimg.resize_image(icon_lg, height=100)
-
-    cimg.stupid_extractor(SPEC_DIR)
 
     # попытка исправить структуру проекта перед проверкой целостности
     check_structure.bulk_rename_folders(SPEC_DIR)

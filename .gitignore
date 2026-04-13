@@ -12,6 +12,7 @@ __pycache__/
 venv/
 env/
 .uv/
+settings.local.json
 
 # --- Node.js & SASS ---
 node_modules/
