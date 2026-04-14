@@ -30,7 +30,8 @@ function u_color_field(string $name, string $value): void {
             <button class="tab-btn" data-target="components">Components</button>
             <button class="tab-btn" data-target="colors">Colors</button>
             <div class="tabs-nav-spacer"></div>
-            <button type="submit" class="button button-primary tabs-save-btn">Save Settings</button>
+            <button type="submit" name="u_randomize_scss" value="1" class="button tabs-random-btn">&#x2684; Random</button>
+            <button type="submit" name="u_save_scss" value="1" class="button button-primary tabs-save-btn">Save Settings</button>
         </nav>
 
         <div class="tabs-content">
@@ -156,6 +157,18 @@ function u_color_field(string $name, string $value): void {
                 $font_sizes = range(14, 22);
                 $current_font_vibe = $v['font-vibe'] ?? 'neo-swiss';
                 ?>
+                <?php
+                $radius_vibes = [
+                    'sharp'    => ['label' => 'Sharp',    'desc' => 'Строгий, технический стиль. Минимальное скругление — ощущение точности и дисциплины.'],
+                    'neutral'  => ['label' => 'Neutral',  'desc' => 'Мягкий, современный стиль. Умеренное скругление — универсальное решение для большинства проектов.'],
+                    'dynamic'  => ['label' => 'Dynamic',  'desc' => 'Спортивный, адаптивный. Скругление меняется с шириной экрана, кнопки всегда в виде пилюли.'],
+                    'rounded'  => ['label' => 'Rounded',  'desc' => 'Максимально мягкие, дружелюбные формы. Идеально для детских, lifestyle и wellness-проектов.'],
+                    'art'      => ['label' => 'Art',      'desc' => 'Дизайнерский стиль со сложными формами. Эллиптические скругления и асимметрия создают уникальный характер.'],
+                    'organic'  => ['label' => 'Organic',  'desc' => 'Органические, живые формы. Неравномерное скругление напоминает природные очертания.'],
+                    'velocity' => ['label' => 'Velocity', 'desc' => 'Скорость и напор. Диагональная асимметрия — острый угол спереди, скругление сзади.'],
+                ];
+                $current_radius_vibe = $v['radius-vibe'] ?? 'neutral';
+                ?>
                 <div class="u-card">
                     <div class="u-card-body">
                         <div class="u-card-left">
@@ -193,6 +206,28 @@ function u_color_field(string $name, string $value): void {
                                     $descs = [];
                                     foreach ($font_vibes as $k => $fv) $descs[$k] = $fv['desc'];
                                     echo json_encode($descs, JSON_UNESCAPED_UNICODE);
+                                ?>;
+                                </script>
+                            </div>
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">Radius Vibe</div>
+                                <div class="u-basic-field-control">
+                                    <select name="u_fields[radius-vibe]" id="radius-vibe-select">
+                                        <?php foreach ($radius_vibes as $val => $rv): ?>
+                                            <option value="<?= $val ?>"
+                                                <?= $current_radius_vibe === $val ? 'selected' : '' ?>>
+                                                <?= $rv['label'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <p class="u-desc" id="radius-vibe-desc"><?= $radius_vibes[$current_radius_vibe]['desc'] ?? '' ?></p>
+                                <script>
+                                var uRadiusVibeDescs = <?php
+                                    $rdescs = [];
+                                    foreach ($radius_vibes as $k => $rv) $rdescs[$k] = $rv['desc'];
+                                    echo json_encode($rdescs, JSON_UNESCAPED_UNICODE);
                                 ?>;
                                 </script>
                             </div>
@@ -240,6 +275,7 @@ function u_color_field(string $name, string $value): void {
                                     </label>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="u-card-right">
@@ -249,6 +285,15 @@ function u_color_field(string $name, string $value): void {
                                      alt="Font preview"
                                      class="u-font-preview-img u-component-preview-img"
                                      id="font-vibe-preview">
+                            </div>
+                            <div class="u-preview u-preview--tall">
+                                <img src="<?= plugins_url("assets/media/radius-vibe-{$current_radius_vibe}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/radius-vibe-', dirname(__FILE__)) ?>"
+                                     alt="Radius preview"
+                                     class="u-radius-preview-img u-component-preview-img"
+                                     id="radius-vibe-preview"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                <span class="u-preview-placeholder" style="display:none"><?= esc_html($radius_vibes[$current_radius_vibe]['label'] ?? $current_radius_vibe) ?></span>
                             </div>
                         </div>
                     </div>
@@ -541,6 +586,5 @@ function u_color_field(string $name, string $value): void {
 
         </div>
 
-        <input type="hidden" name="u_save_scss" value="1">
     </form>
 </div>

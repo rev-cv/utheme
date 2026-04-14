@@ -20,6 +20,28 @@ class UThemeConfigurator {
         'color-success', 'color-warning', 'color-error', 'color-info',
     ];
 
+    // Конфиг рандомизации — повторяет randomize_theme.py
+    private array $random_config = [
+        'main-menu'      => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic'],
+        'footer-menu'    => ['2columns', 'central'],
+        'toc-menu'       => ['circle', 'number', 'icon'],
+        'is-not-section' => ['true', 'false'],
+        'details'        => ['plus', 'arrow'],
+        'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
+        'is-img_contain' => ['true', 'false'],
+        'is-left-align'  => ['true', 'false'],
+        'is-border'      => ['true', 'false'],
+        'font-vibe'      => [
+            'google', 'strict', 'editorial', 'startup', 'space', 'syntax', 'neo-swiss',
+            'engineer', 'vogue', 'boutique', 'wisdom', 'noble', 'manuscript', 'brutal',
+            'urban', 'manifesto', 'black-metal', 'raw', 'velocity', 'courtside', 'district',
+            'blast', 'industry', 'overdrive', 'organic', 'vintage', 'interface', 'antidesign',
+        ],
+        'font-size'   => ['16px', '17px', '18px', '19px', '20px', '21px', '22px', '23px', '24px'],
+        'style'       => ['luxury', 'minimalist', 'vibrant', 'bold-dark', 'graphite', 'pastoral', 'japane'],
+        'radius-vibe' => ['sharp', 'neutral', 'dynamic', 'rounded', 'art', 'organic', 'velocity'],
+    ];
+
     // Маркеры ручного блока в конце файла.
     // is_manual_mode() смотрит только на их наличие.
     private const MANUAL_BLOCK_START = '/* Manual Color Configuration */';
@@ -30,6 +52,7 @@ class UThemeConfigurator {
         add_action('admin_menu',             [$this, 'add_menu']);
         add_action('admin_enqueue_scripts',  [$this, 'enqueue_assets']);
         add_action('admin_init',             [$this, 'handle_save']);
+        add_action('admin_init',             [$this, 'handle_randomize']);
     }
 
     public function add_menu(): void {
@@ -153,6 +176,39 @@ class UThemeConfigurator {
 
         file_put_contents($this->scss_file, $content);
         add_settings_error('u_theme', 'saved', 'Настройки сохранены. Docker запустил пересборку!', 'updated');
+    }
+
+    public function handle_randomize(): void {
+        if (!isset($_POST['u_randomize_scss']) || !check_admin_referer('u_theme_update')) return;
+        if (!file_exists($this->scss_file)) return;
+
+        $content     = file_get_contents($this->scss_file);
+        $string_vars = [
+            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card',
+            'font-vibe', 'style', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
+            'font-size',
+        ];
+
+        // Переменные-списки
+        foreach ($this->random_config as $var => $options) {
+            $new_val   = $options[array_rand($options)];
+            $formatted = in_array($var, $string_vars) ? '"' . $new_val . '"' : $new_val;
+            $pattern   = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $content   = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $formatted . $m[4], $content);
+        }
+
+        // Числовые диапазоны
+        $new_seed    = random_int(0, 360);
+        $density_raw = random_int(0, 20); // 20 шагов по 0.05 от 0.5 до 1.5
+        $new_density = round(0.5 + $density_raw * 0.05, 2);
+
+        foreach (['seed-hue' => $new_seed, 'density-factor' => $new_density] as $var => $new_val) {
+            $pattern = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $content = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $new_val . $m[4], $content);
+        }
+
+        file_put_contents($this->scss_file, $content);
+        add_settings_error('u_theme', 'randomized', 'Тема рандомизирована! Docker запустил пересборку.', 'updated');
     }
 
     // Удаляем блок между маркерами включительно.

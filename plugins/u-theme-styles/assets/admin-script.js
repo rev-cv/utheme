@@ -92,6 +92,21 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    // ─── Radius Vibe: смена картинки + описания ─────────────────────────────
+    $(document).on('change', '#radius-vibe-select', function () {
+        var val      = $(this).val();
+        var $preview = $('#radius-vibe-preview');
+        var $placeholder = $preview.next('.u-preview-placeholder');
+        var baseUrl  = $preview.data('base-url');
+        if (baseUrl) {
+            $preview.show().attr('src', baseUrl + val + '.webp');
+            $placeholder.text($(this).find('option:selected').text()).hide();
+        }
+        if (typeof uRadiusVibeDescs !== 'undefined' && uRadiusVibeDescs[val] !== undefined) {
+            $('#radius-vibe-desc').text(uRadiusVibeDescs[val]);
+        }
+    });
+
     // ─── TOC Icon: показываем только при выборе опции "icon" ────────────────
     function updateTocIconVisibility($select) {
         var $card = $select.closest('.u-component-card');

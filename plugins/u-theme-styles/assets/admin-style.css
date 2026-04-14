@@ -4,6 +4,9 @@
 .tabs-nav { display: flex; align-items: center; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #ccd0d4; padding-bottom: 10px; }
 .tabs-nav-spacer { flex: 1; }
 .tabs-save-btn { margin-left: auto; }
+.u-preview-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 18px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
+.tabs-random-btn { background: #f0f6fc; border-color: #2271b1; color: #2271b1; font-weight: 600; }
+.tabs-random-btn:hover { background: #2271b1; color: #fff; border-color: #2271b1; }
 .tab-btn { padding: 10px 20px; border: 1px solid #ccd0d4; background: #fff; cursor: pointer; border-radius: 4px 4px 0 0; font-weight: 600; transition: all 0.2s; }
 .tab-btn:hover { background: #f9f9f9; }
 .tab-btn.active { background: #2271b1; color: #fff; border-color: #2271b1; }

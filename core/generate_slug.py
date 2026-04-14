@@ -1,5 +1,52 @@
 import re
+from pathlib import Path
 from transliterate import translit
+
+
+def slug_from_pages_list(resource_path):
+    """
+    Ищет slug для .html файла по pages-list.txt в директории spec.
+    Применяется только если файл лежит в папке CL*.
+    Возвращает последний сегмент slug (например, 'fichajes-verano-bundesliga-cuotas')
+    или None, если не удалось найти.
+    """
+    resource_path = Path(resource_path)
+    cl_folder = resource_path.parent
+
+    if not cl_folder.name.startswith('CL'):
+        return None
+
+    # pages-list.txt лежит на два уровня выше папки CL*
+    # структура: spec / CLUSTERS ADD (или CLUSTERS MAIN) / CL25 / file.html
+    spec_dir = cl_folder.parent.parent
+    pages_list_file = spec_dir / 'pages-list.txt'
+
+    if not pages_list_file.exists():
+        return None
+
+    cl_name = cl_folder.name  # например, "CL25"
+
+    try:
+        lines = pages_list_file.read_text(encoding='utf-8').splitlines()
+        for line in lines:
+            # формат строк: "CLUSTERS ADD > CL25 /articles/fichajes-verano-bundesliga-cuotas/"
+            #           или: "CLUSTERS MAIN > CL1 /cuotas-campeon-bundesliga/"
+            parts = line.split('>')
+            if len(parts) < 2:
+                continue
+            right = parts[-1].strip()
+            tokens = right.split()
+            if len(tokens) < 2:
+                continue
+            if tokens[0] == cl_name:
+                slug_path = tokens[1].strip('/')
+                last_segment = slug_path.split('/')[-1]
+                if last_segment:
+                    return last_segment
+    except Exception:
+        pass
+
+    return None
 
 def generate_slug(text):
     """

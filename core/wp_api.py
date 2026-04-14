@@ -358,9 +358,14 @@ def publish_wp_pages(articles_list: list[dict]):
 
         # если это НЕ Utility Page - обновление slug на основе H1
         if not is_utility_page and article_h1:
-            # new_slug = gslug.generate_slug(article_h1)
-            # new_slug = gslug.generate_universal_slug(article_h1)
-            new_slug = gslug.advanced_slugify(article_h1)
+            new_slug = None
+            resource = article.get('resource')
+            if resource and Path(resource).parent.name.startswith('CL'):
+                new_slug = gslug.slug_from_pages_list(resource)
+            if not new_slug:
+                # new_slug = gslug.generate_slug(article_h1)
+                # new_slug = gslug.generate_universal_slug(article_h1)
+                new_slug = gslug.advanced_slugify(article_h1)
             update_payload['slug'] = new_slug
             # print(f"    Сгенерирован slug: {new_slug}")
 

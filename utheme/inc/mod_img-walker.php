@@ -45,6 +45,36 @@ class Island_Walker extends Walker_Nav_Menu
 
 
 
+/**
+ * Walker for the Dynamic menu (vertical grid ↔ horizontal row).
+ * Outputs a thumbnail circle + label for each nav item.
+ */
+class Dynamic_Menu_Walker extends Walker_Nav_Menu {
+    public function start_el( &$output, $item, $depth = 0, $args = null, $id = 0 ) {
+        $classes   = empty( $item->classes ) ? [] : (array) $item->classes;
+        $classes[] = 'dyn-item';
+        $class_str = implode( ' ', array_filter( array_unique( $classes ) ) );
+
+        $thumb_url = get_the_post_thumbnail_url( $item->object_id, [ 48, 48 ] );
+        $url       = esc_url( $item->url );
+        $title     = esc_html( $item->title );
+
+        $output .= '<li class="' . esc_attr( $class_str ) . '">';
+        $output .= '<a href="' . $url . '">';
+
+        if ( $thumb_url ) {
+            $output .= '<span class="dyn-avatar" style="background-image:url(' . esc_url( $thumb_url ) . ')"></span>';
+        } else {
+            $initial = esc_html( mb_strtoupper( mb_substr( $item->title, 0, 1 ) ) );
+            $output .= '<span class="dyn-avatar dyn-avatar--init">' . $initial . '</span>';
+        }
+
+        $output .= '<span class="dyn-label">' . $title . '</span>';
+        $output .= '</a>';
+    }
+}
+
+
 // Устанавливаем максимальные размеры для среднего размера изображений
 update_option( 'thumbnail_size_w', 300 );
 update_option( 'thumbnail_size_h', 300 );

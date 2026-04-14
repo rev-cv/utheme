@@ -3,9 +3,13 @@
 @use "../funcs.scss" as f;
 
 @mixin styles {
-    // To prevent content from jumping behind the fixed header
+    // Prevent content from jumping under the fixed header
     body {
-        padding-top: 120px; // Corresponds to initial header height
+        padding-top: 120px;
+
+        @media (max-width: 1024px) {
+            padding-top: 60px;
+        }
     }
 
     #dynamic-header {
@@ -15,229 +19,347 @@
         width: 100%;
         z-index: 1000;
         transition: background-color 0.3s ease;
-        
-        // Optional: Add a background on scroll
+
         &.is-scrolled {
-            background-color: rgba(conf.$color-bg-light, 0.8);
+            background-color: rgba(conf.$color-bg-light, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 
             @if conf.$is-border == 'true' {
                 border-bottom: 1px solid conf.$color-border-light;
             }
 
             @media (prefers-color-scheme: dark) {
-                background-color: rgba(conf.$color-bg-dark, 0.8);
+                background-color: rgba(conf.$color-bg-dark, 0.9);
                 @if conf.$is-border == 'true' {
                     border-color: conf.$color-border-dark;
                 }
             }
         }
 
+        // ── Wrapper ───────────────────────────────────────────────────────
         .dynamic-header-wrapper {
             display: flex;
             align-items: center;
             padding: 15px clamp(1rem, 5vw, 3rem);
-            position: relative;
-            height: 120px; // Initial height
+            height: 120px;
             transition: height 0.4s ease;
             max-width: conf.$max-width;
             margin: 0 auto;
         }
 
+        // ── Logo ──────────────────────────────────────────────────────────
         .logo-container {
+            flex-shrink: 0;
             position: relative;
             z-index: 2;
+            border-right: 3px solid transparent;
+            padding-right: 1em;
+            @include f.mode((border-color: (conf.$color-text-light, conf.$color-text-dark)));
 
-            img, .text-logo {
+            img,
+            .text-logo {
                 display: block;
-                height: 90px; // Large initial size
+                height: 90px;
                 width: auto;
                 transition: height 0.4s ease;
             }
         }
 
+        // ── Menus container ───────────────────────────────────────────────
         .menus-container {
-            // position: relative;
-            // display: flex;
-            // align-items: center;
-            // margin-left: 2rem;
-
             position: relative;
             display: flex;
             align-items: center;
-            flex-grow: 1; // Позволяет контейнеру занимать свободное место
+            flex-grow: 1;
+            min-width: 0;
             margin-left: clamp(.8rem, 2vw, 1.5rem);
             padding-left: clamp(.8rem, 2vw, 1.5rem);
-            min-width: 0; // Предотвращает раздувание flex-элемента
+            // Decorative left border that fades on scroll
+            border-left: 3px solid rgba(conf.$color-text-light, 0.35);
+            transition: border-color 0.4s ease;
 
-            border-left: rgba(conf.$color-text-light, 60%) solid 3px;
-            transition: boreder-color 1000ms ease;
             @media (prefers-color-scheme: dark) {
-                border-color: rgba(conf.$color-text-dark, 60%);
+                border-color: rgba(conf.$color-text-dark, 0.35);
             }
         }
 
-        .menu-vertical {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            
-            ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
+        // ── Shared item styles ────────────────────────────────────────────
+        .dyn-item a {
+            @include f.font-txt;
+            display: flex;
+            align-items: center;
+            gap: .45em;
+            text-decoration: none;
+            font-size: clamp(.72rem, 1.6vw, .95rem);
+            font-weight: 500;
+            white-space: nowrap;
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+            transition: color 200ms ease;
+
+            &:hover {
+                color: conf.$color-primary-light;
+                @media (prefers-color-scheme: dark) { color: conf.$color-primary-dark; }
+            }
+        }
+
+        // ── Thumbnail avatar circle ───────────────────────────────────────
+        .dyn-avatar {
+            display: inline-block;
+            flex-shrink: 0;
+            width: 1.55em;
+            height: 1.55em;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(0, 0, 0, .08);
+            overflow: hidden;
+
+            @media (prefers-color-scheme: dark) {
+                border-color: rgba(255, 255, 255, .1);
             }
 
-            li a {
-                @include f.font-txt;
-                display: block;
-                padding: 0;
-                text-decoration: none;
-                font-size: clamp(.7rem, 2vw, 1rem);
-                font-weight: 500;
-                @include f.mode(
-                    (color: (conf.$color-text-light, conf.$color-text-dark))
-                );
-                transition: color 300ms ease;
+            // Fallback: initial letter circle
+            &.dyn-avatar--init {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: .6em;
+                font-weight: 700;
+                background: rgba(conf.$color-primary-light, .12);
+                color: conf.$color-primary-light;
 
-                &:hover {
-                    color: conf.$color-primary-light;
-                    @media (prefers-color-scheme: dark) {
-                        color: conf.$color-primary-dark;
-                    }
+                @media (prefers-color-scheme: dark) {
+                    background: rgba(conf.$color-primary-dark, .15);
+                    color: conf.$color-primary-dark;
                 }
             }
         }
 
-        .menu-horizontal {
+        // ── Vertical menu — initial state (scroll = 0) ────────────────────
+        .menu-vertical {
             position: absolute;
             left: 0;
-            top: 50%; // Центрируем по вертикали относительно родителя
-            transform: translateY(-50%) translateX(-20px); // Совмещаем центрирование и ваш сдвиг
-            opacity: 0;
-            pointer-events: none;
-            white-space: nowrap; // ЗАПРЕЩАЕМ ПЕРЕНОС СЛОВ
-            transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 1;
+            pointer-events: auto;
+            transition: opacity .25s ease, transform .25s ease;
 
-            ul {
+            .dyn-menu {
                 display: flex;
-                flex-direction: row; // Гарантируем горизонталь
-                gap: 2rem; // Увеличиваем расстояние между пунктами
-                align-items: center;
+                flex-direction: column;
+                gap: .25rem;
                 list-style: none;
                 padding: 0;
                 margin: 0;
+
+                // Show only the first 3 items in expanded state
+                .dyn-item:nth-child(n+4) { display: none; }
+            }
+        }
+
+        // ── Horizontal menu wrap — scrolled state ─────────────────────────
+        .menu-horizontal-wrap {
+            position: absolute;
+            left: 0;
+            right: 0;          // span full width of .menus-container
+            top: 50%;
+            transform: translateY(-50%) translateX(-18px);
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            transition: opacity .25s ease .1s, transform .25s ease .1s;
+
+            // Push the "···" button to the far right
+            .dyn-more-wrap { margin-left: auto; }
+        }
+
+        // ── Horizontal menu ───────────────────────────────────────────────
+        .menu-horizontal {
+            min-width: 0;
+            overflow: hidden;
+
+            .dyn-menu {
                 display: flex;
-                gap: 1.5rem;
+                flex-wrap: nowrap;
+                align-items: center;
+                gap: .4rem 1rem;
+                list-style: none;
+                padding: 0;
+                margin: 0;
             }
 
-            li a {
-                @include f.font-txt;
-                text-decoration: none;
-                font-weight: 500;
-                @include f.mode(
-                    (color: (conf.$color-text-light, conf.$color-text-dark))
-                );
-                
-                &:hover {
-                    color: conf.$color-primary-light;
-                    @media (prefers-color-scheme: dark) {
-                        color: conf.$color-primary-dark;
-                    }
+            .dyn-item {
+                flex-shrink: 0;
+                max-width: 150px; // cap item width
+
+                .dyn-label {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
             }
         }
 
-        // Scrolled State
+        // ── "···" overflow button ─────────────────────────────────────────
+        .dyn-more-wrap {
+            position: relative;
+            flex-shrink: 0;
+
+            &[hidden] { display: none; }
+        }
+
+        .dyn-more-btn {
+            @include f.font-txt;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: .28em .75em;
+            border-radius: 1.5em;
+            border: 1px solid rgba(conf.$color-text-light, .22);
+            background: transparent;
+            cursor: pointer;
+            font-size: .88rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+            transition: background 180ms ease, border-color 180ms ease;
+
+            @media (prefers-color-scheme: dark) {
+                border-color: rgba(conf.$color-text-dark, .22);
+            }
+
+            &:hover,
+            &[aria-expanded="true"] {
+                background: rgba(conf.$color-primary-light, .1);
+                border-color: conf.$color-primary-light;
+                color: conf.$color-primary-light;
+
+                @media (prefers-color-scheme: dark) {
+                    background: rgba(conf.$color-primary-dark, .1);
+                    border-color: conf.$color-primary-dark;
+                    color: conf.$color-primary-dark;
+                }
+            }
+        }
+
+        // ── Overflow dropdown ─────────────────────────────────────────────
+        .dyn-overflow-list {
+            position: absolute;
+            top: calc(100% + .55rem);
+            right: 0;
+            min-width: 210px;
+            list-style: none;
+            padding: .45rem 0;
+            margin: 0;
+            border-radius: f.get-radius('menu');
+            box-shadow: conf.$shadow-section-hover;
+            z-index: 200;
+
+            @include f.mode((background: (conf.$color-bg-light, conf.$color-bg-dark)));
+
+            @if conf.$is-border == 'true' {
+                border: 1px solid conf.$color-border-light;
+                @media (prefers-color-scheme: dark) { border-color: conf.$color-border-dark; }
+            }
+
+            // Hidden by default — animated in
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity .18s ease, transform .18s ease, visibility 0s .18s;
+
+            &.is-open {
+                opacity: 1;
+                visibility: visible;
+                transform: translateY(0);
+                transition: opacity .18s ease, transform .18s ease;
+            }
+
+            .dyn-avatar { display: none !important; }
+
+            .dyn-item {
+                a {
+                    padding: .4rem 1.1rem;
+                    font-size: .9rem;
+                    white-space: normal;
+                }
+
+                .dyn-label {
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    white-space: normal;
+                }
+            }
+        }
+
+        // ── Scrolled state ────────────────────────────────────────────────
         &.is-scrolled {
-            .menus-container {
-                border-color: transparent;
-            }
-
             .dynamic-header-wrapper {
-                height: 70px; // Shrunk height
+                height: 70px;
             }
 
-            .logo-container img, .logo-container .text-logo {
-                height: 40px; // Small scrolled size
+            .logo-container img,
+            .logo-container .text-logo {
+                height: 40px;
             }
 
             .menu-vertical {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(calc(-50% + 8px));
                 pointer-events: none;
             }
 
-            // .menu-horizontal {
-            //     opacity: 1;
-            //     transform: translateX(0);
-            //     pointer-events: auto;
-            // }
-
-            .menu-horizontal {
+            .menu-horizontal-wrap {
                 opacity: 1;
-                // Возвращаем X в 0, но оставляем Y -50% для центровки
-                transform: translateY(-50%) translateX(0); 
+                transform: translateY(-50%) translateX(0);
                 pointer-events: auto;
             }
         }
 
-        .mobile-only-action {
-        display: none;
-        margin-left: auto; // Прижмет кнопку к правому краю
-        
-        .btn-articles {
-            @include f.font-txt;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid conf.$color-primary-light;
-            @include f.mode((
-                color: (conf.$color-primary-light, conf.$color-primary-dark),
-                border-color: (conf.$color-primary-light, conf.$color-primary-dark)
-            ));
-            transition: all 0.3s ease;
+        // ── Mobile (≤ 1024px) ─────────────────────────────────────────────
+        // Force the compact/horizontal state via pure CSS so the correct
+        // layout is rendered on the very first paint — no JS flash.
+        @media (max-width: 1024px) {
+            body { padding-top: 70px; }
 
-            &:hover {
-                background: conf.$color-primary-light;
-                color: #fff;
+            .dynamic-header-wrapper {
+                height: 70px;
+                padding: 10px clamp(.75rem, 4vw, 1.5rem);
+            }
+
+            .logo-container img,
+            .logo-container .text-logo { height: 42px; }
+
+            // Mirror .is-scrolled rules without waiting for JS
+            .menu-vertical {
+                opacity: 0;
+                transform: translateY(calc(-50% + 8px));
+                pointer-events: none;
+            }
+
+            .menu-horizontal-wrap {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0);
+                pointer-events: auto;
+            }
+
+            // On very small screens tighten even more
+            @media (max-width: 480px) {
+                body { padding-top: 56px; }
+
+                .dynamic-header-wrapper { height: 56px; }
+
+                .logo-container img,
+                .logo-container .text-logo { height: 32px; }
             }
         }
     }
-
-    @media (max-width: 1024px) {
-        // Скрываем основные контейнеры меню
-        .menus-container {
-            display: none !important;
-        }
-
-        // Показываем кнопку "Все статьи"
-        .mobile-only-action {
-            display: block;
-        }
-
-        // Уменьшаем высоту хедера для мобилок изначально
-        body { padding-top: 80px; }
-        .dynamic-header-wrapper {
-            height: 80px !important;
-            padding: 10px 20px;
-        }
-        
-        .logo-container img, .logo-container .text-logo {
-            height: 50px !important;
-        }
-
-        // В состоянии скролла на мобилке делаем еще компактнее
-        &.is-scrolled {
-            .dynamic-header-wrapper { height: 60px !important; }
-            .logo-container img { height: 35px !important; }
-        }
-    }
-    }
-
-    
 }
