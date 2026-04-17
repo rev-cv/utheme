@@ -1,6 +1,26 @@
+import re
 import sys
 from pathlib import Path
 from bs4 import BeautifulSoup, NavigableString
+
+
+def _preprocess_faq_blocks(html: str) -> str:
+    """Конвертирует шорткод [faq]...[/faq] в HTML <details> теги перед парсингом."""
+
+    def replace_faq_block(match: re.Match) -> str:
+        block_content = match.group(1)
+        items = re.findall(
+            r'\[id="[^"]*"\s+title="([^"]*)"\s+desc="([^"]*)"\]',
+            block_content,
+        )
+        details_tags = []
+        for title, desc in items:
+            details_tags.append(
+                f'<details><summary>{title}</summary><p>{desc}</p></details>'
+            )
+        return '\n'.join(details_tags)
+
+    return re.sub(r'\[faq\](.*?)\[/faq\]', replace_faq_block, html, flags=re.DOTALL)
 
 # --- Обработчики блоков ---
 
@@ -258,6 +278,7 @@ BLOCK_HANDLERS = {
 
 def convert_html_to_blocks(html_content, add_post_meta=False):
     """Преобразует строку HTML в WP блоки."""
+    html_content = _preprocess_faq_blocks(html_content)
     soup = BeautifulSoup(html_content, 'html.parser')
     container = soup.find('article') or soup.find('main') or soup.body
     

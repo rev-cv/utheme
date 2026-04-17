@@ -1,26 +1,4 @@
 services:
-  db:
-    image: mariadb:10.6
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wp_user
-      MYSQL_PASSWORD: wp_password
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - default # внутренняя сеть для связи с WP
-
-    healthcheck:
-      # прповерка доступности сервера MariaDB
-      # root_password используется тот, что задан в MYSQL_ROOT_PASSWORD.
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
-      interval: 5s         # Проверять каждые 5 секунд
-      timeout: 3s          # Ждать ответ 3 секунды
-      retries: 10          # Повторить 10 раз, прежде чем объявить unhealthy
-      start_period: 20s    # Дать контейнеру 20 секунд на запуск, прежде чем начать отсчет retries
-
   wordpress:
     image: wordpress:latest
     container_name: "${CONTAINER_NAME:-wp_site}"
@@ -28,10 +6,10 @@ services:
       - "127.0.0.1:${HOST_PORT}:80"
     restart: unless-stopped
     environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: wp_user
-      WORDPRESS_DB_PASSWORD: wp_password
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_HOST: wp_shared_db
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_NAME: ${DB_NAME}
     volumes:
       - ./utheme:/var/www/html/wp-content/themes/utheme
       - ./uploads:/var/www/html/wp-content/uploads
@@ -39,23 +17,23 @@ services:
       - ./core/setup_site.sh:/var/www/html/setup_site.sh
       - ./core/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./core/.htaccess:/var/www/html/.htaccess
+      - ./core/wp-config.php:/var/www/html/wp-config.php
     networks:
-      - default     # внутренняя сеть для связи с WP
-      - web_network # внешняя сеть для NPM
+      - web_network
+      - shared_db_network
 
-    depends_on:
-      db:
-        condition: service_healthy # запустить WordPress только после того, как DB станет healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '${WP_CPU_LIMIT:-0.5}'
+          memory: ${WP_MEM_LIMIT:-256m}
 
-    # === НАЧАЛО: HEALTHCHECK ДЛЯ WORDPRESS ===
     healthcheck:
-      # прповерка доступности сервера WordPress
-      # 'curl -f' вернет ошибку, если код ответа >= 400.
       test: ["CMD", "curl", "-f", "http://localhost/"]
-      interval: 10s        # Проверять каждые 10 секунд
-      timeout: 5s          # Ждать ответ 5 секунд
-      retries: 5           # Повторить 5 раз
-      start_period: 10s    # Дать контейнеру 10 секунд на запуск
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   sass:
     image: node:alpine
@@ -67,12 +45,9 @@ services:
     command: >
       sh -c "npm install -g sass@1.77.8 &&
       sass --watch --poll --style=compressed style.scss:style.css"
-    networks:
-      - default
-
-volumes:
-  db_data: {}
 
 networks:
   web_network:
+    external: true
+  shared_db_network:
     external: true
