@@ -10,7 +10,8 @@ function replace_placeholders_safely($content) {
 
     $replacements = [
         '$$SITENAME$$'     => $site_name,
-        '$$DOMAIN$$'     => $site_name,
+        '$$SITE_NAME$$'    => $site_name,
+        '$$DOMAIN$$'       => $site_name,
         '$$CURRENT_DATE$$' => $current_date,
     ];
 

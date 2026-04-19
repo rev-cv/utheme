@@ -34,42 +34,29 @@ def normalize_and_rename_files(pics: list) -> list:
     
     has_any_changes = False
     for html_file, changes in plan.items():
-        # Фильтруем изменения: оставляем только те, где имена РАЗНЫЕ
         actual_changes = [c for c in changes if c['new'] != c['original']]
-        
         if actual_changes:
             has_any_changes = True
-            print(f"{html_file}")
-            for c in actual_changes:
-                print(f"  - old: {c['original']}")
-                print(f"  - new:  {c['new']}")
-            print("-" * 40)
 
     if not has_any_changes:
-        print("Все имена уникальны, расширения в норме. Изменений не требуется.")
+        print("Все имена уникальны. Изменений не требуется.")
         print('\n' + '='*50)
         return pics
 
-    # 3. Запрос подтверждения
-    
-    confirm = input("ПЕРЕИМЕНОВАТЬ ФАЙЛЫ?: y/n ").lower().strip()
-    if confirm != 'y':
-        print("Выполнение остановлено.")
-        sys.exit(1)
-
-    # 4. Выполнение (если подтверждено)
+    # 3. Выполнение переименования
     for html_path, changes in plan.items():
         try:
             # сначала переименовываются физические файлы на диске
             for c in changes:
+                if c['new'] == c['original']:
+                    continue
                 if c['pic_path'] and c['pic_path'].exists():
                     new_file_path = c['pic_path'].parent / f"{c['new']}{c['pic_path'].suffix}"
                     if c['pic_path'] != new_file_path:
                         c['pic_path'].rename(new_file_path)
-                        # Обновляем путь в исходном объекте
                         c['item_ref']["selected_image"] = new_file_path
+                        print(f"  Переименован: {c['original']} → {c['new']}")
 
-                # Обновляем имя в исходном объекте, чтобы оно было уникальным для последующих шагов
                 c['item_ref']['name'] = c['new']
 
             # затем обнавляяются ссылки внутри HTML

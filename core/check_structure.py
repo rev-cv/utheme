@@ -8,6 +8,62 @@ from dotenv import load_dotenv
 
 load_dotenv(interpolate=True)
 
+_BRANDING_EXTS   = {".png", ".webp", ".jpg", ".jpeg", ".svg", ".ico"}
+_LOGO_STEMS      = {"logo"}
+_FAVICON_STEMS   = {"favicon", "icon"}
+
+def normalize_branding_assets(spec_dir: Path):
+    """
+    Фаза нормализации:
+      • Перемещает logo.* и favicon/icon.* из PILLAR/ (или HUB/PILLAR/) в корень spec/
+      • Удаляет spec/PILLAR/404.html
+    """
+    spec_dir = Path(spec_dir)
+    print(f"\nНормализация брендинга в: {spec_dir}")
+
+    # Possible PILLAR locations: struc1/2 use PILLAR/, struc3 uses HUB/PILLAR/
+    candidate_dirs = [spec_dir / "PILLAR", spec_dir / "HUB" / "PILLAR"]
+    pillar_dir = next((d for d in candidate_dirs if d.is_dir()), None)
+
+    # ── Удаление 404.html ────────────────────────────────────────────────────
+    if pillar_dir:
+        page_404 = pillar_dir / "404.html"
+        if page_404.exists():
+            page_404.unlink()
+            print(f"  Удалён: {page_404.relative_to(spec_dir)}")
+
+    if pillar_dir is None:
+        print("  PILLAR/ не найдена, пропуск.")
+        print('=' * 50)
+        return
+
+    # ── Перемещение лого и фавикона ──────────────────────────────────────────
+    moved = 0
+    for file in list(pillar_dir.iterdir()):
+        if not file.is_file() or file.suffix.lower() not in _BRANDING_EXTS:
+            continue
+
+        stem = file.stem.lower()
+        is_logo    = stem in _LOGO_STEMS or stem.startswith("logo")
+        is_favicon = stem in _FAVICON_STEMS or stem.startswith("favicon")
+
+        if not (is_logo or is_favicon):
+            continue
+
+        dst = spec_dir / file.name
+        if dst.exists():
+            continue
+
+        file.rename(dst)
+        rel = file.relative_to(spec_dir)
+        print(f"  Перемещён: {rel} → {file.name}")
+        moved += 1
+
+    if moved == 0:
+        print("  Брендинг: файлы уже на месте или не найдены в PILLAR/")
+
+    print('=' * 50)
+
 # Правила переименования.
 # Формат: "Финальное_Имя.расширение": ["вариант1.ext", "вариант2.ext", ...]
 # Поиск происходит без учета регистра (case-insensitive).

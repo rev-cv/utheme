@@ -11,13 +11,13 @@ services:
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
     volumes:
+      - wp_html:/var/www/html
       - ./utheme:/var/www/html/wp-content/themes/utheme
       - ./uploads:/var/www/html/wp-content/uploads
       - ./plugins:/var/www/html/wp-content/plugins
-      - ./core/setup_site.sh:/var/www/html/setup_site.sh
-      - ./core/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
-      - ./core/.htaccess:/var/www/html/.htaccess
-      - ./core/wp-config.php:/var/www/html/wp-config.php
+      - ./wp-conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./wp-conf/.htaccess:/var/www/html/.htaccess
+      - ./wp-conf/wp-config.php:/var/www/html/wp-config.php
     networks:
       - web_network
       - shared_db_network
@@ -45,6 +45,9 @@ services:
     command: >
       sh -c "npm install -g sass@1.77.8 &&
       sass --watch --poll --style=compressed style.scss:style.css"
+
+volumes:
+  wp_html:
 
 networks:
   web_network:

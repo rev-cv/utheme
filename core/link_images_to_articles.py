@@ -1,3 +1,8 @@
+from pathlib import Path
+
+_BRANDING_STEMS = {'logo', 'favicon', 'icon'}
+
+
 def link_images_to_articles(articles_list: list[dict], images_list: list[dict]) -> list[dict]:
     """
     Сопоставляет список картинок со списком статей по пути к HTML файлу.
@@ -6,17 +11,20 @@ def link_images_to_articles(articles_list: list[dict], images_list: list[dict]) 
     :param images_list: Список словарей картинок (поле 'html')
     :return: Обновленный список статей с добавленным полем 'images'
     """
-    # Создаем копию списка статей, чтобы не мутировать исходный (хорошая практика)
+    content_images = [
+        img for img in images_list
+        if Path(str(img.get('selected_image', ''))).stem.lower() not in _BRANDING_STEMS
+    ]
+
     updated_articles = []
 
     for article in articles_list:
-        # Создаем новый словарь статьи и инициализируем пустой список для картинок
         article_copy = article.copy()
         article_copy['images'] = []
-        
+
         article_path = article.get('resource')
 
-        for image in images_list:
+        for image in content_images:
             image_html_path = image.get('html')
             
             # Сравниваем пути. Pathlib корректно сравнивает WindowsPath объекты.

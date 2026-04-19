@@ -7,39 +7,42 @@ def slug_from_pages_list(resource_path):
     """
     Ищет slug для .html файла по pages-list.txt в директории spec.
     Применяется только если файл лежит в папке CL*.
-    Возвращает последний сегмент slug (например, 'fichajes-verano-bundesliga-cuotas')
-    или None, если не удалось найти.
+    Проверяет одновременно имя CL-папки И имя секции (CLUSTERS MAIN / CLUSTERS ADD),
+    чтобы CL1 из разных секций не получали один и тот же slug.
+    Возвращает последний сегмент slug или None если не найдено.
     """
     resource_path = Path(resource_path)
-    cl_folder = resource_path.parent
+    cl_folder     = resource_path.parent  # .../CLUSTERS ADD/CL1
 
     if not cl_folder.name.startswith('CL'):
         return None
 
-    # pages-list.txt лежит на два уровня выше папки CL*
     # структура: spec / CLUSTERS ADD (или CLUSTERS MAIN) / CL25 / file.html
-    spec_dir = cl_folder.parent.parent
-    pages_list_file = spec_dir / 'pages-list.txt'
+    section_folder    = cl_folder.parent          # .../CLUSTERS ADD
+    spec_dir          = section_folder.parent     # .../spec
+    pages_list_file   = spec_dir / 'pages-list.txt'
 
     if not pages_list_file.exists():
         return None
 
-    cl_name = cl_folder.name  # например, "CL25"
+    cl_name      = cl_folder.name         # "CL1", "CL25", …
+    section_name = section_folder.name    # "CLUSTERS MAIN", "CLUSTERS ADD", …
 
     try:
         lines = pages_list_file.read_text(encoding='utf-8').splitlines()
         for line in lines:
-            # формат строк: "CLUSTERS ADD > CL25 /articles/fichajes-verano-bundesliga-cuotas/"
-            #           или: "CLUSTERS MAIN > CL1 /cuotas-campeon-bundesliga/"
+            # формат: "CLUSTERS ADD > CL25 /articles/slug/"
             parts = line.split('>')
             if len(parts) < 2:
                 continue
-            right = parts[-1].strip()
+            left  = parts[0].strip()   # "CLUSTERS ADD"
+            right = parts[-1].strip()  # "CL25 /articles/slug/"
             tokens = right.split()
             if len(tokens) < 2:
                 continue
-            if tokens[0] == cl_name:
-                slug_path = tokens[1].strip('/')
+            # совпадение по секции И по имени CL-папки
+            if tokens[0] == cl_name and left == section_name:
+                slug_path    = tokens[1].strip('/')
                 last_segment = slug_path.split('/')[-1]
                 if last_segment:
                     return last_segment

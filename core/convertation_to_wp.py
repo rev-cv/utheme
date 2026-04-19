@@ -46,12 +46,14 @@ def _handle_image(tag):
     """Обработка изображений (img)."""
     src = tag.get('src', '')
     alt = tag.get('alt', '')
-    
-    # Извлекаем имя файла без пути и расширения для использования в ID
-    img_id = Path(src).stem
-    
-    # Формируем блок. src оставляем пустым, ID заполняем из имени файла.
-    return f'<!-- wp:image -->\n<figure id="{img_id}" class="wp-block-image"><img src="" alt="{alt}"/></figure>\n<!-- /wp:image -->'
+    fname = Path(src).stem + ".webp"
+    return (
+        f'<!-- wp:image {{"id":%%IMGID:{fname}%%,"sizeSlug":"full","linkDestination":"none"}} -->\n'
+        f'<figure class="wp-block-image size-full">'
+        f'<img class="wp-image-%%IMGID:{fname}%%" src="%%IMGSRC:{fname}%%" alt="{alt}"/>'
+        f'</figure>\n'
+        f'<!-- /wp:image -->'
+    )
 
 def _handle_list(tag):
     """Обработка списков (ul, ol)."""
@@ -257,14 +259,20 @@ def _handle_figure(tag):
 
     src = img_tag.get('src', '')
     alt = img_tag.get('alt', '')
-    img_id = Path(src).stem
+    fname = Path(src).stem + ".webp"
 
     figcaption_tag = tag.find('figcaption')
-    if figcaption_tag:
-        caption_text = figcaption_tag.get_text(strip=True)
-        return f'<!-- wp:image -->\n<figure id="{img_id}" class="wp-block-image"><img src="" alt="{alt}"/><figcaption class="wp-element-caption">{caption_text}</figcaption></figure>\n<!-- /wp:image -->'
-
-    return f'<!-- wp:image -->\n<figure id="{img_id}" class="wp-block-image"><img src="" alt="{alt}"/></figure>\n<!-- /wp:image -->'
+    caption = (
+        f'<figcaption class="wp-element-caption">{figcaption_tag.get_text(strip=True)}</figcaption>'
+        if figcaption_tag else ''
+    )
+    return (
+        f'<!-- wp:image {{"id":%%IMGID:{fname}%%,"sizeSlug":"full","linkDestination":"none"}} -->\n'
+        f'<figure class="wp-block-image size-full">'
+        f'<img class="wp-image-%%IMGID:{fname}%%" src="%%IMGSRC:{fname}%%" alt="{alt}"/>'
+        f'{caption}</figure>\n'
+        f'<!-- /wp:image -->'
+    )
 
 BLOCK_HANDLERS = {
     'h1': _handle_heading, 'h2': _handle_heading, 'h3': _handle_heading,
@@ -369,13 +377,8 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
             wp_content = convert_html_to_blocks(content, add_post_meta=add_meta)
             
             if wp_content:
-                # сохранить результат конвертирования в файл.wp рядом с файлом .html
-                output_file = source_file.with_suffix(".wp")
-                output_file.write_text(wp_content, encoding='utf-8')
-                
-                # добавить результат конвертирования в объект
                 new_item["wp_block"] = wp_content
-                print(f"{display_path} -> {output_file.name}")
+                print(f"{display_path}")
             else:
                 new_item["wp_block"] = ""
                 print(f"Файл {display_path} пуст после конвертации")

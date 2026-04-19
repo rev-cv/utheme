@@ -117,10 +117,10 @@ function my_custom_seo_head() {
     $curr_date  = get_the_modified_date('c') ?: current_time('c');
 
     // Данные из мета-полей
-    $seo_title    = get_post_meta($post_id, '_custom_seo_title', true) ?: get_the_title($post_id);
-    $seo_desc_raw = get_post_meta($post_id, '_custom_seo_desc', true) ?: get_the_excerpt($post_id);
+    $seo_title    = replace_placeholders_safely(get_post_meta($post_id, '_custom_seo_title', true)) ?: get_the_title($post_id);
+    $seo_desc_raw = replace_placeholders_safely(get_post_meta($post_id, '_custom_seo_desc', true)) ?: get_the_excerpt($post_id);
     $seo_desc     = wp_trim_words(esc_attr($seo_desc_raw), 30, '');
-    $social_headline = get_post_meta($post_id, '_custom_seo_headline', true) ?: $seo_title;
+    $social_headline = replace_placeholders_safely(get_post_meta($post_id, '_custom_seo_headline', true)) ?: $seo_title;
 
     $img_url  = get_the_post_thumbnail_url($post_id, 'full') ?: '';
     $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme_mod('custom_logo'), 'full') : '';
