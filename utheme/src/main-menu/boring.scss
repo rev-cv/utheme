@@ -2,14 +2,16 @@
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
-@mixin styles { 
-    // Стили для шапки сайта
+@mixin styles {
     $header-height: 65px;
     $header-bg-light: rgba(conf.$color-section-light, 0.9);
-    $header-bg-dark: rgba(conf.$color-section-dark, 0.9);
-    $text-color-light: conf.$color-text-light;
-    $text-color-dark: conf.$color-text-dark;
-    $menu-z-index: 1000;
+    $header-bg-dark:  rgba(conf.$color-section-dark,  0.9);
+    $text-light: conf.$color-text-light;
+    $text-dark:  conf.$color-text-dark;
+    $z: 1000;
+    $panel-transition: 0.3s ease;
+
+    // ── Общее ─────────────────────────────────────────────────────────────────
 
     body.menu-open {
         overflow: auto !important;
@@ -19,18 +21,19 @@
         margin-top: $header-height;
     }
 
+    // ── Шапка ─────────────────────────────────────────────────────────────────
+
     #site-header {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         width: 100%;
         height: $header-height;
-        z-index: $menu-z-index;
+        z-index: $z;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
 
-        @include f.mode(( //
+        @include f.mode((
             background: ($header-bg-light, $header-bg-dark),
         ));
 
@@ -49,19 +52,13 @@
         }
 
         .site-logo {
-            flex-shrink: 0; 
+            flex-shrink: 0;
             max-width: 50vw;
             overflow: hidden;
-
             display: flex;
-                align-items: center;
-                justify-content: start;
+            align-items: center;
 
-            a {
-                display: flex;
-                align-items: center;
-                justify-content: start;
-            }
+            a { display: flex; align-items: center; }
 
             img {
                 height: 40px;
@@ -87,8 +84,8 @@
             a {
                 @include f.font-logo;
                 text-decoration: none;
-                @include f.mode(( //
-                    color: ($text-color-light, $text-color-dark),
+                @include f.mode((
+                    color: ($text-light, $text-dark),
                 ));
             }
         }
@@ -106,158 +103,356 @@
             border-radius: f.get-radius();
             transition: background-color 0.2s ease;
 
-            @include f.mode(( //
-                color: ($text-color-light, $text-color-dark),
+            @include f.mode((
+                color: ($text-light, $text-dark),
             ));
 
             &:hover {
-                $bg-hover-light: sys.mix($header-bg-light, #000, 90%);
-                $bg-hover-dark: sys.mix($header-bg-dark, #fff, 90%);
-                @include f.mode(( //
-                    background: ($bg-hover-light, $bg-hover-dark),
-                ));
+                $hl: sys.mix($header-bg-light, #000, 90%);
+                $hd: sys.mix($header-bg-dark,  #fff, 90%);
+                @include f.mode((background: ($hl, $hd)));
             }
         }
     }
 
-    body:has(.side-panel.is-active) #site-header{
-        box-shadow: 0 0 0 rgba(0, 0, 0, 0.05);
-    }
+// ── Панель ────────────────────────────────────────────────────────────────
 
     .side-panel {
         position: fixed;
-        top: $header-height; // Располагаем сразу под шапкой
+        top: $header-height;
         left: 0;
         width: 100%;
-        z-index: $menu-z-index - 1; // Ниже шапки, но выше остального контента
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        max-height: calc(100vh - #{$header-height}); // Ограничиваем высоту
-        overflow-y: auto;
-
-        // По умолчанию меню скрыто
-        visibility: hidden;
-        opacity: 0;
-        transform: translateY(-15px);
-        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-
+        height: 0;
+        z-index: $z - 1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: height 0.35s ease;
 
-        @include f.mode(( //
+        @include f.mode((
             background: ($header-bg-light, $header-bg-dark),
         ));
+    }
 
-        // Когда меню активно (класс .is-active добавляется через JS)
-        &.is-active {
-            visibility: visible;
-            opacity: 1;
-            transform: translateY(0);
+    // ── Навигационная шапка панели ────────────────────────────────────────────
+
+    .side-panel-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 18px clamp(10px, 4vw, 48px) 0 clamp(10px, 4vw, 48px);
+        flex-shrink: 0;
+        height: 40px;
+        overflow: hidden;
+        transition: height 0.2s ease, padding 0.2s ease;
+
+        &:has(.drill-back[hidden]) {
+            height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
         }
 
-        // Заголовок "Related articles" и кнопка закрытия в выпадающем меню не нужны
-        .side-panel-header {
-            display: none;
+        // @include f.mode((
+        //     border-bottom: (
+        //         1px solid rgba(conf.$color-border-light, 0.5),
+        //         1px solid rgba(conf.$color-border-dark,  0.5),
+        //     ),
+        // ));
+
+        .drill-back {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px 5px 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: f.get-radius();
+            transition: color 0.2s ease;
+            // растягиваем на весь свободный горизонтальный простор
+            flex: 1;
+            min-width: 0;
+
+            @include f.mode((color: ($text-light, $text-dark)));
+
+            &:hover { color: conf.$color-accent-light; }
+            &[hidden] { display: none; }
+
+            @media (prefers-color-scheme: dark) {
+                &:hover { color: conf.$color-accent-dark; }
+            }
+
+            svg { flex-shrink: 0; }
+
+            .drill-title {
+                @include f.font-txt;
+                font-size: clamp(.65rem, 2vw, .85rem);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
         }
 
-        .side-nav {
-            padding: 0;
+        .menu-close { display: none; }
+    }
 
-            .side-menu-list {
-                display: grid;
-                grid-template-columns: repeat(6, 1fr);
-                gap: 12px;
-                list-style: none;
-                margin: 0 clamp(0em, 10vw, 8em);
-                padding: 15px;
+    // ── Вьюпорт и панели ─────────────────────────────────────────────────────
 
-                @media (max-width: 1200px) {
-                    grid-template-columns: repeat(4, 1fr);
+    @keyframes boring-drill-in {
+        from { opacity: 0; transform: translateX(12px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes boring-drill-back {
+        from { opacity: 0; transform: translateX(-12px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .drill-viewport {
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
+        min-height: 0;
+    }
+
+    // Все панели скрыты по умолчанию
+    .drill-panel:not(.drill-panel--active) {
+        display: none !important;
+    }
+
+    // Активная панель: display задаётся специфическим селектором ниже
+    .side-menu-list.drill-panel--active {
+        display: grid;
+        animation: boring-drill-in 0.25s ease;
+    }
+
+    .sub-menu-list.drill-panel--active,
+    .sub-sub-menu-list.drill-panel--active {
+        display: grid;
+        animation: boring-drill-in 0.25s ease;
+    }
+
+    // Анимация «назад» добавляется JS-классом .is-going-back на side-panel
+    .side-panel.is-going-back {
+        .side-menu-list.drill-panel--active,
+        .sub-menu-list.drill-panel--active,
+        .sub-sub-menu-list.drill-panel--active {
+            animation-name: boring-drill-back;
+        }
+    }
+
+    // ── Общий уголок-триггер drill-in ─────────────────────────────────────────
+    // Применяется к .submenu-toggle (уровень 1) и .drill-corner (уровни 2–3)
+
+    %drill-corner-base {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 136px;
+        height: 136px;
+        border: none;
+        cursor: pointer;
+        padding: 0 28px 28px 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        clip-path: polygon(100% 0, 100% 100%, 0 100%);
+        z-index: 4;
+        transition: background 0.2s ease;
+
+        svg {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+    }
+
+    // ── Уровень 1: карточки с картинками ──────────────────────────────────────
+
+    .side-menu-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+        list-style: none;
+        padding: 12px clamp(10px, 4vw, 48px);
+        margin: 0;
+        box-sizing: border-box;
+        width: 100%;
+        align-content: start; // группируем сверху вниз
+
+        .menu-item-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: f.get-radius();
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+
+            // Скрываем row-обёртку, всё позиционируем внутри li напрямую
+            .menu-item-row {
+                display: contents;
+            }
+
+            a {
+                display: block;
+                width: 100%;
+                height: 100%;
+                text-decoration: none;
+            }
+
+            .menu-thumb {
+                position: absolute;
+                inset: 0;
+                overflow: hidden;
+                filter: brightness(0.45) blur(2px);
+                transition: filter 0.35s ease, transform 0.35s ease;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
                 }
+            }
 
-                @media (max-width: 900px) {
-                    grid-template-columns: repeat(3, 1fr);
+            .menu-title {
+                @include f.font-txt;
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px;
+                text-align: center;
+                color: #fff;
+                font-weight: 600;
+                line-height: 1.25;
+                text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+                font-size: clamp(16px, 2.5vw, 20px);
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            // Уголок-триггер drill-in (перестилизованный .submenu-toggle)
+            .submenu-toggle {
+                @extend %drill-corner-base;
+                color: #fff;
+                background: transparent;
+            }
+
+            &:hover {
+                .menu-thumb {
+                    filter: brightness(0.65) blur(0);
+                    transform: scale(1.04);
                 }
-
-                @media (max-width: 600px) {
-                    grid-template-columns: repeat(2, 1fr);
-                }
-
-                .menu-item-card {
-                    aspect-ratio: 1 / 1;
-                    position: relative;
-                    overflow: hidden;
-                    border-radius: f.get-radius();
-                    max-width: 250px;
-
-                    a {
-                        display: block;
-                        width: 100%;
-                        height: 100%;
-                        position: relative;
-                        text-decoration: none;
-                    }
-
-                    .menu-thumb {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        overflow: hidden;
-                        filter: brightness(0.4) blur(3px);
-                        transition: filter 0.4s ease, transform 0.4s ease;
-
-                        img {
-                            width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                        }
-                    }
-
-                    .menu-title {
-                        @include f.font-txt;
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        width: 90%;
-                        text-align: center;
-                        color: #ffffff;
-                        font-weight: 600;
-                        line-height: 1.3;
-                        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-                        z-index: 1;
-                        pointer-events: none;
-                        font-size: clamp(12px, 3vw, 0.85rem);
-                    }
-
-                    &:hover {
-                        .menu-thumb {
-                            filter: brightness(0.7) blur(0);
-                            transform: scale(1.05);
-                        }
-                    }
+                
+                .submenu-toggle {
+                    background: rgba(255, 255, 255, 0.4);
                 }
             }
         }
     }
 
-    /*
-    * Оверлей используется для закрытия меню по клику вне его.
-    * В JS он уже настроен. Мы просто делаем его невидимым,
-    * но он по-прежнему будет перехватывать клики.
-    */
+    // ── Уровни 2 и 3: одинаковые текстовые плитки ────────────────────────────
+
+    .sub-menu-list.drill-panel,
+    .sub-sub-menu-list.drill-panel {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+        list-style: none;
+        padding: 12px clamp(10px, 4vw, 48px);
+        margin: 0;
+        box-sizing: border-box;
+        width: 100%;
+        align-content: start;
+
+    }
+
+    // Стиль одной плитки (уровни 2 и 3) — квадратные, идентичные
+    .sub-menu-item,
+    .sub-sub-menu-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: f.get-radius();
+        aspect-ratio: 1 / 1;
+
+        a {
+            @include f.font-txt;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            // отступ справа, чтобы текст не лез под уголок
+            padding: 12px ;
+            text-decoration: none;
+            font-size: clamp(16px, 2vw, 18px);
+            font-weight: 500;
+            line-height: 1.3;
+            transition: color 0.2s ease, background 0.2s ease;
+
+            @include f.mode((
+                background: (
+                    rgba(conf.$color-text-light, 0.06),
+                    rgba(conf.$color-text-dark,  0.09),
+                ),
+                color: (conf.$color-text-light, conf.$color-text-dark),
+            ));
+
+            &:hover {
+                color: conf.$color-accent-light;
+
+                @include f.mode((
+                    background: (
+                        rgba(conf.$color-text-light, 0.11),
+                        rgba(conf.$color-text-dark,  0.15),
+                    ),
+                ));
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-accent-dark;
+                }
+            }
+        }
+
+        .drill-corner {
+            @extend %drill-corner-base;
+            background: rgba(conf.$color-accent-light, 0.15);
+            color: conf.$color-accent-light;
+
+            &:hover {
+                background: rgba(conf.$color-accent-light, 0.35);
+            }
+
+            @media (prefers-color-scheme: dark) {
+                background: rgba(conf.$color-accent-dark, 0.2);
+                color: conf.$color-accent-dark;
+
+                &:hover {
+                    background: rgba(conf.$color-accent-dark, 0.4);
+                }
+            }
+        }
+    }
+
+    // ── Оверлей ───────────────────────────────────────────────────────────────
+
     .menu-overlay {
         position: fixed;
-        top: $header-height; // Начинается под шапкой
+        top: $header-height;
         left: 0;
         width: 100%;
         height: calc(100% - #{$header-height});
         background: transparent;
-        z-index: $menu-z-index - 2;
+        z-index: $z - 2;
         display: none;
 
-        // JS добавляет класс .menu-open на body, что покажет оверлей
         body.menu-open & {
             display: block;
         }

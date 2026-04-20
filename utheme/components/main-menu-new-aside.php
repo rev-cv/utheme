@@ -33,13 +33,13 @@
         "container" => "nav",
         "container_class" => "side-nav",
         "menu_class" => "side-menu-list",
-        "walker" => new Island_Walker(),
-        "depth" => 1,
+        "walker" => new Aside_Walker(),
+        "depth" => 3,
     ]); ?>
 </div>
 
 <script>
-    document.querySelectorAll('.menu-item-card').forEach((item, i) => {
+    document.querySelectorAll('.menu-item-card:not(.has-submenu)').forEach((item, i) => {
         item.style.setProperty('--item-delay', `${((i + 2) * 0.05).toFixed(2)}s`);
     });
 
@@ -48,20 +48,25 @@
             my_theme_get_config("main-menu", "island") === "boring",
         ); ?>;
 
-        const toggle = document.querySelector('.menu-toggle');
-        const close = document.querySelector('.menu-close');
+        const toggle  = document.querySelector('.menu-toggle');
+        const close   = document.querySelector('.menu-close');
         const overlay = document.querySelector('.menu-overlay');
-        const panel = document.querySelector('.side-panel');
-        const header = document.querySelector('.header-island');
-        const body = document.body;
+        const panel   = document.querySelector('.side-panel');
+        const header  = document.querySelector('.header-island');
+        const body    = document.body;
 
-        const getScrollbarWidth = () => {
-            return window.innerWidth - document.documentElement.clientWidth;
-        };
+        const getScrollbarWidth = () =>
+            window.innerWidth - document.documentElement.clientWidth;
+
+        function closeAllSubmenus() {
+            panel.querySelectorAll('.submenu-toggle[aria-expanded="true"]').forEach(btn => {
+                btn.setAttribute('aria-expanded', 'false');
+                btn.closest('.has-submenu').querySelector('.sub-menu-list').classList.remove('is-open');
+            });
+        }
 
         function openMenu() {
             const scrollWidth = getScrollbarWidth();
-
             body.classList.add('menu-open');
             panel.classList.add('is-active');
             body.style.paddingRight = `${scrollWidth}px`;
@@ -69,9 +74,9 @@
 
         function closeMenu() {
             panel.classList.remove('is-active');
-
             setTimeout(() => {
                 body.classList.remove('menu-open');
+                closeAllSubmenus();
                 if (!isBoringMenu) {
                     body.style.paddingRight = '';
                     if (header) header.style.marginRight = '';
@@ -81,14 +86,29 @@
 
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
-            if (panel.classList.contains('is-active')) {
-                closeMenu();
-            } else {
-                openMenu();
-            }
+            panel.classList.contains('is-active') ? closeMenu() : openMenu();
         });
 
         close.addEventListener('click', closeMenu);
         overlay.addEventListener('click', closeMenu);
+
+        // Submenu toggles
+        panel.addEventListener('click', (e) => {
+            const btn = e.target.closest('.submenu-toggle');
+            if (!btn) return;
+
+            e.preventDefault();
+            const card    = btn.closest('.has-submenu');
+            const submenu = card.querySelector('.sub-menu-list');
+            const isOpen  = btn.getAttribute('aria-expanded') === 'true';
+
+            // Close all other open submenus
+            closeAllSubmenus();
+
+            if (!isOpen) {
+                btn.setAttribute('aria-expanded', 'true');
+                submenu.classList.add('is-open');
+            }
+        });
     });
 </script>

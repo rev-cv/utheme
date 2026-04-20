@@ -21,7 +21,6 @@ WEB_NETWORK  = "web_network"
 def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
 
-    _find_free_port()
     _clean_wp_config_volume(wp_conf_dir)
     _ensure_shared_db()
     _create_site_db()
@@ -197,8 +196,12 @@ def _start_container(container: str) -> None:
     else:
         print("  [!] WP не стал healthy за 150 сек, продолжаем...")
 
-    # Права на wp-content
-    _exec_root(container, "chown -R www-data:www-data /var/www/html/wp-content && chmod -R 775 /var/www/html/wp-content")
+    # Права на wp-content + обязательные директории
+    _exec_root(container,
+        "mkdir -p /var/www/html/wp-content/upgrade /var/www/html/wp-content/cache && "
+        "chown -R www-data:www-data /var/www/html/wp-content && "
+        "chmod -R 775 /var/www/html/wp-content"
+    )
 
     # WP-CLI
     print("  Установка WP-CLI...")
@@ -340,10 +343,12 @@ def _ensure_network(name: str) -> None:
 
 
 def _exec_root(container: str, cmd: str) -> None:
-    subprocess.run(
+    result = subprocess.run(
         COMPOSE + ["exec", "-u", "root", WP_SERVICE, "bash", "-c", cmd],
-        capture_output=True,
+        capture_output=True, text=True,
     )
+    if result.returncode != 0:
+        print(f"  [!] exec_root failed: {result.stderr.strip()}")
 
 
 def _run(cmd: list) -> None:

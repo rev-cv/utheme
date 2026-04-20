@@ -137,3 +137,13 @@
 @else if conf.$details =='arrow' {
     @include details_arrow.styles;
 }
+
+
+
+
+
+.tc-brand-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}

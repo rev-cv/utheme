@@ -11,8 +11,10 @@
     <?php
         $menu_type = my_theme_get_config('main-menu', 'island');
 
-        if ($menu_type === 'aside' || $menu_type === 'boring') {
+        if ($menu_type === 'aside') {
             get_template_part('components/main-menu-new-aside');
+        } elseif ($menu_type === 'boring') {
+            get_template_part('components/main-menu-boring');
         } elseif ($menu_type === 'marquee') {
             get_template_part('components/main-menu-marquee');
         } elseif ($menu_type === 'docs') {

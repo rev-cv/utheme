@@ -16,7 +16,7 @@ fi
 
 SITE_URL="{{ site.url }}"
 SITE_TITLE="{{ site.title | bash_escape }}"
-ADMIN_USER="admin"
+ADMIN_USER="{{ site.admin_user | bash_escape }}"
 ADMIN_EMAIL="{{ site.email }}"
 THEME_SLUG="{{ site.theme_slug | default('utheme') }}"
 WP_LANG="{{ wp_locale }}"
@@ -268,7 +268,12 @@ wp eval "
 \$locs['header-menu'] = \$menu_id;
 set_theme_mod('nav_menu_locations', \$locs);
 {% for node in menus.main %}
-wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish'{% if node.menu_title %}, 'menu-item-title' => base64_decode('{{ node.menu_title | b64 }}'){% endif %}]);
+\$parent_item_{{ node.slug | replace('-', '_') }} = wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish'{% if node.menu_title %}, 'menu-item-title' => base64_decode('{{ node.menu_title | b64 }}'){% endif %}]);
+{% if node.children is defined and node.children %}
+{% for child in node.children %}
+wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ child.slug }}]}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish', 'menu-item-parent-id' => \$parent_item_{{ node.slug | replace('-', '_') }}{% if child.menu_title is defined and child.menu_title %}, 'menu-item-title' => base64_decode('{{ child.menu_title | b64 }}'){% endif %}]);
+{% endfor %}
+{% endif %}
 {% endfor %}
 "
 echo "MainMenu created with {{ menus.main | length }} items."

@@ -33,6 +33,10 @@ def run():
     (STAGING_DIR / "images").mkdir(exist_ok=True)
     (STAGING_DIR / "pages").mkdir(exist_ok=True)
 
+    # ── 0. ВЫБОР ПОРТА ──────────────────────────────────────────────────────
+    from core.docker_setup import _find_free_port
+    _find_free_port()
+
     # ── 1. НОРМАЛИЗАЦИЯ ИМЁН ─────────────────────────────────────────────────
     _phase(1, 10, "Нормализация имён файлов и папок")
     from core import check_structure
@@ -269,12 +273,13 @@ def _site_config() -> dict:
     favicon_path = _find_branding_file(["favicon", "icon"])
     logo_path    = _find_branding_file(["logo"])
     return {
-        "title":   os.environ.get("SITE_TITLE",  "WordPress Site"),
-        "url":     os.environ.get("SITE_URL",     "http://localhost:8080"),
-        "lang":    os.environ.get("SITE_LANG",    "EN"),
-        "email":   os.environ.get("ADMIN_EMAIL",  "admin@example.com"),
-        "favicon": Path(favicon_path).name if favicon_path else None,
-        "logo":    Path(logo_path).name    if logo_path    else None,
+        "title":      os.environ.get("SITE_TITLE",  "WordPress Site"),
+        "url":        os.environ.get("SITE_URL",     "http://localhost:8080"),
+        "lang":       os.environ.get("SITE_LANG",    "EN"),
+        "email":      os.environ.get("ADMIN_EMAIL",  "admin@example.com"),
+        "admin_user": os.environ.get("ADMIN_USER",   "admin"),
+        "favicon":    Path(favicon_path).name if favicon_path else None,
+        "logo":       Path(logo_path).name    if logo_path    else None,
     }
 
 

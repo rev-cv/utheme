@@ -160,6 +160,18 @@ wordpress:
 - `web_network` — для Nginx Proxy Manager / reverse proxy
 - `shared_db_network` — для общей MariaDB
 
+## Удаление проекта
+
+Поскольку в текущей реализации контейнер с бд и контейнер wp разнесены, удаление wp требует того, чтобы так же была удалена таблица удаляемого сайта.
+
+команда удаления для Windows (заменить `<DB_PASSWORD>` на пароль, который можно посмотреть в .env лежащим в папке с контейнером базы данной):
+```sh
+docker compose down -v; docker exec wp_shared_db mariadb -uroot -p<DB_PASSWORD> -e $('DROP DATABASE IF EXISTS ' + [char]96 + 'footchmondial2026-com' + [char]96 + ';')
+```
+
+Для нормальных систем:
+
+
 ### Лимиты ресурсов
 
 ```env

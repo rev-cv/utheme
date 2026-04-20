@@ -4,8 +4,7 @@ Optionally combined with CLUSTERS ADD/CL1-CL30 for scheduled content.
 """
 from pathlib import Path
 
-from ._shared import _page, _node
-from ..generate_slug import slug_from_pages_list
+from ._shared import _page, _node, _cl_slug
 
 
 def detect(spec_dir: Path) -> bool:
@@ -64,15 +63,6 @@ def _add_pages(spec_dir: Path) -> list[dict]:
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
-
-def _cl_slug(cl_dir: Path, fallback: str) -> str:
-    html_file = cl_dir / "index.html"
-    if not html_file.exists():
-        found = list(cl_dir.glob("*.html"))
-        html_file = found[0] if found else html_file
-    slug = slug_from_pages_list(html_file)
-    return slug if slug else fallback
-
 
 def _build_menus(pages: list[dict]) -> dict:
     main_nodes = [

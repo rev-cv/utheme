@@ -61,11 +61,17 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
 
         /* Логотип: ограничение размера */
         .site-logo {
+            flex-shrink: 1;
+            min-width: 0;
+            overflow: hidden;
+
             img {
                 display: block;
                 max-height: 40px;
                 width: auto;
+                max-width: 100%;
                 transition: transform 0.3s ease;
+                object-fit: contain;
             }
 
             a:hover img {
@@ -147,7 +153,9 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
         height: 100%;
         z-index: 2000;
         /* Выше шторки */
-        padding: 30px 20px;
+        padding: 30px 0 30px 20px;
+        display: flex;
+        flex-direction: column;
 
         transform: translateX(105%);
         /* Полностью прячем, включая тени */
@@ -177,6 +185,20 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
 
             @media (prefers-color-scheme: dark) {
                 color: conf.$color-text-dark;
+            }
+        }
+
+        /* Скролл меню при переполнении */
+        .side-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: conf.$color-border-light transparent;
+
+            @media (prefers-color-scheme: dark) {
+                scrollbar-color: conf.$color-border-dark transparent;
             }
         }
 
@@ -214,11 +236,18 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             transform: translateY(20px);
             transition: opacity 0.4s ease, transform 0.4s ease;
 
+            /* Строка: ссылка-карточка + кнопка-стрелка */
+            .menu-item-row {
+                display: flex;
+                align-items: stretch;
+                gap: 0;
+            }
+
             a {
+                flex: 1;
                 display: flex;
                 align-items: center;
                 gap: 16px;
-                border-radius: calc(f.get-radius() + 12px);
                 border-radius: f.get-radius();
                 text-decoration: none;
                 transition: all 0.2s ease;
@@ -235,6 +264,160 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 }
             }
 
+            /* Если есть кнопка подменю — убираем правый бордер и скругление у ссылки */
+            &.has-submenu .menu-item-row > a {
+                border-right: none;
+                border-radius: f.get-radius() 0 0 f.get-radius();
+            }
+
+            /* При наведении на строку — восстанавливаем скругление на стыке */
+            &.has-submenu .menu-item-row:hover > a {
+                border-top-right-radius: f.get-radius();
+                border-bottom-right-radius: f.get-radius();
+            }
+
+            &.has-submenu .menu-item-row:hover > .submenu-toggle {
+                border-top-left-radius: f.get-radius();
+                border-bottom-left-radius: f.get-radius();
+            }
+
+            /* Кнопка раскрытия подменю */
+            .submenu-toggle {
+                flex-shrink: 0;
+                background: conf.$color-section-light;
+                border: 1px solid transparent;
+                border-left: none;
+                border-radius: 0 f.get-radius() f.get-radius() 0;
+                padding: 0 10px;
+                cursor: pointer;
+                color: conf.$color-text-light;
+                display: flex;
+                align-items: center;
+                transition: color 0.2s ease, background 0.2s ease;
+
+                @media (prefers-color-scheme: dark) {
+                    background: conf.$color-section-dark;
+                    color: conf.$color-text-dark;
+                }
+
+                svg {
+                    display: block;
+                    transition: transform 0.3s ease;
+                }
+
+                &[aria-expanded="true"] svg {
+                    transform: rotate(90deg);
+                }
+
+                &:hover {
+                    color: conf.$color-accent-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-accent-dark;
+                    }
+                }
+            }
+
+            /* Подменю 2-го уровня (скрытое / раскрытое) */
+            .sub-menu-list {
+                list-style: none !important;
+                padding: 4px 0 4px 16px !important;
+                margin: 0 !important;
+                overflow: hidden;
+                max-height: 0;
+                transition: max-height 0.35s ease, padding 0.35s ease;
+
+                &.is-open {
+                    max-height: 2400px;
+
+                    .sub-sub-menu-list {
+                        max-height: 1200px;
+                    }
+                }
+            }
+
+            .sub-menu-item {
+                margin-bottom: 4px;
+
+                a {
+                    display: block;
+                    padding: 7px 12px;
+                    border-radius: f.get-radius();
+                    background: transparent;
+                    color: conf.$color-text-light;
+                    font-size: clamp(.65em, 1vw, .88em);
+                    border: none;
+                    transform: none !important;
+                    box-shadow: none !important;
+                    gap: 0;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-text-dark;
+                    }
+
+                    &:hover {
+                        color: conf.$color-accent-light;
+                        background: rgba(0, 0, 0, .04);
+                        transform: translateX(-3px) !important;
+
+                        @media (prefers-color-scheme: dark) {
+                            color: conf.$color-accent-dark;
+                            background: rgba(255, 255, 255, .06);
+                        }
+                    }
+                }
+            }
+
+            /* Подменю 3-го уровня */
+            .sub-sub-menu-list {
+                list-style: none !important;
+                padding: 2px 0 2px 14px !important;
+                margin: 0 !important;
+                overflow: hidden;
+                max-height: 0;
+                transition: max-height 0.35s ease;
+                border-left: 2px solid conf.$color-border-light;
+                margin-left: 10px !important;
+
+                @media (prefers-color-scheme: dark) {
+                    border-left-color: conf.$color-border-dark;
+                }
+            }
+
+            .sub-sub-menu-item {
+                margin-bottom: 2px;
+
+                a {
+                    display: block;
+                    padding: 5px 10px;
+                    border-radius: f.get-radius();
+                    background: transparent;
+                    color: conf.$color-text-light;
+                    font-size: clamp(.6em, 1vw, .82em);
+                    opacity: 0.8;
+                    border: none;
+                    transform: none !important;
+                    box-shadow: none !important;
+                    gap: 0;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-text-dark;
+                    }
+
+                    &:hover {
+                        opacity: 1;
+                        color: conf.$color-accent-light;
+                        background: rgba(0, 0, 0, .04);
+                        transform: translateX(-3px) !important;
+
+                        @media (prefers-color-scheme: dark) {
+                            color: conf.$color-accent-dark;
+                            background: rgba(255, 255, 255, .06);
+                        }
+                    }
+                }
+            }
+
             .menu-title {
                 @include f.font-txt;
                 font-weight: 500;
@@ -246,8 +429,6 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 @media (prefers-color-scheme: dark) {
                     color: conf.$color-text-dark;
                 }
-
-
             }
 
             &:hover .menu-title {

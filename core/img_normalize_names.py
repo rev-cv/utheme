@@ -4,6 +4,9 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from collections import Counter, defaultdict
 
+_PROTECTED_NAMES = {"logo", "favicon", "icon"}
+
+
 def normalize_and_rename_files(pics: list) -> list:
     print("\nПроверка уникальности имен картинок в проекте.")
 
@@ -15,9 +18,9 @@ def normalize_and_rename_files(pics: list) -> list:
         original_name = item['name']
         html_path = Path(item['html'])
         selected_pic_path = item.get("selected_image")
-        
+
         # 1. Генерация нового имени
-        if name_counts[original_name] > 1:
+        if name_counts[original_name] > 1 and original_name not in _PROTECTED_NAMES:
             occurrence_tracker[original_name] = occurrence_tracker.get(original_name, 0) + 1
             unique_seed = f"{original_name}_{html_path}_{occurrence_tracker[original_name]}"
             hash_suffix = hashlib.md5(unique_seed.encode()).hexdigest()[:8]
@@ -33,7 +36,7 @@ def normalize_and_rename_files(pics: list) -> list:
         })
     
     has_any_changes = False
-    for html_file, changes in plan.items():
+    for changes in plan.values():
         actual_changes = [c for c in changes if c['new'] != c['original']]
         if actual_changes:
             has_any_changes = True

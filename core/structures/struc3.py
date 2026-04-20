@@ -56,6 +56,7 @@ def build(spec_dir: Path) -> dict:
         main_nodes.append(_node(slug, menu_title=menu_title))
 
         # Child articles inside the section dir
+        child_nodes: list[dict] = []
         for child_dir in sorted(top_dir.iterdir()):
             if not child_dir.is_dir():
                 continue
@@ -67,6 +68,10 @@ def build(spec_dir: Path) -> dict:
                 pages.append(_page(child_slug, slug, None, post_status="draft"))
             else:
                 pages.append(_page(child_slug, slug, child_html))
+                child_nodes.append(_node(child_slug))
+
+        if child_nodes:
+            main_nodes[-1]["children"] = child_nodes
 
     # ── ADD PAGES ─────────────────────────────────────────────────────────────
     if add_pages_dir.is_dir():

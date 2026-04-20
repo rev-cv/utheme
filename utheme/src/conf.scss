@@ -17,17 +17,17 @@
 $font-size: 16px;
 
 // тип добавляемого меню на сайте
-$main-menu: "aside";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
-$is-menu-title: "true"; // отображать название сайта в главном меню? true, false 
+$main-menu: "boring";  // island, aside, marquee, boring, docs, circle, newspaper, console, dynamic
+$is-menu-title: "false"; // отображать название сайта в главном меню? true, false 
 // поддержка: boring
 
-$footer-menu: "central"; // 2columns, central
+$footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
-$toc-menu: "circle"; // circle, number, icon
+$toc-menu: "icon"; // circle, number, icon
 // меню должно быть в секции или располагаться открыто?
 $is-not-section: "true"; // true, false
-$toc-icon: "bike";
+$toc-icon: "football";
 $toc-icon-select: map.get(ico.$icon-tuple, $toc-icon);
 
 // стилизация блока details
@@ -46,22 +46,22 @@ $is-left-align: "true"; // true, false
 $is-border: "true"; // true, false
 
 // какую шрифтовую пару выбрать для сайта?
-$font-vibe: "neo-swiss";
+$font-vibe: "velocity";
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
 // какой радиус использовать для секций, меню, карточек и прочее?
 $radius-vibe: "neutral";
 
 // токен плотности: 'compact' = 0.75, 'standard' = 1, 'spacious' = 1.5
-$density-factor: 0.89;
+$density-factor: 0.9;
 
 // =========================================================
 // ЦВЕТА (COLOR SCHEME)
 // =========================================================
-$seed-hue: 222; 
+$seed-hue: 214; 
 // "luxury", "minimalist", "vibrant", "bold-dark"
 // "graphite", "pastoral", "japane" 
-$style: "pastoral"; 
+$style: "graphite"; 
 $scheme: gen.generate-scheme($seed-hue, $style);
 
 $color-primary-light: map.get($scheme, "pr-l");
@@ -106,3 +106,25 @@ $shadow-section-hover: 0 2px 10px rgba(0, 0, 0, 0.2);
 
 $breadcrumbs-separator: "/";
 
+
+
+/* Manual Color Configuration */
+$color-primary-light: #22C55E;
+$color-accent-light: #22C55E;
+$color-text-light: #F1F5F9;
+$color-bg-light: #0F1219;
+$color-section-light: #1A2030;
+$color-H1-light: #F1F5F9;
+$color-border-light: #1A2030;
+$color-primary-dark: #22C55E;
+$color-accent-dark: #22C55E;
+$color-text-dark: #F1F5F9;
+$color-bg-dark: #0F1219;
+$color-section-dark: #1A2030;
+$color-H1-dark: #F1F5F9;
+$color-border-dark: #1A2030;
+$color-success: #22C55E;
+$color-warning: #22C55E;
+$color-error: #22C55E;
+$color-info: #22C55E;
+/* End Manual Color Configuration */
