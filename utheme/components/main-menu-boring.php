@@ -86,7 +86,8 @@
 
             function onOpen() {
                 panel.removeEventListener('transitionend', onOpen);
-                panel.style.height = 'auto';
+                panel.style.transition = '';
+                // keep height at target px so drill-viewport can scroll
             }
             panel.addEventListener('transitionend', onOpen);
         }

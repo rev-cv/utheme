@@ -441,6 +441,33 @@
         }
     }
 
+    // ── Мобильный брейкпойнт: прямоугольные карточки ─────────────────────────
+
+    @media (max-width: 600px) {
+        .side-menu-list {
+            .menu-item-card {
+                aspect-ratio: 16 / 7;
+            }
+        }
+
+        .sub-menu-item,
+        .sub-sub-menu-item {
+            aspect-ratio: 16 / 5;
+
+            a { font-size: clamp(14px, 4vw, 17px); }
+        }
+
+        // Масштабируем угловой треугольник под уменьшенную высоту карточки
+        .submenu-toggle,
+        .drill-corner {
+            width: 72px;
+            height: 72px;
+            padding: 0 14px 14px 0;
+
+            svg { width: 18px; height: 18px; }
+        }
+    }
+
     // ── Оверлей ───────────────────────────────────────────────────────────────
 
     .menu-overlay {
