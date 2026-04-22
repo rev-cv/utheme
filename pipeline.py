@@ -11,6 +11,8 @@
 # ///
 import json
 import os
+import platform
+import subprocess
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
@@ -36,6 +38,10 @@ def run():
     # ── 0. ВЫБОР ПОРТА ──────────────────────────────────────────────────────
     from core.docker_setup import _find_free_port
     _find_free_port()
+
+    if platform.system() == "Windows":
+        _phase(0, 10, "Windows: запуск SASS-контейнера")
+        subprocess.run(["docker", "compose", "up", "-d", "sass"], check=True)
 
     # ── 1. НОРМАЛИЗАЦИЯ ИМЁН ─────────────────────────────────────────────────
     _phase(1, 10, "Нормализация имён файлов и папок")
@@ -93,6 +99,9 @@ def run():
     _phase(10, 10, "Деплой: Docker → WP install → медиа → контент")
     from core import docker_setup
     docker_setup.run(manifest, STAGING_DIR, WP_CONF_DIR)
+
+    if platform.system() == "Windows":
+        _activate_plugin("u-theme-styles")
 
     _header("ГОТОВО")
 
@@ -304,6 +313,22 @@ def _copy_branding_to_build(out_dir: Path):
             if not dst.exists():
                 shutil.copy2(src, dst)
                 print(f"  Скопирован: {Path(src).name}")
+
+
+# ─── Windows-специфичные шаги ────────────────────────────────────────────────
+
+def _activate_plugin(slug: str):
+    container = os.environ.get("CONTAINER_NAME", "wp_site")
+    print(f"  Активация плагина '{slug}'...")
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", container,
+         "wp", "plugin", "activate", slug, "--path=/var/www/html", "--allow-root"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        print(f"  [!] Не удалось активировать плагин: {result.stderr.strip()}")
+    else:
+        print(f"  Плагин '{slug}' активирован.")
 
 
 # ─── Утилиты вывода ──────────────────────────────────────────────────────────

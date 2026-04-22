@@ -203,6 +203,16 @@ def _start_container(container: str) -> None:
         "chmod -R 775 /var/www/html/wp-content"
     )
 
+    # На Windows WSL2 chown на NTFS bind mounts не работает — www-data не становится
+    # реальным владельцем plugins/ и uploads/. Применяем 777 только там и только на Windows.
+    import platform
+    if platform.system() == "Windows":
+        _exec_root(container,
+            "chmod -R 777 /var/www/html/wp-content/plugins "
+            "/var/www/html/wp-content/uploads "
+            "/var/www/html/wp-content/upgrade"
+        )
+
     # WP-CLI
     print("  Установка WP-CLI...")
     _exec_root(container,
