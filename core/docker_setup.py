@@ -25,6 +25,7 @@ def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> None:
     _ensure_shared_db()
     _create_site_db()
     _start_container(container)
+    _patch_provision_url(wp_conf_dir)
     _copy_staging(staging_dir, container)
     _copy_provision_sh(wp_conf_dir, container)
     _run_provision_sh(container)
@@ -171,16 +172,14 @@ def _start_container(container: str) -> None:
     print("  Запуск контейнера WordPress...")
     _ensure_network(WEB_NETWORK)
 
+    # HOST_PORT=0 → ядро ОС атомарно назначает свободный порт, гонка исключена
     result = subprocess.run(
         COMPOSE + ["up", "-d", WP_SERVICE],
         capture_output=True, text=True,
+        env={**os.environ, "HOST_PORT": "0"},
     )
     if result.returncode != 0:
-        err = result.stderr
-        if "port is already allocated" in err or "Bind for" in err:
-            print("  [!] PORT уже занят. Освободи порт и перезапусти.")
-        else:
-            print(f"  [!] Docker error:\n{err}")
+        print(f"  [!] Docker error:\n{result.stderr}")
         sys.exit(1)
 
     print("  Ожидание готовности WordPress...")
@@ -195,6 +194,16 @@ def _start_container(container: str) -> None:
         time.sleep(5)
     else:
         print("  [!] WP не стал healthy за 150 сек, продолжаем...")
+
+    # Читаем реально назначенный порт и обновляем .env / os.environ
+    r = subprocess.run(["docker", "port", container, "80"], capture_output=True, text=True)
+    if r.returncode != 0 or not r.stdout.strip():
+        print("  [!] Не удалось прочитать порт контейнера.")
+        sys.exit(1)
+    actual_port = r.stdout.strip().split(":")[-1].strip()
+    actual_url  = f"http://localhost:{actual_port}"
+    _write_env_port(actual_port, actual_url)
+    print(f"  Порт назначен: {actual_port}")
 
     # Права на wp-content + обязательные директории
     _exec_root(container,
@@ -213,13 +222,7 @@ def _start_container(container: str) -> None:
             "/var/www/html/wp-content/upgrade"
         )
 
-    # WP-CLI
-    print("  Установка WP-CLI...")
-    _exec_root(container,
-        "curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && "
-        "chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp"
-    )
-    print("  WP-CLI установлен.")
+    _install_wpcli(container)
 
 
 def _copy_staging(staging_dir: Path, container: str) -> None:
@@ -231,6 +234,11 @@ def _copy_staging(staging_dir: Path, container: str) -> None:
     if result.returncode != 0:
         print(f"  [!] docker cp failed: {result.stderr}")
         sys.exit(1)
+    # docker cp создаёт файлы от root — даём www-data право писать (sed -i нужен tmp-файл рядом)
+    subprocess.run(
+        ["docker", "exec", container, "chmod", "-R", "777", f"/tmp/{staging_dir.name}"],
+        capture_output=True,
+    )
     print(f"  Скопировано в /tmp/{staging_dir.name}/")
 
 
@@ -249,7 +257,8 @@ def _copy_provision_sh(wp_conf_dir: Path, container: str) -> None:
 def _run_provision_sh(container: str) -> None:
     print("  Запуск /tmp/provision.sh внутри контейнера...")
     result = subprocess.run(
-        ["docker", "exec", "-u", "root", container, "bash", "/tmp/provision.sh"],
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "bash", "/tmp/provision.sh"],
         text=True,
     )
     subprocess.run(
@@ -336,6 +345,7 @@ def _extract_wp_config(container: str, wp_conf_dir: Path) -> None:
     if added:
         print("  Пересоздание контейнера с wp-config.php volume...")
         subprocess.run(COMPOSE + ["up", "-d", WP_SERVICE], capture_output=True)
+        _install_wpcli(container)
     print(f"  wp-config.php сохранён в wp-conf/")
 
 
@@ -350,6 +360,47 @@ def _ensure_network(name: str) -> None:
     r = subprocess.run(["docker", "network", "inspect", name], capture_output=True)
     if r.returncode != 0:
         subprocess.run(["docker", "network", "create", name], check=True, capture_output=True)
+
+
+def _write_env_port(port: str, url: str) -> None:
+    env_path = Path(".env")
+    content = env_path.read_text(encoding="utf-8") if env_path.exists() else ""
+    for key, val in [("HOST_PORT", port), ("SITE_URL", url)]:
+        if re.search(rf"^{key}\s*=", content, re.MULTILINE):
+            content = re.sub(rf"^({key}\s*=\s*).*$", f"{key}={val}", content, flags=re.MULTILINE)
+        else:
+            content += f"\n{key}={val}"
+    env_path.write_text(content, encoding="utf-8", newline="\n")
+    os.environ["HOST_PORT"] = port
+    os.environ["SITE_URL"]  = url
+    load_dotenv(override=True)
+
+
+def _patch_provision_url(wp_conf_dir: Path) -> None:
+    actual_url = os.environ.get("SITE_URL", "")
+    if not actual_url:
+        return
+    sh = wp_conf_dir / "provision.sh"
+    if not sh.exists():
+        return
+    content = sh.read_text(encoding="utf-8")
+    patched = re.sub(
+        r'^SITE_URL="[^"]*"', f'SITE_URL="{actual_url}"',
+        content, flags=re.MULTILINE,
+    )
+    if patched != content:
+        sh.write_text(patched, encoding="utf-8", newline="\n")
+        print(f"  provision.sh: SITE_URL → {actual_url}")
+
+
+
+def _install_wpcli(container: str) -> None:
+    print("  Установка WP-CLI...")
+    _exec_root(container,
+        "curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && "
+        "chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp"
+    )
+    print("  WP-CLI установлен.")
 
 
 def _exec_root(container: str, cmd: str) -> None:

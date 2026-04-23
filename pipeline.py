@@ -35,10 +35,6 @@ def run():
     (STAGING_DIR / "images").mkdir(exist_ok=True)
     (STAGING_DIR / "pages").mkdir(exist_ok=True)
 
-    # ── 0. ВЫБОР ПОРТА ──────────────────────────────────────────────────────
-    from core.docker_setup import _find_free_port
-    _find_free_port()
-
     if platform.system() == "Windows":
         _phase(0, 10, "Windows: запуск SASS-контейнера")
         subprocess.run(["docker", "compose", "up", "-d", "sass"], check=True)
@@ -102,6 +98,7 @@ def run():
 
     if platform.system() == "Windows":
         _activate_plugin("u-theme-styles")
+        _install_and_activate_plugin("all-in-one-wp-migration")
 
     _header("ГОТОВО")
 
@@ -317,16 +314,32 @@ def _copy_branding_to_build(out_dir: Path):
 
 # ─── Windows-специфичные шаги ────────────────────────────────────────────────
 
+def _install_and_activate_plugin(slug: str):
+    container = os.environ.get("CONTAINER_NAME", "wp_site")
+    print(f"  Установка плагина '{slug}'...")
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "plugin", "install", slug, "--activate", "--path=/var/www/html"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        output = (result.stdout + result.stderr).strip()
+        print(f"  [!] Не удалось установить плагин '{slug}': {output}")
+    else:
+        print(f"  Плагин '{slug}' установлен и активирован.")
+
+
 def _activate_plugin(slug: str):
     container = os.environ.get("CONTAINER_NAME", "wp_site")
     print(f"  Активация плагина '{slug}'...")
     result = subprocess.run(
-        ["docker", "exec", "-u", "www-data", container,
-         "wp", "plugin", "activate", slug, "--path=/var/www/html", "--allow-root"],
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "plugin", "activate", slug, "--path=/var/www/html"],
         capture_output=True, text=True,
     )
     if result.returncode != 0:
-        print(f"  [!] Не удалось активировать плагин: {result.stderr.strip()}")
+        output = (result.stdout + result.stderr).strip()
+        print(f"  [!] Не удалось активировать плагин: {output}")
     else:
         print(f"  Плагин '{slug}' активирован.")
 

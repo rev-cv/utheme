@@ -102,10 +102,15 @@ def build(spec_dir: Path) -> dict:
 def _required_items(spec_dir: Path) -> list:
     _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
     hub_pillar = spec_dir / "HUB" / "PILLAR"
+    add = spec_dir / "ADD PAGES"
     return [
         hub_pillar,
         hub_pillar / "index.html",
-        spec_dir / "ADD PAGES",
+        add,
+        add / "about-us.html",
+        add / "cookie-policy.html",
+        add / "privacy-policy.html",
+        add / "legal-notice.html",
         [spec_dir / f"logo{e}"    for e in _exts],
         [spec_dir / f"favicon{e}" for e in _exts] + [spec_dir / f"icon{e}" for e in _exts],
     ]

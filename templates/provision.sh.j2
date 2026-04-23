@@ -191,47 +191,79 @@ echo "Placeholders resolved."
 
 # ===========================================================================
 # 8. PAGES
-# Каждая страница создаётся одним wp eval: wp_insert_post + мета + категории.
-# ob_start/ob_end_clean подавляет любой побочный вывод WP; echo $id — единственный stdout.
-# Текстовые данные передаются через base64, избегая конфликтов bash/PHP экранирования.
+# Все страницы создаются в одном PHP-процессе (один бутстрап WP).
+# PHP выводит slug→ID сразу после каждой страницы (fflush), bash читает построчно.
+
+# Сериализуем MEDIA_IDS → JSON для передачи в PHP
+{
+    printf '{'
+    _first=1
+    for _fname in "${!MEDIA_IDS[@]}"; do
+        [ $_first -eq 1 ] && _first=0 || printf ','
+        printf '"%s":%s' "$_fname" "${MEDIA_IDS[$_fname]}"
+    done
+    printf '}'
+} > /tmp/media_ids.json
 
 declare -A PAGE_IDS
 
-{% for page in pages %}
-# --- {{ page.slug }} ---
-PAGE_ID=$(wp eval "
-ob_start();
-\$id = wp_insert_post([
-    'post_type'     => 'page',
-    'post_title'    => base64_decode('{{ page.title | b64 }}'),
-    'post_name'     => '{{ page.slug }}',
-    'post_status'   => '{{ page.post_status if page.post_status else ("publish" if page.publish_at == "now" else "future") }}',
-{% if not page.post_status and page.publish_at != "now" %}    'post_date'     => '{{ page.publish_at }}',
-{% endif %}    'post_content'  => {% if page.content %}file_get_contents('/tmp/staging/pages/{{ page.content }}'){% else %}''{% endif %},
-    'page_template' => '{{ page.template }}',
-    'post_author'   => $ADMIN_ID,
-{% if page.parent %}    'post_parent'   => ${PAGE_IDS[{{ page.parent }}]},
-{% endif %}]);
-{% if page.categories %}
-wp_set_object_terms(\$id, [{% for cat in page.categories %}'{{ cat }}'{% if not loop.last %}, {% endif %}{% endfor %}], 'category', false);
-{% endif %}
-{% if page.images %}
-update_post_meta(\$id, '_thumbnail_id', ${MEDIA_IDS[{{ page.images[0] }}]});
-{% endif %}
-update_post_meta(\$id, '_custom_seo_title', base64_decode('{{ page.title | b64 }}'));
-{% if page.seo_title %}
-update_post_meta(\$id, '_custom_seo_headline', base64_decode('{{ page.seo_title | b64 }}'));
-{% endif %}
-{% if page.seo_descr %}
-update_post_meta(\$id, '_custom_seo_desc', base64_decode('{{ page.seo_descr | b64 }}'));
-{% endif %}
-ob_end_clean();
-echo \$id;
-" 2>/dev/null)
-PAGE_IDS[{{ page.slug }}]=$PAGE_ID
-echo "  Created '{{ page.slug }}' (ID: $PAGE_ID)"
+cat > /tmp/create_pages.php << PHPEOF
+<?php
+\$admin_id  = $ADMIN_ID;
+\$media_ids = json_decode(file_get_contents('/tmp/media_ids.json'), true) ?: [];
+\$page_ids  = [];
+ob_implicit_flush(true);
 
+\$pages = [
+{% for page in pages %}
+    [
+        'slug'         => '{{ page.slug }}',
+        'title'        => '{{ page.title | b64 }}',
+        'status'       => '{{ page.post_status if page.post_status else ("publish" if page.publish_at == "now" else "future") }}',
+        'date'         => '{{ page.publish_at if (not page.post_status and page.publish_at != "now") else "" }}',
+        'content_file' => '{{ ("/tmp/staging/pages/" ~ page.content) if page.content else "" }}',
+        'template'     => '{{ page.template }}',
+        'parent_slug'  => '{{ page.parent if page.parent else "" }}',
+        'cats'         => [{% for cat in (page.categories or []) %}'{{ cat }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+        'thumb'        => '{{ page.images[0] if page.images else "" }}',
+        'seo_headline' => '{{ page.seo_title | b64 if page.seo_title else "" }}',
+        'seo_desc'     => '{{ page.seo_descr | b64 if page.seo_descr else "" }}',
+    ],
 {% endfor %}
+];
+
+foreach (\$pages as \$p) {
+    ob_start();
+    \$parent_id = \$p['parent_slug'] !== '' ? (\$page_ids[\$p['parent_slug']] ?? 0) : 0;
+    \$args = [
+        'post_type'     => 'page',
+        'post_title'    => base64_decode(\$p['title']),
+        'post_name'     => \$p['slug'],
+        'post_status'   => \$p['status'],
+        'post_content'  => \$p['content_file'] !== '' ? file_get_contents(\$p['content_file']) : '',
+        'page_template' => \$p['template'],
+        'post_author'   => \$admin_id,
+        'post_parent'   => \$parent_id,
+    ];
+    if (\$p['date'] !== '') \$args['post_date'] = \$p['date'];
+    \$id = wp_insert_post(\$args);
+    \$page_ids[\$p['slug']] = \$id;
+    if (!empty(\$p['cats']))       wp_set_object_terms(\$id, \$p['cats'], 'category', false);
+    if (\$p['thumb'] !== '' && isset(\$media_ids[\$p['thumb']])) update_post_meta(\$id, '_thumbnail_id', \$media_ids[\$p['thumb']]);
+    update_post_meta(\$id, '_custom_seo_title', base64_decode(\$p['title']));
+    if (\$p['seo_headline'] !== '') update_post_meta(\$id, '_custom_seo_headline', base64_decode(\$p['seo_headline']));
+    if (\$p['seo_desc']     !== '') update_post_meta(\$id, '_custom_seo_desc',     base64_decode(\$p['seo_desc']));
+    ob_end_clean();
+    echo \$p['slug'] . "\t" . \$id . "\n";
+    fflush(STDOUT);
+}
+PHPEOF
+
+while IFS=$'\t' read -r _slug _pid; do
+    PAGE_IDS[$_slug]=$_pid
+    echo "  Created '$_slug' (ID: $_pid)"
+done < <(wp eval-file /tmp/create_pages.php 2>/dev/null)
+rm -f /tmp/create_pages.php /tmp/media_ids.json
 
 # Homepage and privacy page
 wp eval "
@@ -307,6 +339,7 @@ APP_PASS=$(wp user application-password create $ADMIN_USER "autoposter" --porcel
 echo ""
 echo "========================================================="
 echo "  CREDENTIALS (copy now!)"
+echo "  URL:      $SITE_URL"
 echo "  Login:    $ADMIN_USER"
 echo "  Password: $ADMIN_PASS"
 echo "  Email:    $ADMIN_EMAIL"

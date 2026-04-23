@@ -10,7 +10,7 @@ aside {
 
     // Общие стили для всех контентных блоков внутри статьи
     section {
-        background: linear-gradient(135deg, conf.$color-section-light, #f7fafc);
+        background: conf.$color-section-light;
         border-radius: f.get-radius();
         padding: $section-padding;
         margin: $section-margin-y auto;
