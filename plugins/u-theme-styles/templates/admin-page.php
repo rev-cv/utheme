@@ -91,7 +91,7 @@ function u_color_field(string $name, string $value): void {
                     ],
                     'manuscript' => [
                         'label' => 'Manuscript',
-                        'desc' => ''
+                        'desc' => 'Рукописная элегантность. DM Serif Display с высоким контрастом штрихов создаёт атмосферу литературного журнала или авторского блога.'
                     ],
                     'brutal' => [
                         'label' => 'Brutal',
@@ -119,19 +119,19 @@ function u_color_field(string $name, string $value): void {
                     ],
                     'courtside' => [
                         'label' => 'Courtside',
-                        'desc' => ''
+                        'desc' => 'Спортивная энергия. Широкие заголовки Big Shoulders Display в капсе — ощущение стадиона и трибун. Saira Condensed держит читаемость в теле текста.'
                     ],
                     'district' => [
                         'label' => 'District',
-                        'desc' => ''
+                        'desc' => 'Городской конструктивизм. Ruslan Display отсылает к советскому плакату и уличной типографике, Inter обеспечивает нейтральность основного текста.'
                     ],
                     'blast' => [
                         'label' => 'Blast',
-                        'desc' => ''
+                        'desc' => 'Монолитный удар. Rubik Mono One — единственный вес, максимальная масса. Заголовок занимает всё пространство, Inter сохраняет читаемость тела.'
                     ],
                     'industry' => [
                         'label' => 'Industry',
-                        'desc' => ''
+                        'desc' => 'Промышленная чёткость. Oswald в капсе — архивы, документация, технические издания. Source Sans 3 обеспечивает максимальную читаемость текста.'
                     ],
                     'overdrive' => [
                         'label' => 'Overdrive',
@@ -147,7 +147,7 @@ function u_color_field(string $name, string $value): void {
                     ],
                     'interface' => [
                         'label' => 'Interface',
-                        'desc' => ''
+                        'desc' => 'Чистый интерфейс. Два нейтральных гротеска без стилистических акцентов — идеально для SaaS, документации и продуктовых лендингов.'
                     ],
                     'antidesign' => [
                         'label' => 'Anti Design',
@@ -163,9 +163,10 @@ function u_color_field(string $name, string $value): void {
                     'neutral'  => ['label' => 'Neutral',  'desc' => 'Мягкий, современный стиль. Умеренное скругление — универсальное решение для большинства проектов.'],
                     'dynamic'  => ['label' => 'Dynamic',  'desc' => 'Спортивный, адаптивный. Скругление меняется с шириной экрана, кнопки всегда в виде пилюли.'],
                     'rounded'  => ['label' => 'Rounded',  'desc' => 'Максимально мягкие, дружелюбные формы. Идеально для детских, lifestyle и wellness-проектов.'],
-                    'art'      => ['label' => 'Art',      'desc' => 'Дизайнерский стиль со сложными формами. Эллиптические скругления и асимметрия создают уникальный характер.'],
-                    'organic'  => ['label' => 'Organic',  'desc' => 'Органические, живые формы. Неравномерное скругление напоминает природные очертания.'],
                     'velocity' => ['label' => 'Velocity', 'desc' => 'Скорость и напор. Диагональная асимметрия — острый угол спереди, скругление сзади.'],
+                    'chess'   => ['label' => 'Chess',   'desc' => 'Шахматный паттерн. Скруглены два противоположных угла по другой диагонали — карточки и кнопки выглядят как вырезанные из бумаги.'],
+                    'sticker' => ['label' => 'Sticker', 'desc' => 'Бейдж и стикер. Крупные фиксированные радиусы, шапка скруглена только снизу — сайт выглядит как набор карточек-наклеек.'],
+
                 ];
                 $current_radius_vibe = $v['radius-vibe'] ?? 'neutral';
                 ?>
@@ -336,7 +337,7 @@ function u_color_field(string $name, string $value): void {
                     'main-menu' => [
                         'title'       => 'Main Menu',
                         'desc'        => 'Стиль отображения главного меню сайта.',
-                        'options'     => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic'],
+                        'options'     => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic', 'hierarchical'],
                         'switch'      => 'is-menu-title',
                         'switch_desc' => 'Показывать название сайта в главном меню (только для boring)',
                     ],
@@ -367,9 +368,20 @@ function u_color_field(string $name, string $value): void {
                             <?php if (isset($data['options'])): ?>
                                 <select name="u_fields[<?= $id ?>]" class="u-component-select">
                                     <?php foreach ($data['options'] as $opt): ?>
+                                        <?php
+                                            // Определяем метку для опции
+                                            $label = ucfirst($opt);
+                                            if ($id === 'main-menu') {
+                                                if ($opt === 'aside' || $opt === 'boring') {
+                                                    $label .= ' [3LEV]';
+                                                } elseif ($opt === 'hierarchical') {
+                                                    $label .= ' [2LEV]';
+                                                }
+                                            }
+                                        ?>
                                         <option value="<?= $opt ?>"
                                             <?= ($v[$id] ?? $data['options'][0]) === $opt ? 'selected' : '' ?>>
-                                            <?= ucfirst($opt) ?>
+                                            <?= $label ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>

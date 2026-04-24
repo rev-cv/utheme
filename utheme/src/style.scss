@@ -11,6 +11,7 @@
 @use "main-menu/newspaper.scss" as newspaper;
 @use "main-menu/console.scss" as console;
 @use "main-menu/dynamic.scss" as dynamic;
+@use "main-menu/hierarchical.scss" as hierarchical;
 
 @use 'footer/2column.scss' as footer_2columns;
 @use 'footer/central.scss' as footer_central;
@@ -87,6 +88,9 @@
 }
 @else if conf.$main-menu =='dynamic' {
     @include dynamic.styles;
+}
+@else if conf.$main-menu =='hierarchical' {
+    @include hierarchical.styles;
 }
 
 // блок стилизация оглавления

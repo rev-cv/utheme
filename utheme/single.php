@@ -15,14 +15,14 @@ function _sp_lang() {
             'es'=>'Mañana','fr'=>'Demain','de'=>'Morgen','pl'=>'Jutro','pt'=>'Amanhã','nl'=>'Morgen',
             'sk'=>'Zajtra','it'=>'Domani','et'=>'Homme','lv'=>'Rīt','ro'=>'Mâine','sv'=>'Imorgon','lt'=>'Rytoj',
             'bg'=>'Утре','sl'=>'Jutri','hu'=>'Holnap','fi'=>'Huomenna','en'=>'Tomorrow','cs'=>'Zítra',
-            'da'=>'I morgen','ru'=>'Завтра','el'=>'Αύριο'
+            'da'=>'I morgen','ru'=>'Завтра','el'=>'Αύριο','hr'=>'Sutra','no'=>'I morgen','lb'=>'Muer'
         ],
         'pre_match'  => [
             'es'=>'Pre-partido','fr'=>'Avant-match','de'=>'Vor dem Spiel','pl'=>'Przed meczem','pt'=>'Pré-jogo',
             'nl'=>'Voor de wedstrijd','sk'=>'Pred zápasom','it'=>'Pre-partita','et'=>'Enne mängu','lv'=>'Pirms spēles',
             'ro'=>'Pre-meci','sv'=>'Före match','lt'=>'Prieš rungtynes','bg'=>'Преди мач','sl'=>'Pred tekmo',
             'hu'=>'Mérkőzés előtt','fi'=>'Ennen ottelua','en'=>'Pre-Match','cs'=>'Před zápasem','da'=>'Før kamp',
-            'ru'=>'До матча','el'=>'Πριν τον αγώνα'
+            'ru'=>'До матча','el'=>'Πριν τον αγώνα','hr'=>'Prije utakmice','no'=>'Før kamp','lb'=>'Virun dem Match'
         ],
         'match_started' => [
             'es'=>'El partido ha empezado','fr'=>'Le match a commencé','de'=>'Spiel hat begonnen',
@@ -30,19 +30,22 @@ function _sp_lang() {
             'it'=>'La partita è iniziata','et'=>'Mäng alanud','lv'=>'Spēle ir sākusies','ro'=>'Meciul a început',
             'sv'=>'Matchen har börjat','lt'=>'Rungtynės prasidėjo','bg'=>'Мачът започна','sl'=>'Tekma se je začela',
             'hu'=>'A mérkőzés elkezdődött','fi'=>'Ottelu on alkanut','en'=>'Match started','cs'=>'Zápas začal',
-            'da'=>'Kampen er startet','ru'=>'Мач начался','el'=>'Ο αγώνας ξεκίνησε'
+            'da'=>'Kampen er startet','ru'=>'Мач начался','el'=>'Ο αγώνας ξεκίνησε',
+            'hr'=>'Utakmica je počela','no'=>'Kampen har startet','lb'=>'De Match huet ugefaangen'
         ],
         'home_team'  => [
             'es'=>'Local','fr'=>'Domicile','de'=>'Heim','pl'=>'Gospodarz','pt'=>'Casa','nl'=>'Thuis',
             'sk'=>'Domáci','it'=>'Casa','et'=>'Kodu','lv'=>'Mājas','ro'=>'Acasă','sv'=>'Hemmalag',
             'lt'=>'Namuose','bg'=>'Домашен','sl'=>'Domači','hu'=>'Hazai','fi'=>'Koti','en'=>'Home',
-            'cs'=>'Domácí','da'=>'Hjemme','ru'=>'Домашняя','el'=>'Γηπεδούχος'
+            'cs'=>'Domácí','da'=>'Hjemme','ru'=>'Домашняя','el'=>'Γηπεδούχος',
+            'hr'=>'Domaćin','no'=>'Hjemmelag','lb'=>'Heem'
         ],
         'away_team'  => [
             'es'=>'Visitante','fr'=>'Extérieur','de'=>'Auswärts','pl'=>'Gość','pt'=>'Fora','nl'=>'Uit',
             'sk'=>'Hosť','it'=>'Trasferta','et'=>'Võõrsil','lv'=>'Izbraukums','ro'=>'Deplasare','sv'=>'Bortalag',
             'lt'=>'Svečiuose','bg'=>'Гост','sl'=>'Gostje','hu'=>'Vendég','fi'=>'Vieras','en'=>'Away',
-            'cs'=>'Hosté','da'=>'Ude','ru'=>'Гостевая','el'=>'Φιλοξενούμενη'
+            'cs'=>'Hosté','da'=>'Ude','ru'=>'Гостевая','el'=>'Φιλοξενούμενη',
+            'hr'=>'Gost','no'=>'Bortelag','lb'=>'Auswäerts'
         ],
         'expert_analysis' => [
             'es'=>'Análisis estratégico de expertos','fr'=>"Analyse stratégique d'experts",'de'=>'Strategische Expertenanalyse',
@@ -52,7 +55,8 @@ function _sp_lang() {
             'lt'=>'Ekspertų strateginė analizė','bg'=>'Експертен стратегически анализ','sl'=>'Ekspertna strateška analiza',
             'hu'=>'Szakértő stratégiai elemzés','fi'=>'Asiantuntijan strateginen analyysi','en'=>'Expert Strategic Analysis',
             'cs'=>'Expertní strategická analýza','da'=>'Ekspert strategisk analyse','ru'=>'Экспертный стратегический анализ',
-            'el'=>'Εμπειρογνώμονας στρατηγική ανάλυση'
+            'el'=>'Εμπειρογνώμονας στρατηγική ανάλυση','hr'=>'Stručna strateška analiza',
+            'no'=>'Ekspert strategisk analyse','lb'=>'Fachleche strategesche Analyse'
         ],
     ];
     $out = [];

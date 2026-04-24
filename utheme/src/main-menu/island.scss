@@ -132,8 +132,7 @@
 
         .island-name {
             @if conf.$is-menu-title == 'false' {
-                visibility: hidden;
-                pointer-events: none;
+                display: none;
             }
 
             a {

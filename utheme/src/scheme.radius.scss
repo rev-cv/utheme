@@ -1,14 +1,14 @@
 $radius-schemes: (
     // Строгий, технический стиль
-    "sharp": ( //
-        "default": 2px, //
+    "sharp": (
+        "default": 2px, 
     ),
 
     // Мягкий, современный
-    "neutral": ( //
+    "neutral": (
         "default": 8px,
         "header": 12px,
-        "card": 10px //
+        "card": 10px
     ),
 
     // Спортивный, адаптивный (с использованием clamp)
@@ -16,23 +16,14 @@ $radius-schemes: (
         "default": clamp(10px, 2vw, 20px),
         "header": 0px,
         "card": clamp(16px, 4vw, 32px),
-        "button": 999px // Всегда пилюля
+        "button": 999px
     ),
 
-    "rounded": ( //
+    "rounded": (
         "default": clamp(10px, 2.5vw, 30px),
     ),
 
-    // Дизайнерский (сложные формы)
-    "art": ("default": 20px 5px, // Эллиптическое скругление
-        "header": 0 0 40px 40px, // Только низ скруглен
-        "card": 30% 70% 70% 30% / 30% 30% 70% 70%),
-
-    "organic": ( //
-        "default": 40% 60% 70% 30% / 40% 50% 60% 50%, //
-    ),
-
-    "velocity": ( //
+    "velocity": (
         "default": clamp(4px, 1.5vw, 16px)
         /* Верх-Лево */
         clamp(28px, 8vw, 40px)
@@ -40,5 +31,22 @@ $radius-schemes: (
         clamp(4px, 1.5vw, 16px)
         /* Низ-Право */
         clamp(28px, 8vw, 40px), //
-    )
+    ),
+
+    // Шахматный паттерн — скруглены два противоположных угла (другая диагональ, чем velocity)
+    "chess": (
+        "default": 0px 20px, // top-left:0 top-right:20 bottom-right:0 bottom-left:20
+        "header":  0px 28px,
+        "card":    20px 0px, // инвертировано — визуальный контраст с дефолтом
+        "button":  20px 0px,
+    ),
+
+    // Бейдж/стикер — крупные фиксированные радиусы, шапка скруглена только снизу
+    "sticker": (
+        "default": 28px,
+        "header":  0px 0px 28px 28px, // скруглены только нижние углы
+        "card":    32px,
+        "button":  999px,
+    ),
+
 );

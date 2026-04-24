@@ -5,19 +5,28 @@ from bs4 import BeautifulSoup, NavigableString
 
 
 def _preprocess_faq_blocks(html: str) -> str:
-    """Конвертирует шорткод [faq]...[/faq] в HTML <details> теги перед парсингом."""
+    """Конвертирует шорткод [faq]...[/faq] в HTML <details> теги, поддерживая разные структуры."""
 
     def replace_faq_block(match: re.Match) -> str:
         block_content = match.group(1)
-        items = re.findall(
-            r'\[id="[^"]*"\s+title="([^"]*)"\s+desc="([^"]*)"\]',
-            block_content,
-        )
+        
+        # Находим отдельные блоки [id="..." ...]
+        # Используем ленивый квантификатор .*? для захвата содержимого скобок
+        items = re.findall(r'(\[id="[^"]*".*?\])', block_content)
+        
         details_tags = []
-        for title, desc in items:
-            details_tags.append(
-                f'<details><summary>{title}</summary><p>{desc}</p></details>'
-            )
+        for item in items:
+            # Пытаемся извлечь содержимое для заголовка (question или title)
+            # и для описания (answer или desc)
+            question = re.search(r'(?:question|title)="([^"]*)"', item)
+            answer = re.search(r'(?:answer|desc)="([^"]*)"', item)
+            
+            if question and answer:
+                q_text = question.group(1)
+                a_text = answer.group(1)
+                details_tags.append(
+                    f'<details><summary>{q_text}</summary><p>{a_text}</p></details>'
+                )
         return '\n'.join(details_tags)
 
     return re.sub(r'\[faq\](.*?)\[/faq\]', replace_faq_block, html, flags=re.DOTALL)

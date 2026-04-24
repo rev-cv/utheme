@@ -17,12 +17,11 @@ class UThemeConfigurator {
         'color-bg-light', 'color-section-light', 'color-H1-light', 'color-border-light',
         'color-primary-dark', 'color-accent-dark', 'color-text-dark',
         'color-bg-dark', 'color-section-dark', 'color-H1-dark', 'color-border-dark',
-        'color-success', 'color-warning', 'color-error', 'color-info',
     ];
 
     // Конфиг рандомизации — повторяет randomize_theme.py
     private array $random_config = [
-        'main-menu'      => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic'],
+        'main-menu'      => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic', 'hierarchical'],
         'footer-menu'    => ['2columns', 'central'],
         'toc-menu'       => ['circle', 'number', 'icon'],
         'is-not-section' => ['true', 'false'],
@@ -39,7 +38,7 @@ class UThemeConfigurator {
         ],
         'font-size'   => ['16px', '17px', '18px', '19px', '20px', '21px', '22px', '23px', '24px'],
         'style'       => ['luxury', 'minimalist', 'vibrant', 'bold-dark', 'graphite', 'pastoral', 'japane'],
-        'radius-vibe' => ['sharp', 'neutral', 'dynamic', 'rounded', 'art', 'organic', 'velocity'],
+        'radius-vibe' => ['sharp', 'neutral', 'dynamic', 'rounded', 'velocity', 'chess', 'sticker'],
     ];
 
     // Маркеры ручного блока в конце файла.
@@ -161,8 +160,6 @@ class UThemeConfigurator {
                 'color-accent-dark'   => '#c0392b', 'color-text-dark'     => '#ffffff',
                 'color-bg-dark'       => '#1a1a1a', 'color-section-dark'  => '#2a2a2a',
                 'color-H1-dark'       => '#5dade2', 'color-border-dark'   => '#444444',
-                'color-success'       => '#5db97a', 'color-warning'       => '#fcd34d',
-                'color-error'         => '#dc2f02', 'color-info'          => '#4fc3f7',
             ];
 
             $block = "\n\n" . self::MANUAL_BLOCK_START . "\n";

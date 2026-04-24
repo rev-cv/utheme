@@ -1,0 +1,647 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+
+    // ── Локальные токены ──────────────────────────────────────────────────────
+    $h:      58px * conf.$density-factor;
+    $px:     16px * conf.$density-factor;  // горизонтальный падинг айтема
+    $py:      9px * conf.$density-factor;  // вертикальный падинг айтема
+    $gap:    20px * conf.$density-factor;  // гап между логотипом, названием, навом
+    $drop-py: 6px * conf.$density-factor;  // вертикальный падинг дропдауна
+    $trans:   cubic-bezier(0.4, 0, 0.2, 1) 0.35s;
+
+    // ── Шапка ────────────────────────────────────────────────────────────────
+
+    #site-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        backdrop-filter: blur(16px);
+
+        @include f.mode((
+            background: (
+                rgba(conf.$color-bg-light, 0.93),
+                rgba(conf.$color-bg-dark,  0.93),
+            ),
+        ));
+
+        @if conf.$is-border == 'true' {
+            border-bottom: 1px solid conf.$color-border-light;
+            @media (prefers-color-scheme: dark) {
+                border-bottom-color: conf.$color-border-dark;
+            }
+        }
+
+        .header-island {
+            display: flex;
+            align-items: center;
+            gap: $gap;
+            height: $h;
+            max-width: conf.$max-width;
+            margin: 0 auto;
+            padding: 0 clamp(16px, 4vw, 40px);
+        }
+
+        // ── Логотип ───────────────────────────────────────────────────────────
+
+        .site-logo {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+
+            a { display: flex; align-items: center; }
+
+            img {
+                height: 34px * conf.$density-factor;
+                width: auto;
+                object-fit: contain;
+                transition: opacity 0.2s ease;
+            }
+
+            a:hover img { opacity: 0.75; }
+        }
+
+        // ── Название сайта ────────────────────────────────────────────────────
+
+        .site-name {
+            @if conf.$is-menu-title == 'false' {
+                display: none;
+            }
+            flex-shrink: 0;
+
+            a {
+                @include f.font-logo;
+                text-decoration: none;
+                font-size: clamp(0.72em, 2vw, 0.92em);
+                font-weight: 700;
+                white-space: nowrap;
+                transition: color 0.2s ease;
+
+                @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+                &:hover { color: conf.$color-accent-light; }
+
+                @media (prefers-color-scheme: dark) {
+                    &:hover { color: conf.$color-accent-dark; }
+                }
+            }
+        }
+
+        // ── Обёртка навигации ─────────────────────────────────────────────────
+
+        .nav-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: stretch;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .side-nav {
+            display: flex;
+            align-items: stretch;
+            height: 100%;
+        }
+
+        // ── Горизонтальный список первого уровня ──────────────────────────────
+
+        .side-menu-list {
+            display: flex;
+            align-items: stretch;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            gap: 2px * conf.$density-factor;
+
+            > .menu-item {
+                position: relative;
+                display: flex;
+                align-items: stretch;
+
+                // Ссылка первого уровня
+                > a {
+                    @include f.font-txt;
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding: 0 $px;
+                    text-decoration: none;
+                    font-size: clamp(0.78em, 1.5vw, 0.88em);
+                    font-weight: 500;
+                    white-space: nowrap;
+                    // border-radius: f.get-radius();
+                    position: relative;
+                    transition: color 0.2s ease, background 0.2s ease;
+
+                    @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+                    // Анимированная черта снизу
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 6px;
+                        left: $px;
+                        right: $px;
+                        height: 2px;
+                        border-radius: 1px;
+                        background: conf.$color-accent-light;
+                        transform: scaleX(0);
+                        transform-origin: left;
+                        transition: transform 0.25s ease;
+
+                        @media (prefers-color-scheme: dark) {
+                            background: conf.$color-accent-dark;
+                        }
+                    }
+
+                    .item-chevron {
+                        flex-shrink: 0;
+                        opacity: 0.5;
+                        transition: transform 0.25s ease, opacity 0.2s ease;
+                    }
+                }
+
+                // ── Дропдаун первого уровня ───────────────────────────────────
+
+                > .sub-menu {
+                    position: absolute;
+                    top: calc(100% + 6px);
+                    left: 0;
+                    list-style: none;
+                    margin: 0;
+                    padding: $drop-py 0;
+                    min-width: 220px;
+                    max-width: 280px;
+                    border-radius: f.get-radius();
+                    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.07);
+                    opacity: 0;
+                    visibility: hidden;
+                    transform: translateY(-8px);
+                    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+                    z-index: 100;
+                    max-height: 60vh;
+                    overflow-y: auto;
+
+                    @include f.mode((
+                        background: (conf.$color-section-light, conf.$color-section-dark),
+                    ));
+
+                    @if conf.$is-border == 'true' {
+                        border: 1px solid conf.$color-border-light;
+                        @media (prefers-color-scheme: dark) { border-color: conf.$color-border-dark; }
+                    }
+
+                    // Пункт второго уровня
+                    > .menu-item {
+                        position: relative;
+
+                        > a {
+                            @include f.font-txt;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            gap: 10px;
+                            padding: $py $px;
+                            text-decoration: none;
+                            font-size: clamp(0.78em, 1.5vw, 0.86em);
+                            font-weight: 400;
+                            overflow: hidden;
+                            transition: color 0.15s ease, background 0.15s ease;
+
+                            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+                            .item-label {
+                                flex: 1;
+                                min-width: 0;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+
+                            .item-chevron {
+                                flex-shrink: 0;
+                                opacity: 0.4;
+                                transition: opacity 0.15s ease, transform 0.15s ease;
+                            }
+
+                            &:hover {
+                                color: conf.$color-accent-light;
+
+                                @include f.mode((
+                                    background: (
+                                        rgba(conf.$color-text-light, 0.05),
+                                        rgba(conf.$color-text-dark,  0.08),
+                                    ),
+                                ));
+
+                                .item-chevron { opacity: 1; transform: translateX(2px); }
+
+                                @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                            }
+                        }
+
+                        // ── Вылетающее подменю третьего уровня ───────────────
+
+                        > .sub-sub-menu {
+                            position: absolute;
+                            top: -1 * $drop-py;
+                            left: calc(100% + 4px);
+                            list-style: none;
+                            margin: 0;
+                            padding: $drop-py 0;
+                            min-width: 200px;
+                            max-width: 260px;
+                            border-radius: f.get-radius();
+                            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.07);
+                            opacity: 0;
+                            visibility: hidden;
+                            transform: translateX(-8px);
+                            transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+                            z-index: 101;
+
+                            @include f.mode((
+                                background: (conf.$color-section-light, conf.$color-section-dark),
+                            ));
+
+                            @if conf.$is-border == 'true' {
+                                border: 1px solid conf.$color-border-light;
+                                @media (prefers-color-scheme: dark) { border-color: conf.$color-border-dark; }
+                            }
+
+                            > .menu-item > a {
+                                @include f.font-txt;
+                                display: block;
+                                padding: $py $px;
+                                text-decoration: none;
+                                font-size: clamp(0.76em, 1.5vw, 0.84em);
+                                font-weight: 400;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                transition: color 0.15s ease, background 0.15s ease;
+
+                                @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+                                &:hover {
+                                    color: conf.$color-accent-light;
+
+                                    @include f.mode((
+                                        background: (
+                                            rgba(conf.$color-text-light, 0.05),
+                                            rgba(conf.$color-text-dark,  0.08),
+                                        ),
+                                    ));
+
+                                    @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                                }
+                            }
+                        }
+
+                        &:hover > .sub-sub-menu,
+                        &:focus-within > .sub-sub-menu {
+                            opacity: 1;
+                            visibility: visible;
+                            transform: translateX(0);
+                        }
+
+                        // Флип: нет места справа — уходит влево
+                        &.sub-sub-flip > .sub-sub-menu {
+                            left: auto;
+                            right: calc(100% + 4px);
+                            transform: translateX(8px);
+                        }
+
+                        &.sub-sub-flip:hover > .sub-sub-menu,
+                        &.sub-sub-flip:focus-within > .sub-sub-menu {
+                            transform: translateX(0);
+                        }
+                    }
+                }
+
+                // Активация hover/focus на пункте первого уровня
+                &:hover > a,
+                &:focus-within > a {
+                    color: conf.$color-accent-light;
+
+                    @include f.mode((
+                        background: (
+                            rgba(conf.$color-text-light, 0.05),
+                            rgba(conf.$color-text-dark,  0.07),
+                        ),
+                    ));
+
+                    @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+
+                    &::after { transform: scaleX(1); }
+                    .item-chevron { transform: rotate(180deg); opacity: 1; }
+                }
+
+                &:hover > .sub-menu,
+                &:focus-within > .sub-menu {
+                    opacity: 1;
+                    visibility: visible;
+                    transform: translateY(0);
+                }
+
+                // Флип: нет места справа — прижимаем к правому краю пункта
+                &.sub-flip > .sub-menu {
+                    left: auto;
+                    right: 0;
+                }
+            }
+        }
+
+        // ── Бургер (только мобильный) ─────────────────────────────────────────
+
+        .menu-toggle {
+            flex-shrink: 0;
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: f.get-radius();
+            transition: background 0.2s ease;
+
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+            &:hover {
+                @include f.mode((
+                    background: (
+                        rgba(conf.$color-text-light, 0.07),
+                        rgba(conf.$color-text-dark,  0.1),
+                    ),
+                ));
+            }
+        }
+    }
+
+    // ── Мобильная панель ─────────────────────────────────────────────────────
+
+    .side-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: min(320px, 88vw);
+        height: 100%;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        transform: translateX(105%);
+        visibility: hidden;
+        transition: transform $trans, visibility $trans;
+        box-shadow: -12px 0 48px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+
+        @include f.mode((
+            background: (conf.$color-section-light, conf.$color-section-dark),
+        ));
+
+        &.is-active {
+            transform: translateX(0);
+            visibility: visible;
+        }
+
+        // Шапка панели: лого + кнопка закрытия
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px * conf.$density-factor 20px * conf.$density-factor;
+            flex-shrink: 0;
+
+            @if conf.$is-border == 'true' {
+                border-bottom: 1px solid conf.$color-border-light;
+                @media (prefers-color-scheme: dark) { border-bottom-color: conf.$color-border-dark; }
+            }
+
+            .panel-site-name {
+                @include f.font-logo;
+                font-size: 0.9em;
+                font-weight: 700;
+
+                @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+            }
+
+            .panel-close {
+                flex-shrink: 0;
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 7px;
+                border-radius: f.get-radius();
+                display: flex;
+                align-items: center;
+                transition: background 0.2s ease;
+
+                @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+                &:hover {
+                    @include f.mode((
+                        background: (
+                            rgba(conf.$color-text-light, 0.07),
+                            rgba(conf.$color-text-dark,  0.1),
+                        ),
+                    ));
+                }
+            }
+        }
+
+        // Прокручиваемое тело
+        .panel-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: conf.$color-border-light transparent;
+
+            @media (prefers-color-scheme: dark) {
+                scrollbar-color: conf.$color-border-dark transparent;
+            }
+        }
+
+        // ── Аккордеон-меню ────────────────────────────────────────────────────
+
+        .panel-menu-list {
+            list-style: none;
+            margin: 0;
+            padding: 6px * conf.$density-factor 0;
+        }
+
+        .panel-item {
+            & + .panel-item {
+                border-top: 1px solid transparent;
+
+                @include f.mode((
+                    border-top-color: (
+                        rgba(conf.$color-border-light, 0.6),
+                        rgba(conf.$color-border-dark,  0.6),
+                    ),
+                ));
+            }
+
+            .panel-item-row {
+                display: flex;
+                align-items: stretch;
+
+                > a {
+                    @include f.font-txt;
+                    flex: 1;
+                    display: block;
+                    padding: 13px * conf.$density-factor 20px * conf.$density-factor;
+                    text-decoration: none;
+                    font-size: 0.92em;
+                    font-weight: 500;
+                    transition: color 0.2s ease;
+
+                    @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+
+                    &:hover { color: conf.$color-accent-light; }
+
+                    @media (prefers-color-scheme: dark) {
+                        &:hover { color: conf.$color-accent-dark; }
+                    }
+                }
+
+                > .panel-toggle {
+                    flex-shrink: 0;
+                    background: none;
+                    border: none;
+                    border-left: 1px solid transparent;
+                    cursor: pointer;
+                    padding: 0 16px * conf.$density-factor;
+                    display: flex;
+                    align-items: center;
+                    transition: color 0.2s ease, background 0.2s ease;
+
+                    @include f.mode((
+                        color: (conf.$color-text-light, conf.$color-text-dark),
+                        border-left-color: (
+                            rgba(conf.$color-border-light, 0.6),
+                            rgba(conf.$color-border-dark,  0.6),
+                        ),
+                    ));
+
+                    svg { display: block; transition: transform 0.3s ease; }
+
+                    &.is-open svg { transform: rotate(90deg); }
+
+                    &:hover {
+                        color: conf.$color-accent-light;
+
+                        @include f.mode((
+                            background: (
+                                rgba(conf.$color-text-light, 0.05),
+                                rgba(conf.$color-text-dark,  0.07),
+                            ),
+                        ));
+
+                        @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                    }
+                }
+            }
+
+            // Второй уровень (аккордеон)
+            > .panel-sub-menu {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                max-height: 0;
+                transition: max-height 0.32s ease;
+
+                @include f.mode((
+                    background: (
+                        rgba(conf.$color-text-light, 0.03),
+                        rgba(conf.$color-text-dark,  0.05),
+                    ),
+                ));
+
+                &.is-open { max-height: 2400px; }
+
+                > .panel-item > .panel-item-row > a {
+                    padding-left: 36px * conf.$density-factor;
+                    font-size: 0.87em;
+                    font-weight: 400;
+
+                    @include f.mode((
+                        color: (
+                            rgba(conf.$color-text-light, 0.82),
+                            rgba(conf.$color-text-dark,  0.82),
+                        ),
+                    ));
+                }
+
+                // Третий уровень
+                > .panel-item > .panel-sub-sub-menu {
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                    max-height: 0;
+                    transition: max-height 0.32s ease;
+                    border-left: 2px solid conf.$color-border-light;
+                    margin-left: 36px * conf.$density-factor;
+
+                    @media (prefers-color-scheme: dark) {
+                        border-left-color: conf.$color-border-dark;
+                    }
+
+                    &.is-open { max-height: 800px; }
+
+                    > .panel-item > .panel-item-row > a {
+                        padding-left: 14px * conf.$density-factor;
+                        font-size: 0.83em;
+                        font-weight: 400;
+                        opacity: 0.72;
+                    }
+                }
+            }
+        }
+    }
+
+    // ── Оверлей ───────────────────────────────────────────────────────────────
+
+    .menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.42);
+        backdrop-filter: blur(3px);
+        z-index: 1500;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity $trans, visibility $trans;
+
+        body.menu-open & {
+            opacity: 1;
+            visibility: visible;
+            cursor: pointer;
+        }
+    }
+
+    body.menu-open { overflow: hidden; }
+
+    // ── Адаптив (управляется JS-классом .is-desktop) ─────────────────────────
+
+    #site-header:not(.is-desktop) {
+        .nav-wrapper { display: none; }
+        .menu-toggle { display: flex; }
+    }
+
+    #site-header.is-desktop {
+        .menu-toggle { display: none; }
+    }
+
+    #site-header.is-desktop ~ .side-panel,
+    #site-header.is-desktop ~ .menu-overlay {
+        display: none;
+    }
+}

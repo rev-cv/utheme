@@ -94,6 +94,7 @@ RENAME_RULES = {
         "datenschutz.html",
         "privatlivspolitik.html",
         "integritetspolicy.html",
+        "ochrana-soukromi.html"
     ],
     "about-us.html": [
         "sobre-nosotros.html",
@@ -106,6 +107,8 @@ RENAME_RULES = {
         "about.html",
         "om-os.html",
         "om-oss.html",
+        "o-nas.html",
+        "a-propos.html",
     ],
     "cookie-policy.html": [
         "politica-de-cookies.html",

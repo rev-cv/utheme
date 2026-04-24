@@ -8,27 +8,19 @@
 }
 
 ::-webkit-scrollbar-track {
-    $bg-light: sys.mix(conf.$color-bg-light, #000, 95%);
-    $bg-dark: sys.mix(conf.$color-bg-dark, #fff, 95%);
-
-    @include f.mode(( //
-            background: ($bg-light, $bg-dark),
-        ));
+    $bg-light: sys.mix(conf.$color-bg-light, conf.$color-accent-light, 95%);
+    $bg-dark: sys.mix(conf.$color-bg-dark, conf.$color-accent-dark, 95%);
+    @include f.mode((background: ($bg-light, $bg-dark)));
 }
 
 ::-webkit-scrollbar-thumb {
-    $bg-light: sys.mix(conf.$color-bg-light, #000, 70%);
-    $bg-dark: sys.mix(conf.$color-bg-dark, #fff, 70%);
-
-    @include f.mode(( //
-            background: ($bg-light, $bg-dark),
-        ));
-
+    $bg-light: sys.mix(conf.$color-bg-light, conf.$color-accent-light, 70%);
+    $bg-dark: sys.mix(conf.$color-bg-dark, conf.$color-accent-dark, 70%);
+    @include f.mode((background: ($bg-light, $bg-dark)));
     border-radius: 5px;
     transition: background 300ms ease-in-out;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    @include f.mode((background: (conf.$color-accent-light, conf.$color-accent-dark),
-        ));
+    @include f.mode((background: (conf.$color-accent-light, conf.$color-accent-dark)));
 }

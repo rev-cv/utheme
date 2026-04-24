@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 
 load_dotenv(interpolate=True)
 
+from core.translations import LANG_MAP
+
 ROOT_DIR     = Path(__file__).parent
 SPEC_DIR     = ROOT_DIR / "spec"
 STAGING_DIR  = ROOT_DIR / "staging"
@@ -30,14 +32,11 @@ MANIFEST     = ROOT_DIR / "manifest.json"
 
 def run():
     _header("PIPELINE START")
+    _check_lang()
 
     STAGING_DIR.mkdir(exist_ok=True)
     (STAGING_DIR / "images").mkdir(exist_ok=True)
     (STAGING_DIR / "pages").mkdir(exist_ok=True)
-
-    if platform.system() == "Windows":
-        _phase(0, 10, "Windows: запуск SASS-контейнера")
-        subprocess.run(["docker", "compose", "up", "-d", "sass"], check=True)
 
     # ── 1. НОРМАЛИЗАЦИЯ ИМЁН ─────────────────────────────────────────────────
     _phase(1, 10, "Нормализация имён файлов и папок")
@@ -98,6 +97,7 @@ def run():
 
     if platform.system() == "Windows":
         _activate_plugin("u-theme-styles")
+        subprocess.run(["docker", "compose", "up", "-d", "sass"], check=True)
         _install_and_activate_plugin("all-in-one-wp-migration")
 
     _header("ГОТОВО")
@@ -301,15 +301,114 @@ def _find_branding_file(stems: list[str]) -> str | None:
 
 
 def _copy_branding_to_build(out_dir: Path):
-    """Копирует logo и favicon из spec/ в build/images/ вместе с остальными картинками."""
+    """Копирует logo/favicon из spec/ в staging/images/, обрабатывая растровые файлы."""
     import shutil
-    for stems in (["favicon", "icon"], ["logo"]):
+    from PIL import Image
+
+    for stems, max_kb, max_height in (
+        (["favicon", "icon"], 15,  None),
+        (["logo"],            50,  100),
+    ):
         src = _find_branding_file(stems)
-        if src:
-            dst = out_dir / Path(src).name
-            if not dst.exists():
-                shutil.copy2(src, dst)
-                print(f"  Скопирован: {Path(src).name}")
+        if not src:
+            continue
+        src = Path(src)
+        dst = out_dir / src.name
+        if dst.exists():
+            continue
+
+        suffix = src.suffix.lower()
+        src_kb = src.stat().st_size / 1024
+
+        # SVG и ICO не трогаем
+        if suffix in (".svg", ".ico"):
+            shutil.copy2(src, dst)
+            print(f"  Скопирован: {src.name}")
+            continue
+
+        # Проверяем, нужна ли обработка
+        height_ok = (not max_height) or (Image.open(src).height <= max_height)
+        if src_kb <= max_kb and height_ok:
+            shutil.copy2(src, dst)
+            print(f"  Скопирован: {src.name}  ({src_kb:.1f} KB)")
+            continue
+
+        result = _process_branding_raster(src, max_kb=max_kb, max_height=max_height)
+        if result is None:
+            print(f"  [!] Не удалось обработать '{src.name}', скопирован оригинал")
+            shutil.copy2(src, dst)
+            continue
+
+        shutil.copy2(result, dst)
+        dst_kb = dst.stat().st_size / 1024
+        info = f"{src_kb:.1f} → {dst_kb:.1f} KB"
+        if max_height:
+            w, h = Image.open(dst).size
+            info += f" | {w}×{h}px"
+        print(f"  Брендинг: {src.name}  ({info})")
+
+
+def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> Path | None:
+    """Уменьшает высоту (если нужно) и сжимает растровый файл до max_kb.
+    Возвращает путь к временному файлу или None если сжать не удалось."""
+    import io, tempfile
+    from PIL import Image
+
+    try:
+        img = Image.open(src)
+    except Exception as e:
+        print(f"  [!] Ошибка открытия {src.name}: {e}")
+        return None
+
+    has_alpha = img.mode in ("RGBA", "LA", "PA") or (
+        img.mode == "P" and "transparency" in img.info
+    )
+    img = img.convert("RGBA" if has_alpha else "RGB")
+
+    # 1. Ограничение высоты (для logo)
+    if max_height and img.height > max_height:
+        ratio = max_height / img.height
+        img = img.resize((max(1, int(img.width * ratio)), max_height), Image.Resampling.LANCZOS)
+
+    target = max_kb * 1024
+    suffix = src.suffix.lower()
+    tmp = Path(tempfile.mkdtemp()) / src.name
+    quality = 90
+    resize_f = 1.0
+
+    for _ in range(35):
+        buf = io.BytesIO()
+        curr = img
+        if resize_f < 1.0:
+            curr = img.resize(
+                (max(1, int(img.width * resize_f)), max(1, int(img.height * resize_f))),
+                Image.Resampling.LANCZOS,
+            )
+        if suffix == ".png":
+            colors = max(16, int(256 * quality / 100))
+            curr.quantize(colors=colors, method=Image.Quantize.MEDIANCUT).convert("RGBA").save(
+                buf, format="PNG", optimize=True
+            )
+        elif suffix in (".jpg", ".jpeg"):
+            curr.convert("RGB").save(buf, format="JPEG", quality=quality, optimize=True)
+        elif suffix == ".webp":
+            curr.save(buf, format="WEBP", quality=quality, method=6)
+        else:
+            curr.save(buf, format="PNG", optimize=True)
+
+        if buf.tell() <= target:
+            tmp.write_bytes(buf.getvalue())
+            return tmp
+
+        if quality > 30:
+            quality -= 10
+        elif resize_f > 0.4:
+            resize_f = round(resize_f - 0.1, 1)
+            quality = 90
+        else:
+            return None
+
+    return None
 
 
 # ─── Windows-специфичные шаги ────────────────────────────────────────────────
@@ -342,6 +441,22 @@ def _activate_plugin(slug: str):
         print(f"  [!] Не удалось активировать плагин: {output}")
     else:
         print(f"  Плагин '{slug}' активирован.")
+
+
+# ─── Проверка языка ──────────────────────────────────────────────────────────
+
+def _check_lang():
+    lang = os.environ.get("SITE_LANG", "").strip().upper()
+    if lang in LANG_MAP:
+        print(f"  Язык: {lang}")
+        return
+    valid = ", ".join(sorted(LANG_MAP))
+    if lang:
+        print(f"\n  ОШИБКА: язык '{lang}' не поддерживается.")
+    else:
+        print("\n  ОШИБКА: переменная SITE_LANG не задана в .env.")
+    print(f"  Доступные языки: {valid}")
+    sys.exit(1)
 
 
 # ─── Утилиты вывода ──────────────────────────────────────────────────────────

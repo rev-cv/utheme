@@ -121,8 +121,9 @@
 
         // ── Drill-down ────────────────────────────────────────────────────────
 
-        var stack   = [];
-        var counter = 0;
+        var stack          = [];
+        var counter        = 0;
+        var _heightHandler = null;
 
         function init() {
             var rootList = nav.querySelector('.side-menu-list');
@@ -203,6 +204,7 @@
             });
 
             updateHeader();
+            recalcHeight();
         }
 
         function drillOut() {
@@ -212,6 +214,7 @@
             setPanel(cur.el, 'drill-panel--next');
             setPanel(stack[stack.length - 1].el, 'drill-panel--active');
             updateHeader();
+            recalcHeight();
         }
 
         function resetDrill() {
@@ -233,6 +236,37 @@
                 backBtn.setAttribute('hidden', '');
                 titleEl.textContent = '';
             }
+        }
+
+        var _recalcTimer = null;
+
+        function recalcHeight() {
+            if (_heightHandler) {
+                panel.removeEventListener('transitionend', _heightHandler);
+                _heightHandler = null;
+            }
+            if (_recalcTimer) {
+                clearTimeout(_recalcTimer);
+            }
+            _recalcTimer = setTimeout(function () {
+                _recalcTimer = null;
+                var active = nav.querySelector('.drill-panel--active');
+                if (!active) return;
+                void active.offsetHeight;
+                var panelHeader = panel.querySelector('.side-panel-header');
+                var headerH = panelHeader ? panelHeader.offsetHeight : 0;
+                var maxH    = Math.round(window.innerHeight * 0.8);
+                var target  = Math.min(headerH + active.scrollHeight, maxH);
+                panel.style.transition = 'height 0.25s ease';
+                panel.style.height = target + 'px';
+                _heightHandler = function (e) {
+                    if (e.propertyName !== 'height') return;
+                    panel.removeEventListener('transitionend', _heightHandler);
+                    _heightHandler = null;
+                    panel.style.transition = '';
+                };
+                panel.addEventListener('transitionend', _heightHandler);
+            }, 200);
         }
 
         init();

@@ -27,7 +27,10 @@
             get_template_part('components/main-menu-console');
         } elseif ($menu_type === 'dynamic') {
             get_template_part('components/main-menu-dynamic');
+        } elseif ($menu_type === 'hierarchical') {
+            get_template_part('components/main-menu-hierarchical');
         } else {
             get_template_part('components/main-menu-island');
         }
+
     ?>

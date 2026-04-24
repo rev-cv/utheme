@@ -8,6 +8,7 @@ LANG_MAP = {
     "ET": "et_EE", "LV": "lv_LV", "RO": "ro_RO", "SV": "sv_SE",
     "LT": "lt_LT", "BG": "bg_BG", "SL": "sl_SI", "HU": "hu_HU",
     "FI": "fi_FI", "DA": "da_DK", "GR": "el",
+    "HR": "hr_HR", "NO": "nb_NO", "LB": "lb_LU",
 }
 
 # slug → lang_code → title
@@ -21,6 +22,7 @@ PAGE_TITLES = {
         "SV": "Hem",         "LT": "Pradžia",       "BG": "Начало",
         "SL": "Domov",       "HU": "Főoldal",       "FI": "Koti",
         "DA": "Forside",     "GR": "Αρχική",
+        "HR": "Početna",     "NO": "Hjem",          "LB": "Heem",
     },
     "articles": {
         "EN": "All Posts",          "RU": "Все статьи",          "FR": "Tous les articles",
@@ -31,6 +33,7 @@ PAGE_TITLES = {
         "SV": "Alla inlägg",        "LT": "Visi įrašai",         "BG": "Всички статии",
         "SL": "Vsi prispevki",      "HU": "Összes bejegyzés",    "FI": "Kaikki kirjoitukset",
         "DA": "Alle indlæg",        "GR": "Όλα τα άρθρα",
+        "HR": "Sve objave",         "NO": "Alle innlegg",        "LB": "All Artikelen",
     },
     "about-us": {
         "EN": "About Us",       "RU": "О нас",          "FR": "À propos",
@@ -41,6 +44,7 @@ PAGE_TITLES = {
         "SV": "Om oss",         "LT": "Apie mus",        "BG": "За нас",
         "SL": "O nas",          "HU": "Rólunk",          "FI": "Meistä",
         "DA": "Om os",          "GR": "Σχετικά με εμάς",
+        "HR": "O nama",         "NO": "Om oss",              "LB": "Iwwer eis",
     },
     "cookie-policy": {
         "EN": "Cookie Policy",          "RU": "Политика Cookie",          "FR": "Politique cookies",
@@ -51,6 +55,7 @@ PAGE_TITLES = {
         "SV": "Cookiepolicy",           "LT": "Slapukų politika",         "BG": "Политика за бисквитки",
         "SL": "Pravilnik o piškotkih",  "HU": "Süti szabályzat",          "FI": "Evästekäytäntö",
         "DA": "Cookiepolitik",          "GR": "Πολιτική Cookies",
+        "HR": "Pravila o kolačićima",   "NO": "Informasjonskapselpolicy", "LB": "Cookie-Politik",
     },
     "privacy-policy": {
         "EN": "Privacy Policy",             "RU": "Политика конфиденциальности", "FR": "Confidentialité",
@@ -61,6 +66,7 @@ PAGE_TITLES = {
         "SV": "Integritetspolicy",          "LT": "Privatumo politika",          "BG": "Политика за поверителност",
         "SL": "Pravilnik o zasebnosti",     "HU": "Adatvédelmi irányelvek",      "FI": "Tietosuojaseloste",
         "DA": "Privatlivspolitik",          "GR": "Πολιτική Απορρήτου",
+        "HR": "Pravila privatnosti",        "NO": "Personvernerklæring",     "LB": "Dateschutzpolitik",
     },
     "legal-notice": {
         "EN": "Legal Notice",           "RU": "Юридическая информация",  "FR": "Mentions légales",
@@ -71,6 +77,7 @@ PAGE_TITLES = {
         "SV": "Rättslig information",   "LT": "Teisinė informacija",     "BG": "Правна информация",
         "SL": "Pravno obvestilo",       "HU": "Jogi nyilatkozat",        "FI": "Oikeudellinen huomautus",
         "DA": "Juridisk meddelelse",    "GR": "Νομική Σημείωση",
+        "HR": "Pravna napomena",        "NO": "Juridisk merknad",        "LB": "Rechtleche Vermerk",
     },
     "sitemap": {
         "EN": "Sitemap",        "RU": "Карта сайта",    "FR": "Plan du site",
@@ -81,6 +88,7 @@ PAGE_TITLES = {
         "SV": "Sajtkarta",      "LT": "Svetainės medis","BG": "Карта на сайта",
         "SL": "Kazalo strani",  "HU": "Oldaltérkép",    "FI": "Sivukartta",
         "DA": "Sitemap",        "GR": "Χάρτης Ιστότοπου",
+        "HR": "Karta stranice", "NO": "Nettstedskart",           "LB": "Saiteplang",
     },
     "news": {
         "EN": "News",       "RU": "Новости",    "FR": "Actualités",
@@ -91,6 +99,7 @@ PAGE_TITLES = {
         "SV": "Nyheter",    "LT": "Naujienos",  "BG": "Новини",
         "SL": "Novice",     "HU": "Hírek",      "FI": "Uutiset",
         "DA": "Nyheder",    "GR": "Νέα",
+        "HR": "Vijesti",    "NO": "Nyheter",    "LB": "Neiegkeeten",
     },
 }
 
@@ -103,6 +112,7 @@ EDITORIAL = {
     "SV": "Redaktionen",     "LT": "Redakcija",       "BG": "Редакция",
     "SL": "Uredništvo",      "HU": "Szerkesztőség",   "FI": "Toimitus",
     "DA": "Redaktion",       "GR": "Σύνταξη",
+    "HR": "Uredništvo",      "NO": "Redaksjon",      "LB": "Redaktioun",
 }
 
 
@@ -130,6 +140,9 @@ WELCOME_NEWS_TITLE = {
     "FI": "Tervetuloa! Olemme avanneet!",
     "DA": "Velkommen! Vi er gået i luften!",
     "GR": "Καλώς ήρθατε! Ξεκινήσαμε!",
+    "HR": "Dobrodošli! Pokrenuli smo se!",
+    "NO": "Velkommen! Vi har lansert!",
+    "LB": "Wëllkomm! Mir hunn gestart!",
 }
 
 WELCOME_NEWS_CONTENT = {
@@ -156,6 +169,9 @@ WELCOME_NEWS_CONTENT = {
     "FI": "Olemme iloisia voidessamme ilmoittaa uuden verkkosivustomme, «{site_title}», julkaisusta! Tämä on matkamme alku, ja olemme innoissamme voidessamme jakaa sen kanssanne. Täältä löydät uusimmat uutiset, mielenkiintoisia artikkeleita ja tärkeitä päivityksiä. Pysy kuulolla ja kiitos, että olet mukanamme!",
     "DA": "Vi er glade for at annoncere lanceringen af vores nye hjemmeside, «{site_title}»! Dette er begyndelsen på vores rejse, og vi er spændte på at dele den med jer. Her finder du de seneste nyheder, interessante artikler og vigtige opdateringer. Følg med og tak fordi du er med os!",
     "GR": "Είμαστε στην ευχάριστη θέση να ανακοινώσουμε την έναρξη του νέου μας ιστότοπου, «{site_title}»! Αυτή είναι η αρχή του ταξιδιού μας και είμαστε ενθουσιασμένοι που το μοιραζόμαστε μαζί σας. Εδώ θα βρείτε τα τελευταία νέα, ενδιαφέροντα άρθρα και σημαντικές ενημερώσεις. Μείνετε συντονισμένοι και σας ευχαριστούμε που είστε μαζί μας!",
+    "HR": "Oduševljeni smo što možemo najaviti pokretanje naše nove web stranice, «{site_title}»! Ovo je početak našeg putovanja i radujemo se što ga možemo podijeliti s vama. Ovdje ćete pronaći najnovije vijesti, zanimljive članke i važne informacije. Pratite nas i hvala što ste s nama!",
+    "NO": "Vi er begeistret for å kunngjøre lanseringen av vår nye nettside, «{site_title}»! Dette er begynnelsen på vår reise, og vi er glade for å dele den med deg. Her finner du de siste nyhetene, interessante artikler og viktige oppdateringer. Følg med og takk for at du er med oss!",
+    "LB": "Mir si frou déi Lancéierung vun eisem neien Internetsite, «{site_title}», unzekënnegen! Dëst ass den Ufank vun eisem Wee an mir freeën eis dësen mat Iech ze deelen. Hei fannt Dir déi lescht Neiegkeeten, interessant Artikelen an wichteg Aktualiséierungen. Bleift dobäi a Merci datt Dir bei eis sidd!",
 }
 
 

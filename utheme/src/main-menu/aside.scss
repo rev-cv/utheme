@@ -82,8 +82,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
         /* Название сайта */
         .site-name {
             @if conf.$is-menu-title == 'false' {
-                visibility: hidden;
-                pointer-events: none;
+                display: none;
             }
 
             a {
@@ -193,7 +192,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding-right: 20px;
+            padding: 0 20px 0 6px;
             scrollbar-width: thin;
             scrollbar-color: conf.$color-border-light transparent;
 
@@ -257,11 +256,12 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 @media (prefers-color-scheme: dark) {
                     background: conf.$color-section-dark;
                 }
+            }
 
-                &:hover {
-                    transform: translateX(-5px);
-                    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.05);
-                }
+            /* Сдвиг при наведении на всю строку */
+            .menu-item-row:hover > a {
+                transform: translateX(-5px);
+                box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.05);
             }
 
             /* Если есть кнопка подменю — убираем правый бордер и скругление у ссылки */
@@ -321,7 +321,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             /* Подменю 2-го уровня (скрытое / раскрытое) */
             .sub-menu-list {
                 list-style: none !important;
-                padding: 4px 0 4px 16px !important;
+                padding: 0 0 0 16px !important;
                 margin: 0 !important;
                 overflow: hidden;
                 max-height: 0;
@@ -329,6 +329,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
 
                 &.is-open {
                     max-height: 2400px;
+                    padding: 4px 0 4px 16px !important;
 
                     .sub-sub-menu-list {
                         max-height: 1200px;
