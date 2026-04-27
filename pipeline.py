@@ -386,7 +386,7 @@ def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> 
             )
         if suffix == ".png":
             colors = max(16, int(256 * quality / 100))
-            curr.quantize(colors=colors, method=Image.Quantize.MEDIANCUT).convert("RGBA").save(
+            curr.quantize(colors=colors, method=Image.Quantize.FASTOCTREE).convert("RGBA").save(
                 buf, format="PNG", optimize=True
             )
         elif suffix in (".jpg", ".jpeg"):
