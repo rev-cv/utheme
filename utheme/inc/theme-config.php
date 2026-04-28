@@ -37,6 +37,9 @@ function my_theme_get_config($key = null, $default = null)
             if (preg_match('/\$article-card:\s*["\']?([a-zA-Z0-9_-]+)["\']?/', $content, $m)) {
                 $config['article-card'] = $m[1];
             }
+            if (preg_match('/\$breadcrumbs-separator:\s*["\']([^"\']*)["\']/', $content, $m)) {
+                $config['breadcrumbs-separator'] = $m[1];
+            }
         }
     }
 

@@ -144,6 +144,10 @@
         height: 40px;
         overflow: hidden;
         transition: height 0.2s ease, padding 0.2s ease;
+        max-width: conf.$max-width;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
 
         &:has(.drill-back[hidden]) {
             height: 0;
@@ -215,6 +219,11 @@
         overflow-x: hidden;
         flex: 1;
         min-height: 0;
+    }
+
+    .side-nav {
+        max-width: conf.$max-width;
+        margin: 0 auto;
     }
 
     // Все панели скрыты по умолчанию
@@ -481,3 +490,4 @@
         }
     }
 }
+

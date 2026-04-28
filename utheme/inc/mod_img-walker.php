@@ -133,12 +133,11 @@ class Dynamic_Menu_Walker extends Walker_Nav_Menu {
 }
 
 
-// Устанавливаем максимальные размеры для среднего размера изображений
-update_option( 'thumbnail_size_w', 300 );
-update_option( 'thumbnail_size_h', 300 );
-
-// Отключаем жесткую обрезку (crop), чтобы сохранялись пропорции
-update_option( 'thumbnail_crop', 0 );
+add_action('after_switch_theme', function () {
+    update_option('thumbnail_size_w', 300);
+    update_option('thumbnail_size_h', 300);
+    update_option('thumbnail_crop', 0);
+});
 
 
 /*

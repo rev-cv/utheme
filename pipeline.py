@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 
 load_dotenv(interpolate=True)
 
-from core.translations import LANG_MAP
+from core.translations import LANG_MAP, get_lang_code, get_wp_locale
 
 ROOT_DIR     = Path(__file__).parent
 SPEC_DIR     = ROOT_DIR / "spec"
@@ -182,7 +182,7 @@ def _build_manifest(structure: dict, pics: list[dict]) -> dict:
     from core import enrich_with_schedule as schedule
     from core import translations
 
-    lang  = os.environ.get("SITE_LANG", "EN")
+    lang  = get_lang_code(os.environ.get("SITE_LANG", "EN"))
     pages = structure["pages"]
 
     # ── контентные страницы (есть HTML-источник) ─────────────────────────────
@@ -209,8 +209,11 @@ def _build_manifest(structure: dict, pics: list[dict]) -> dict:
             item.pop(field, None)
 
     # ── структурные страницы (нет HTML, заголовок из translations) ────────────
+    site_title = os.environ.get("SITE_TITLE", "")
     for item in structural_pages:
-        item["title"] = translations.get_page_title(item["slug"], lang)
+        slug = item["slug"]
+        item["title"]     = translations.get_page_title(slug, lang)
+        item["seo_descr"] = translations.get_page_description(slug, lang, site_title)
 
     # ── объединяем в исходном порядке ─────────────────────────────────────────
     content_map    = {p["slug"]: p for p in resource_list}
@@ -281,7 +284,8 @@ def _site_config() -> dict:
     return {
         "title":      os.environ.get("SITE_TITLE",  "WordPress Site"),
         "url":        os.environ.get("SITE_URL",     "http://localhost:8080"),
-        "lang":       os.environ.get("SITE_LANG",    "EN"),
+        "lang":       get_lang_code(os.environ.get("SITE_LANG", "EN")),
+        "wp_locale":  get_wp_locale(os.environ.get("SITE_LANG", "EN")),
         "email":      os.environ.get("ADMIN_EMAIL",  "admin@example.com"),
         "admin_user": os.environ.get("ADMIN_USER",   "admin"),
         "favicon":    Path(favicon_path).name if favicon_path else None,
@@ -446,16 +450,18 @@ def _activate_plugin(slug: str):
 # ─── Проверка языка ──────────────────────────────────────────────────────────
 
 def _check_lang():
-    lang = os.environ.get("SITE_LANG", "").strip().upper()
-    if lang in LANG_MAP:
-        print(f"  Язык: {lang}")
+    raw = os.environ.get("SITE_LANG", "").strip()
+    if not raw:
+        print("\n  ОШИБКА: переменная SITE_LANG не задана в .env.")
+        print(f"  Доступные коды: {', '.join(sorted(LANG_MAP))}")
+        sys.exit(1)
+    code = get_lang_code(raw)
+    if code in LANG_MAP:
+        print(f"  Язык: {raw}")
         return
     valid = ", ".join(sorted(LANG_MAP))
-    if lang:
-        print(f"\n  ОШИБКА: язык '{lang}' не поддерживается.")
-    else:
-        print("\n  ОШИБКА: переменная SITE_LANG не задана в .env.")
-    print(f"  Доступные языки: {valid}")
+    print(f"\n  ОШИБКА: язык '{raw}' не поддерживается.")
+    print(f"  Доступные коды: {valid}")
     sys.exit(1)
 
 

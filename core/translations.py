@@ -103,6 +103,94 @@ PAGE_TITLES = {
     },
 }
 
+PAGE_DESCRIPTIONS = {
+    "articles": {
+        "EN": "All articles on «{site_title}» — expert guides, reviews and useful tips.",
+        "RU": "Все статьи «{site_title}» — экспертные руководства, обзоры и полезные советы.",
+        "FR": "Tous les articles de «{site_title}» — guides d'experts, avis et conseils pratiques.",
+        "DE": "Alle Artikel von «{site_title}» — Expertenratgeber, Rezensionen und nützliche Tipps.",
+        "PL": "Wszystkie artykuły «{site_title}» — poradniki ekspertów, recenzje i przydatne wskazówki.",
+        "CZ": "Všechny články «{site_title}» — odborné průvodce, recenze a užitečné tipy.",
+        "CS": "Všechny články «{site_title}» — odborné průvodce, recenze a užitečné tipy.",
+        "PT": "Todos os artigos de «{site_title}» — guias especializados, análises e dicas úteis.",
+        "IT": "Tutti gli articoli di «{site_title}» — guide di esperti, recensioni e consigli utili.",
+        "NL": "Alle artikelen van «{site_title}» — expertgidsen, beoordelingen en nuttige tips.",
+        "ES": "Todos los artículos de «{site_title}» — guías de expertos, reseñas y consejos útiles.",
+        "SK": "Všetky články «{site_title}» — odborné príručky, recenzie a užitočné tipy.",
+        "ET": "Kõik artiklid saidil «{site_title}» — eksperdijuhendid, arvustused ja kasulikud näpunäited.",
+        "LV": "Visi raksti vietnē «{site_title}» — ekspertu ceļveži, atsauksmes un noderīgi padomi.",
+        "RO": "Toate articolele de pe «{site_title}» — ghiduri de experți, recenzii și sfaturi utile.",
+        "SV": "Alla artiklar på «{site_title}» — expertguider, recensioner och användbara tips.",
+        "LT": "Visi straipsniai «{site_title}» — ekspertų vadovai, apžvalgos ir naudingi patarimai.",
+        "BG": "Всички статии на «{site_title}» — експертни ръководства, ревюта и полезни съвети.",
+        "SL": "Vsi članki na «{site_title}» — strokovni vodniki, ocene in koristni nasveti.",
+        "HU": "Összes cikk a(z) «{site_title}» oldalon — szakértői útmutatók, vélemények és hasznos tippek.",
+        "FI": "Kaikki artikkelit sivustolla «{site_title}» — asiantuntijaoppaat, arvostelut ja hyödylliset vinkit.",
+        "DA": "Alle artikler på «{site_title}» — ekspertguider, anmeldelser og nyttige tips.",
+        "GR": "Όλα τα άρθρα του «{site_title}» — οδηγοί ειδικών, κριτικές και χρήσιμες συμβουλές.",
+        "HR": "Svi članci na «{site_title}» — stručni vodiči, recenzije i korisni savjeti.",
+        "NO": "Alle artikler på «{site_title}» — ekspertguider, anmeldelser og nyttige tips.",
+        "LB": "All Artikelen op «{site_title}» — Experteführeren, Rezensiounen a nëtzlech Tipps.",
+    },
+    "news": {
+        "EN": "Latest news and updates from «{site_title}» — stay informed with the most recent publications.",
+        "RU": "Последние новости «{site_title}» — актуальные события, обновления и анонсы.",
+        "FR": "Dernières actualités de «{site_title}» — restez informé des publications les plus récentes.",
+        "DE": "Neueste Nachrichten von «{site_title}» — bleiben Sie mit den aktuellen Meldungen auf dem Laufenden.",
+        "PL": "Najnowsze wiadomości «{site_title}» — bądź na bieżąco z aktualnymi publikacjami.",
+        "CZ": "Nejnovější zprávy «{site_title}» — zůstaňte informováni o nejnovějších příspěvcích.",
+        "CS": "Nejnovější zprávy «{site_title}» — zůstaňte informováni o nejnovějších příspěvcích.",
+        "PT": "Últimas notícias de «{site_title}» — fique informado com as publicações mais recentes.",
+        "IT": "Ultime notizie da «{site_title}» — rimani aggiornato con le pubblicazioni più recenti.",
+        "NL": "Laatste nieuws van «{site_title}» — blijf op de hoogte van de meest recente publicaties.",
+        "ES": "Últimas noticias de «{site_title}» — mantente informado con las publicaciones más recientes.",
+        "SK": "Najnovšie správy «{site_title}» — zostante informovaní o najnovších príspevkoch.",
+        "ET": "Viimased uudised leheküljelt «{site_title}» — püsige kursis kõige värskema sisuga.",
+        "LV": "Jaunākās ziņas no «{site_title}» — sekojiet līdzi jaunākajām publikācijām.",
+        "RO": "Ultimele știri de pe «{site_title}» — rămâneți la curent cu cele mai recente publicații.",
+        "SV": "Senaste nyheterna från «{site_title}» — håll dig uppdaterad med de senaste inläggen.",
+        "LT": "Naujausios naujienos iš «{site_title}» — sekite naujausius įrašus ir atnaujinimus.",
+        "BG": "Последни новини от «{site_title}» — бъдете в крак с актуалните публикации.",
+        "SL": "Najnovejše novice z «{site_title}» — ostanite na tekočem z najsvežjimi objavami.",
+        "HU": "Legújabb hírek a(z) «{site_title}» oldalról — maradj naprakész a legfrissebb publikációkkal.",
+        "FI": "Uusimmat uutiset sivustolta «{site_title}» — pysy ajan tasalla tuoreimpien julkaisujen kanssa.",
+        "DA": "Seneste nyheder fra «{site_title}» — hold dig opdateret med de nyeste indlæg.",
+        "GR": "Τελευταία νέα από το «{site_title}» — μείνετε ενημερωμένοι με τις πιο πρόσφατες δημοσιεύσεις.",
+        "HR": "Najnovije vijesti s «{site_title}» — ostanite informirani o najnovijim objavama.",
+        "NO": "Siste nyheter fra «{site_title}» — hold deg oppdatert med de nyeste innleggene.",
+        "LB": "Déi lescht Neiegkeeten vun «{site_title}» — bleift mat de neisten Artikelen um Lafenden.",
+    },
+    "sitemap": {
+        "EN": "Sitemap «{site_title}»: complete list of all sections and pages on the site.",
+        "RU": "Карта сайта «{site_title}»: полный список всех разделов и страниц сайта.",
+        "FR": "Plan du site «{site_title}» : liste complète de toutes les sections et pages.",
+        "DE": "Sitemap «{site_title}»: vollständige Liste aller Bereiche und Seiten der Website.",
+        "PL": "Mapa strony «{site_title}»: pełna lista wszystkich sekcji i stron witryny.",
+        "CZ": "Mapa stránek «{site_title}»: úplný seznam všech sekcí a stránek webu.",
+        "CS": "Mapa stránek «{site_title}»: úplný seznam všech sekcí a stránek webu.",
+        "PT": "Mapa do site «{site_title}»: lista completa de todas as secções e páginas.",
+        "IT": "Mappa del sito «{site_title}»: elenco completo di tutte le sezioni e le pagine.",
+        "NL": "Sitemap «{site_title}»: volledige lijst van alle secties en pagina's van de site.",
+        "ES": "Mapa del sitio «{site_title}»: lista completa de todas las secciones y páginas.",
+        "SK": "Mapa stránok «{site_title}»: úplný zoznam všetkých sekcií a stránok webu.",
+        "ET": "Saidikaart «{site_title}»: täielik loend kõigist jaotistest ja lehtedest.",
+        "LV": "Vietnes karte «{site_title}»: pilns visu sadaļu un lapu saraksts.",
+        "RO": "Harta site-ului «{site_title}»: lista completă a tuturor secțiunilor și paginilor.",
+        "SV": "Webbplatskarta «{site_title}»: fullständig lista över alla sektioner och sidor.",
+        "LT": "Svetainės žemėlapis «{site_title}»: pilnas visų skyrių ir puslapių sąrašas.",
+        "BG": "Карта на сайта «{site_title}»: пълен списък на всички раздели и страници.",
+        "SL": "Zemljevid spletnega mesta «{site_title}»: celoten seznam vseh razdelkov in strani.",
+        "HU": "Oldaltérkép «{site_title}»: a webhely összes szakaszának és oldalának teljes listája.",
+        "FI": "Sivukartta «{site_title}»: täydellinen luettelo kaikista osioista ja sivuista.",
+        "DA": "Sitemap «{site_title}»: komplet liste over alle sektioner og sider på sitet.",
+        "GR": "Χάρτης ιστότοπου «{site_title}»: πλήρης λίστα όλων των ενοτήτων και σελίδων.",
+        "HR": "Karta web mjesta «{site_title}»: cjelovit popis svih sekcija i stranica.",
+        "NO": "Nettstedskart «{site_title}»: fullstendig liste over alle seksjoner og sider.",
+        "LB": "Saiteplang «{site_title}»: vollständeg Lëscht vun alle Sektiounen a Säiten.",
+    },
+}
+
+
 EDITORIAL = {
     "EN": "Editorial Team",  "RU": "Редакция",       "FR": "La Rédaction",
     "DE": "Redaktion",       "PL": "Redakcja",        "CZ": "Redakce",
@@ -188,9 +276,29 @@ def get_page_title(slug: str, lang: str) -> str:
     return titles.get(lang) or titles.get("EN") or slug
 
 
+def get_page_description(slug: str, lang: str, site_title: str) -> str | None:
+    """Возвращает SEO-описание технической страницы с подставленным названием сайта."""
+    descs = PAGE_DESCRIPTIONS.get(slug, {})
+    template = descs.get(lang) or descs.get("EN")
+    if not template:
+        return None
+    return template.format(site_title=site_title)
+
+
+def get_lang_code(lang: str) -> str:
+    """Нормализует SITE_LANG к 2-буквенному uppercase-ключу для словарей.
+    Принимает как 'FR', так и 'fr_BE' → 'FR'."""
+    if "_" in lang:
+        return lang[:2].upper()
+    return lang.upper()
+
+
 def get_wp_locale(lang: str) -> str:
-    """Возвращает WP locale slug (например EN → en_US)."""
-    return LANG_MAP.get(lang, "en_US")
+    """Возвращает WP locale slug.
+    Принимает как 'FR' (→ fr_FR через LANG_MAP), так и 'fr_BE' (→ fr_BE напрямую)."""
+    if "_" in lang:
+        return lang
+    return LANG_MAP.get(lang.upper(), "en_US")
 
 
 def get_editorial_name(lang: str, site_title: str) -> str:

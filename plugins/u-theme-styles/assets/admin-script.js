@@ -54,6 +54,16 @@ jQuery(document).ready(function ($) {
         initColorPickers($target);
     });
 
+    // ─── Применить hex-цвет ко всем элементам u-color-field ────────────────
+    function setColorField(name, hex) {
+        var $field = $('[name="' + name + '"]').closest('.u-color-field');
+        if (!$field.length) return;
+        $field.find('.u-color-native').val(hex);
+        $field.find('.u-color-hex').val(hex);
+        $field.find('.u-color-swatch').css('background-color', hex);
+        $field.find('.u-color-picker').val(hex);
+    }
+
     // ─── Auto / Manual переключатель ────────────────────────────────────────
     $('#color-mode-toggle').on('change', function () {
         var isManual = this.checked;
@@ -64,7 +74,30 @@ jQuery(document).ready(function ($) {
             .toggleClass('manual',  isManual)
             .text(isManual ? 'Manual' : 'Auto');
         $('.tab-btn[data-target="colors"]').addClass('dirty');
-        if (isManual) initColorPickers($('#color-mode-manual'));
+
+        if (isManual) {
+            initColorPickers($('#color-mode-manual'));
+
+            // Если в conf.scss нет сохранённых ручных цветов — подгружаем сгенерированные
+            if (typeof uThemeData !== 'undefined' && !uThemeData.isManual) {
+                var $manual = $('#color-mode-manual');
+                $manual.addClass('u-colors-loading');
+                $.post(uThemeData.ajaxUrl, {
+                    action: 'u_theme_preview_colors',
+                    nonce:  uThemeData.nonce
+                })
+                .done(function (resp) {
+                    if (resp.success && resp.data) {
+                        $.each(resp.data, function (key, hex) {
+                            setColorField('u_fields[' + key + ']', hex);
+                        });
+                    }
+                })
+                .always(function () {
+                    $manual.removeClass('u-colors-loading');
+                });
+            }
+        }
     });
 
     // ─── Dirty-индикатор ────────────────────────────────────────────────────
@@ -165,6 +198,12 @@ jQuery(document).ready(function ($) {
             $('#toc-icon-dropdown').removeClass('is-open');
             $('#toc-icon-list').hide();
         }
+    });
+
+    // ─── Theme Mode: обновление активной кнопки сегментированного контрола ──
+    $(document).on('change', 'input[name="u_theme_mode"]', function () {
+        $('.u-mode-btn').removeClass('is-active');
+        $(this).closest('.u-mode-btn').addClass('is-active');
     });
 
     // ─── Первичная инициализация ─────────────────────────────────────────────

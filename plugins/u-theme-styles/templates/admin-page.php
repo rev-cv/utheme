@@ -453,11 +453,57 @@ function u_color_field(string $name, string $value): void {
                         </div>
                     </div>
                 <?php endforeach; ?>
+
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Breadcrumbs</h3>
+                        <select name="u_fields[breadcrumbs-separator]">
+                            <?php
+                            $sep_options = ['/' => '/', '|' => '|', '»' => '»', '>' => '>', '-' => '-'];
+                            $current_sep = $v['breadcrumbs-separator'] ?? '/';
+                            foreach ($sep_options as $val => $label): ?>
+                                <option value="<?= esc_attr($val) ?>"
+                                    <?= $current_sep === $val ? 'selected' : '' ?>>
+                                    <?= esc_html($label) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+                            <p class="u-desc">Разделитель между элементами хлебных крошек.</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- ── Colors ─────────────────────────────────────────────────── -->
             <section id="colors" class="tab-pane">
                 <h2>Colors</h2>
+
+                <div class="u-theme-mode-wrap">
+                    <span class="u-theme-mode-label">Theme Mode</span>
+                    <div class="u-theme-mode-group">
+                        <?php
+                        $mode_options = [
+                            'dark-only'  => 'Dark Only',
+                            'both'       => 'Dark &amp; Light',
+                            'light-only' => 'Light Only',
+                        ];
+                        foreach ($mode_options as $val => $lbl): ?>
+                            <label class="u-mode-btn <?= $theme_mode === $val ? 'is-active' : '' ?>">
+                                <input type="radio" name="u_theme_mode" value="<?= $val ?>"
+                                       <?= $theme_mode === $val ? 'checked' : '' ?>>
+                                <?= $lbl ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="u-desc" style="margin-top:6px">
+                        <b>Dark Only</b> — сайт всегда тёмный независимо от системных настроек.<br>
+                        <b>Dark &amp; Light</b> — адаптируется к системной теме пользователя.<br>
+                        <b>Light Only</b> — сайт всегда светлый.
+                    </p>
+                </div>
 
                 <div class="color-mode-switcher">
                     <label class="switcher-label">
@@ -494,12 +540,17 @@ function u_color_field(string $name, string $value): void {
                         </label>
                         <?php
                         $style_options = [
+                            'graphite'   => 'Graphite',
+                            'minimalist' => 'Minimalist',
                             'luxury'     => 'Luxury',
-                            'minimalist'    => 'Minimalist',
-                            'vibrant' => 'Vibrant',
-                            'graphite' => 'Graphite',
-                            'pastoral' => 'Pastoral',
-                            'japane' => 'Japane',
+                            'pastoral'   => 'Pastoral',
+                            'japane'     => 'Japane',
+                            'vibrant'    => 'Vibrant',
+                            'bold-dark'  => 'Bold Dark',
+                            'neon'       => 'Neon',
+                            'ocean'      => 'Ocean',
+                            'sunset'     => 'Sunset',
+                            'mono'       => 'Mono',
                         ];
                         ?>
                         <label>Style:

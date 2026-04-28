@@ -48,26 +48,6 @@ add_action('after_setup_theme', 'my_theme_setup');
 
 
 
-function custom_dequeue_gutenberg_styles()
-{
-    // 1. Определение шаблонов для исключения
-    $excluded_templates = array(
-        'article.php',
-        'articles.php',
-        'home.php',
-    );
-
-    // 2. Проверка, используется ли один из исключенных шаблонов
-    if (is_page_template($excluded_templates)) {
-        // Отключаем стили, так как мы находимся на "безопасном" шаблоне
-        wp_dequeue_style('wp-block-library');        // Основные стили Gutenberg
-        wp_dequeue_style('wp-block-library-theme');  // Тематические стили Gutenberg
-        wp_dequeue_style('global-styles');           // Глобальные стили (от FSE)
-    }
-}
-
-// Прикрепляем функцию к правильному хуку
-add_action('wp_enqueue_scripts', 'custom_dequeue_gutenberg_styles', 999);
 
 
 

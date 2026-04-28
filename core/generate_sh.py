@@ -4,7 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from .translations import (
     EDITORIAL, WELCOME_NEWS_TITLE, WELCOME_NEWS_CONTENT,
-    get_wp_locale, get_editorial_name,
+    get_editorial_name,
 )
 
 _TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
@@ -48,7 +48,7 @@ def generate_sh(manifest: dict, out_path: Path) -> None:
         "site":            manifest["site"],
         "pages":           manifest["pages"],
         "menus":           manifest.get("menus", {}),
-        "wp_locale":       get_wp_locale(lang),
+        "wp_locale":       manifest["site"]["wp_locale"],
         "editorial_first": EDITORIAL.get(lang) or EDITORIAL["EN"],
         "editorial":       get_editorial_name(lang, site_title),
         "welcome_title":   welcome_title,

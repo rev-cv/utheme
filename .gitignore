@@ -2,8 +2,9 @@
 .DS_Store
 Thumbs.db
 Desktop.ini
-.vscode/
+# .vscode/
 .idea/
+CLAUDE.md
 
 # --- Python & Automation ---
 __pycache__/

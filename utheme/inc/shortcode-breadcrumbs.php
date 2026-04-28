@@ -11,27 +11,11 @@ function my_custom_breadcrumbs_settings() {
         'show_in_rest' => true,
         'default' => true,
     ]);
-    register_setting('general', 'bc_separator', [
-        'type' => 'string',
-        'show_in_rest' => true,
-        'default' => '|',
-    ]);
-
     add_settings_section('bc_section', 'Breadcrumbs Settings', null, 'general');
 
     add_settings_field('bc_enable', 'Enable Breadcrumbs', function() {
         $val = get_option('bc_enable', 1);
         echo '<input type="checkbox" name="bc_enable" value="1" ' . checked(1, $val, false) . ' />';
-    }, 'general', 'bc_section');
-
-    add_settings_field('bc_separator', 'Separator', function() {
-        $val = get_option('bc_separator', '|');
-        $options = ['|', '/', '»', '>', '-'];
-        echo '<select name="bc_separator">';
-        foreach ($options as $opt) {
-            echo '<option value="'.esc_attr($opt).'" '.selected($val, $opt, false).'>'.$opt.'</option>';
-        }
-        echo '</select>';
     }, 'general', 'bc_section');
 }
 
@@ -120,7 +104,7 @@ function get_my_breadcrumbs() {
         return '';
     }
 
-    $sep = '<span class="separator"> ' . esc_html(get_option('bc_separator', '|')) . ' </span>';
+    $sep = '<span class="separator"> ' . esc_html(my_theme_get_config('breadcrumbs-separator', '/')) . ' </span>';
     $before = '<span class="last">';
     $after = '</span>';
 

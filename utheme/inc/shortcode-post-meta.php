@@ -10,7 +10,7 @@ function get_reading_time($post_id = null)
 
     $content = strip_tags($post->post_content);
 
-    $word_count = str_word_count($content);
+    $word_count = count(preg_split('~[^\p{L}\p{N}]+~u', $content, -1, PREG_SPLIT_NO_EMPTY));
 
     $minutes = ceil($word_count / 180);
 

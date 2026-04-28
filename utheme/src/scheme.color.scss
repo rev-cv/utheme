@@ -38,6 +38,30 @@
     } @else if $style == "minimalist" {
         $bg-l: #ffffff; $pr-l: #111111; $ac-l: $p-gen;
         $bg-d: #050505; $pr-d: #ffffff;
+
+    } @else if $style == "neon" {
+        $bg-l: #0a0a0f; $tx-l: #e8e8ff; $pr-l: hsl($hue, 100%, 60%);
+        $bg-d: #000000;
+        $ac-l: hsl(($hue + 120) % 360, 100%, 55%);
+
+    } @else if $style == "ocean" {
+        $bg-l: #F0F4F8; $tx-l: hsl($hue, 25%, 18%);
+        $pr-l: hsl($hue, 55%, 40%);
+        $bg-d: hsl($hue, 20%, 10%); $pr-d: hsl($hue, 45%, 70%);
+        $ac-l: hsl(($hue - 30 + 360) % 360, 60%, 45%);
+
+    } @else if $style == "sunset" {
+        $warm-hue: ($hue + 20) % 360;
+        $bg-l: #FFF8F2; $tx-l: hsl(20, 30%, 20%);
+        $pr-l: hsl($warm-hue, 70%, 45%);
+        $bg-d: hsl(20, 15%, 10%); $pr-d: hsl($warm-hue, 65%, 65%);
+        $ac-l: hsl(($warm-hue + 40) % 360, 80%, 50%);
+
+    } @else if $style == "mono" {
+        $bg-l: hsl($hue, 10%, 97%); $tx-l: hsl($hue, 20%, 15%);
+        $pr-l: hsl($hue, 40%, 35%);
+        $bg-d: hsl($hue, 15%, 8%); $pr-d: hsl($hue, 30%, 75%);
+        $ac-l: hsl($hue, 60%, 50%);
     }
 
     @return (
@@ -49,7 +73,7 @@
         "ac-d": if($ac-d, $ac-d, color.adjust($ac-l, $lightness: 10%)),
         "tx-d": $tx-d,
         "bg-d": $bg-d,
-        "h1-l": if($style == "bold-dark", #fff, $pr-l),
+        "h1-l": if($style == "bold-dark" or $style == "neon", #fff, $pr-l),
         "brd-l": color.mix($pr-l, $bg-l, 15%),
         "brd-d": color.mix($pr-d, $bg-d, 20%)
     );
