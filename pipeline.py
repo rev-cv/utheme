@@ -75,22 +75,24 @@ def run():
     check_links.check_links_in_articles(structure["pages"])
 
     # ── 7. СБОРКА МАНИФЕСТА ──────────────────────────────────────────────────
-    _phase(7, 10, "Сборка manifest.json")
+    _phase(7, 10, "Сборка и валидация manifest.json")
     manifest = _build_manifest(structure, pics)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"  Записан: {MANIFEST.relative_to(ROOT_DIR).as_posix()}")
-
-    # ── 8. ВАЛИДАЦИЯ МАНИФЕСТА ───────────────────────────────────────────────
-    _phase(8, 10, "Валидация manifest.json")
     _validate_manifest(manifest)
 
-    # ── 9. ГЕНЕРАЦИЯ BASH-СКРИПТА ────────────────────────────────────────────
+    # ── 8. ПРОВЕРКА ВНУТРЕННИХ ССЫЛОК ────────────────────────────────────────
+    _phase(8, 10, "Проверка внутренних ссылок")
+    from core.check_internal_links import check_internal_links
+    check_internal_links(manifest, STAGING_DIR)
+
+    # ── 10. ГЕНЕРАЦИЯ BASH-СКРИПТА ───────────────────────────────────────────
     _phase(9, 10, "Генерация wp-conf/provision.sh")
     WP_CONF_DIR.mkdir(exist_ok=True)
     from core.generate_sh import generate_sh
     generate_sh(manifest, WP_CONF_DIR / "provision.sh")
 
-    # ── 10. ДЕПЛОЙ ───────────────────────────────────────────────────────────
+    # ── 11. ДЕПЛОЙ ───────────────────────────────────────────────────────────
     _phase(10, 10, "Деплой: Docker → WP install → медиа → контент")
     from core import docker_setup
     docker_setup.run(manifest, STAGING_DIR, WP_CONF_DIR)

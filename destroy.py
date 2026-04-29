@@ -8,6 +8,7 @@ Works on Linux and Windows.
 """
 
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -115,6 +116,15 @@ def main():
         print(f"  [WARN] mariadb command exited with code {code}")
     else:
         print("  [OK] Database dropped.")
+
+    # --- Step 3: remove local uploads/ folder ---
+    uploads_dir = project_dir / "uploads"
+    if uploads_dir.exists():
+        print("\n[3/3] Removing uploads/ folder...")
+        shutil.rmtree(uploads_dir)
+        print("  [OK] uploads/ removed.")
+    else:
+        print("\n[3/3] uploads/ not found, skipping.")
 
     print("\nDone. Site destroyed.")
 

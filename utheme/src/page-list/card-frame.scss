@@ -53,21 +53,27 @@
             }
         }
 
-        h3 {
-            flex-shrink: 0; 
+        h2 {
+            @include f.font-hd;
+            flex-shrink: 0;
             padding: 1em 1em 0 1em;
             margin: 0;
             font-size: clamp(1rem, 2vw, 1.1rem);
             line-height: 1.3;
-            display: -webkit-box; 
+            display: -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             overflow: hidden;
             text-overflow: ellipsis;
             font-weight: 800;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            @include f.mode((background-color: (conf.$color-accent-light, conf.$color-accent-dark)));
         }
 
         p {
+            @include f.font-txt;
             flex-shrink: 0; 
             margin: 0;
             padding: 0 1em;

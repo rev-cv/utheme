@@ -20,7 +20,7 @@ $img_url = get_the_post_thumbnail_url($post_id, 'medium_large');
         <?php endif; ?>
     </a>
     <div class="card-content">
-        <h3><a href="<?php echo esc_url($permalink); ?>"><?php echo esc_html($title); ?></a></h3>
+        <h2><a href="<?php echo esc_url($permalink); ?>"><?php echo esc_html($title); ?></a></h2>
         <p><?php echo wp_trim_words(get_the_excerpt($post_id), 15); ?></p>
         <a class="read-more" href="<?php echo esc_url($permalink); ?>"><?php echo esc_html($read_more_text); ?></a>
     </div>

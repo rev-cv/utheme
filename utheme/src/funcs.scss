@@ -75,14 +75,18 @@
 
 
 @function get-radius($component: "default") {
-    // 1. Достаем всю карту выбранного вайба
     $current-vibe-map: map.get(radius.$radius-schemes, conf.$radius-vibe);
 
-    // 2. Проверяем, есть ли в этом вайбе специфичный ключ для компонента
     @if map.has-key($current-vibe-map, $component) {
         @return map.get($current-vibe-map, $component);
     }
 
-    // 3. Если ключа нет или он не передан, отдаем default этого вайба
     @return map.get($current-vibe-map, "default");
+}
+
+// Для контекстов, где нужно строго одно значение: calc(), смешанный shorthand,
+// border-top-*-radius / border-bottom-*-radius.
+// Если схема задаёт несколько значений (chess, velocity), берём первое.
+@function get-radius-single($component: "default") {
+    @return list.nth(get-radius($component), 1);
 }

@@ -11,26 +11,21 @@ $radius-schemes: (
         "card": 10px
     ),
 
-    // Спортивный, адаптивный (с использованием clamp)
-    "dynamic": ( //
-        "default": clamp(10px, 2vw, 20px),
+    // Спортивный, адаптивный
+    "dynamic": (
+        "default": 16px,
         "header": 0px,
-        "card": clamp(16px, 4vw, 32px),
+        "card": 24px,
         "button": 999px
     ),
 
     "rounded": (
-        "default": clamp(10px, 2.5vw, 30px),
+        "default": 20px,
     ),
 
+    // Асимметричные углы: маленький + большой на противоположных диагоналях
     "velocity": (
-        "default": clamp(4px, 1.5vw, 16px)
-        /* Верх-Лево */
-        clamp(28px, 8vw, 40px)
-        /* Верх-Право */
-        clamp(4px, 1.5vw, 16px)
-        /* Низ-Право */
-        clamp(28px, 8vw, 40px), //
+        "default": 8px 32px 8px 32px,
     ),
 
     // Шахматный паттерн — скруглены два противоположных угла (другая диагональ, чем velocity)

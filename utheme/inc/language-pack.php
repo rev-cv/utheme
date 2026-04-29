@@ -25,7 +25,8 @@ $HELP_URLS = [
     'el' => 'https://www.kethea.gr/',
     'hr' => 'https://www.igraj-odgovorno.hr/',
     'no' => 'https://www.hjelpelinjen.no/',
-    'lb' => 'https://www.fnaj.lu/'
+    'lb' => 'https://www.fnaj.lu/',
+    'ga' => 'https://www.gambleaware.ie/'
 ];
 
 function get_site_translation($key = 'read_more')
@@ -70,7 +71,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Διαβάστε περισσότερα',
             'hr' => 'Pročitajte više',
             'no' => 'Les mer',
-            'lb' => 'Méi liesen'
+            'lb' => 'Méi liesen',
+            'ga' => 'Léigh níos mó'
         ],
         'not_found' => [
             'es' => 'Página no encontrada',
@@ -97,7 +99,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Η σελίδα δεν βρέθηκε',
             'hr' => 'Stranica nije pronađena',
             'no' => 'Siden ble ikke funnet',
-            'lb' => 'Säit net fonnt'
+            'lb' => 'Säit net fonnt',
+            'ga' => 'Leathanach gan aimsiú'
         ],
         'toc' => [
             'es' => 'Índice de contenidos',
@@ -124,7 +127,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Πίνακας περιεχομένων',
             'hr' => 'Sadržaj',
             'no' => 'Innholdsfortegnelse',
-            'lb' => 'Inhaltsverzeechnes'
+            'lb' => 'Inhaltsverzeechnes',
+            'ga' => 'Clár Ábhair'
         ],
         'reading_time' => [
             'es' => 'Tiempo de lectura',
@@ -151,7 +155,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Χρόνος ανάγνωσης',
             'hr' => 'Vrijeme čitanja',
             'no' => 'Lesetid',
-            'lb' => 'Liesezeit'
+            'lb' => 'Liesezeit',
+            'ga' => 'Am léitheoireachta'
         ],
         'mins' => [
             'es' => 'min',
@@ -178,7 +183,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'λεπτά',
             'hr' => 'min',
             'no' => 'min',
-            'lb' => 'min'
+            'lb' => 'min',
+            'ga' => 'nóim'
         ],
         'kb_bets' => [
             'es' => 'Su base de conocimientos para apuestas más inteligentes',
@@ -205,7 +211,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Η βάση γνώσεών σας για εξυπνότερα στοιχήματα',
             'hr' => 'Vaša baza znanja za pametnije oklade',
             'no' => 'Din kunnskapsbase for smartere spill',
-            'lb' => 'Är Wëssensbasis fir méi kloug Wetten'
+            'lb' => 'Är Wëssensbasis fir méi kloug Wetten',
+            'ga' => 'Do bhunachar eolais le haghaidh geallta níos cliste'
         ],
         'legal_disclaimer' => [
             'es' => 'Esta guía es solo informativa. Por favor, juegue de forma responsable. 18+',
@@ -232,7 +239,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Αυτός ο οδηγός είναι μόνο για ενημερωτικούς σκοπούς. Παρακαλούμε παίξτε υπεύθυνα. 18+',
             'hr' => 'Ovaj vodič je samo u informativne svrhe. Molimo igrajte odgovorno. 18+',
             'no' => 'Denne veiledningen er kun til informasjonsformål. Spill ansvarlig. 18+',
-            'lb' => 'Dëse Guide ass nëmme fir Informatiounszwecker. Spillt verantwortlech. 18+'
+            'lb' => 'Dëse Guide ass nëmme fir Informatiounszwecker. Spillt verantwortlech. 18+',
+            'ga' => 'Is ar mhaithe le faisnéis amháin an treoir seo. Imir go freagrach. 18+'
         ],
         'cookie_notice' => [
             'es' => 'Utilizamos cookies para mejorar su experiencia. Al continuar en el sitio, acepta <a href="' . $cookie_url . '">nuestra política</a>.',
@@ -259,7 +267,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Χρησιμοποιούμε cookies για να βελτιώσουμε την εμπειρία σας. Παραμένοντας στον ιστότοπο, αποδέχεστε την <a href="' . $cookie_url . '">πολιτική μας</a>.',
             'hr' => 'Koristimo kolačiće kako bismo poboljšali vaše iskustvo. Ostajanjem na stranici, slažete se s <a href="' . $cookie_url . '">našom politikom</a>.',
             'no' => 'Vi bruker informasjonskapsler for å forbedre din opplevelse. Ved å bli på siden, godtar du <a href="' . $cookie_url . '">vår policy</a>.',
-            'lb' => 'Mir benotze Cookies fir Är Erfahrung ze verbesseren. Andeems Dir op der Säit bleift, stëmmt Dir <a href="' . $cookie_url . '">eiser Politik</a> zou.'
+            'lb' => 'Mir benotze Cookies fir Är Erfahrung ze verbesseren. Andeems Dir op der Säit bleift, stëmmt Dir <a href="' . $cookie_url . '">eiser Politik</a> zou.',
+            'ga' => 'Úsáidimid fianáin chun do thaithí a fheabhsú. Trí leanúint ar an suíomh, aontaíonn tú le <a href="' . $cookie_url . '">ár mbeartas</a>.'
         ],
         'cookie_notice_modal' => [
             'es' => 'Utilizamos cookies para mejorar su experiencia, analizar el tráfico y personalizar anuncios. Por favor, acepte o configure sus preferencias.',
@@ -286,7 +295,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Χρησιμοποιούμε cookies για να βελτιώσουμε την εμπειρία σας, να αναλύσουμε την κίνηση και να εξατομικεύσουμε τις διαφημίσεις. Παρακαλούμε αποδεχτείτε ή ρυθμίστε τις προτιμήσεις σας.',
             'hr' => 'Koristimo kolačiće za poboljšanje vašeg iskustva, analizu prometa i personalizaciju oglasa. Prihvatite ili postavite svoje preferencije.',
             'no' => 'Vi bruker informasjonskapsler for å forbedre din opplevelse, analysere trafikk og tilpasse annonser. Aksepter eller administrer dine preferanser.',
-            'lb' => 'Mir benotze Cookies fir Är Erfahrung ze verbesseren, de Traffic z\'analyséieren an d\'Annoncen ze personaliséieren. Acceptéiert oder setzt Är Preferenzen.'
+            'lb' => 'Mir benotze Cookies fir Är Erfahrung ze verbesseren, de Traffic z\'analyséieren an d\'Annoncen ze personaliséieren. Acceptéiert oder setzt Är Preferenzen.',
+            'ga' => 'Úsáidimid fianáin chun do thaithí a fheabhsú, trácht a anailísiú agus fógraí a phearsantú. Glac leo nó cumraigh do roghanna.'
         ],
         'created_by_editorial' => [
             'es' => 'Creado por la redacción de <a href="' . $aboutUrl . '" title="Sobre nosotros">«' . $siteName . '»</a>',
@@ -313,7 +323,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Δημιουργήθηκε από τη συντακτική ομάδα του <a href="' . $aboutUrl . '" title="Σχετικά με εμάς">«' . $siteName . '»</a>',
             'hr' => 'Kreirao urednički tim <a href="' . $aboutUrl . '" title="O nama">«' . $siteName . '»</a>',
             'no' => 'Laget av redaksjonen i <a href="' . $aboutUrl . '" title="Om oss">«' . $siteName . '»</a>',
-            'lb' => 'Erstallt vum Redaktiounsteam vun <a href="' . $aboutUrl . '" title="Iwwer eis">«' . $siteName . '»</a>'
+            'lb' => 'Erstallt vum Redaktiounsteam vun <a href="' . $aboutUrl . '" title="Iwwer eis">«' . $siteName . '»</a>',
+            'ga' => 'Cruthaithe ag foireann eagarthóireachta <a href="' . $aboutUrl . '" title="Fúinn">«' . $siteName . '»</a>'
         ],
         'affiliate_disclosure' => [
             'es' => 'Este sitio contiene enlaces de afiliados. Podemos recibir una comisión si realiza una compra a través de ellos, sin costo adicional para usted.',
@@ -340,7 +351,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Αυτός ο ιστότοπος περιέχει συνδέσμους συνεργατών. Ενδέχεται να λάβουμε προμήθεια εάν πραγματοποιήσετε μια αγορά μέσω αυτών, χωρίς επιπλέον κόστος για εσάς.',
             'hr' => 'Ova stranica sadrži partnerske veze. Možemo primiti proviziju ako obavite kupnju putem njih, bez dodatnih troškova za vas.',
             'no' => 'Dette nettstedet inneholder affiliatekoblinger. Vi kan motta en provisjon hvis du gjør et kjøp gjennom dem, uten ekstra kostnad for deg.',
-            'lb' => 'Dëse Site enthält Partnerlinks. Mir kënne eng Kommissioun kréien wann Dir duerch hinnen eppes kafft, ouni zousätzlech Käschten fir Iech.'
+            'lb' => 'Dëse Site enthält Partnerlinks. Mir kënne eng Kommissioun kréien wann Dir duerch hinnen eppes kafft, ouni zousätzlech Käschten fir Iech.',
+            'ga' => 'Tá naisc cleamhnaithe ar an suíomh seo. Féadfaimid coimisiún a fháil má dhéanann tú ceannach tríothu, gan costas breise duit.'
         ],
         'help_text' => [
             'es' => 'Si tiene problemas con el juego, puede encontrar ayuda aquí',
@@ -367,7 +379,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Εάν αντιμετωπίζετε πρόβλημα εθισμού στον τζόγο, μπορείτε να βρείτε βοήθεια εδώ',
             'hr' => 'Ako imate problema s ovisnošću o kockanju, možete pronaći pomoć ovdje',
             'no' => 'Hvis du sliter med spillavhengighet, kan du finne hjelp her',
-            'lb' => 'Wann Dir mat Spillsucht kämpft, kënnt Dir hei Hëllef fannen'
+            'lb' => 'Wann Dir mat Spillsucht kämpft, kënnt Dir hei Hëllef fannen',
+            'ga' => 'Má tá deacracht agat le andúil cearrbhachais, is féidir leat cabhair a fháil anseo'
         ],
         '404_title' => [
             'es' => 'Página no encontrada',
@@ -394,7 +407,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Η σελίδα δεν βρέθηκε',
             'hr' => 'Stranica nije pronađena',
             'no' => 'Siden ble ikke funnet',
-            'lb' => 'Säit net fonnt'
+            'lb' => 'Säit net fonnt',
+            'ga' => 'Leathanach gan aimsiú'
         ],
         '404_description' => [
             'es' => 'Lo sentimos, la página solicitada ya no existe o ha sido movida.',
@@ -421,7 +435,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Λυπούμαστε, η σελίδα που ζητήσατε δεν υπάρχει πλέον ή έχει μετακινηθεί.',
             'hr' => 'Nažalost, tražena stranica više ne postoji ili je premještena.',
             'no' => 'Beklager, den forespurte siden eksisterer ikke lenger eller har blitt flyttet.',
-            'lb' => 'Entschëllegt, déi ugefrot Säit existéiert net méi oder gouf geréckelt.'
+            'lb' => 'Entschëllegt, déi ugefrot Säit existéiert net méi oder gouf geréckelt.',
+            'ga' => 'Tá brón orainn, níl an leathanach atá uait ann a thuilleadh nó tá sé bogtha.'
         ],
         '404_back_home' => [
             'es' => 'Volver al inicio',
@@ -448,7 +463,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Επιστροφή στην αρχική',
             'hr' => 'Natrag na početnu',
             'no' => 'Tilbake til hjem',
-            'lb' => 'Zréck zur Haaptsäit'
+            'lb' => 'Zréck zur Haaptsäit',
+            'ga' => 'Ar ais go dtí an baile'
         ],
         '404_go_to_kb' => [
             'es' => 'Ir a la base de conocimientos',
@@ -475,7 +491,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Μετάβαση στη βάση γνώσεων',
             'hr' => 'Idi na bazu znanja',
             'no' => 'Gå til kunnskapsbasen',
-            'lb' => 'Gitt op d\'Wëssensbasis'
+            'lb' => 'Gitt op d\'Wëssensbasis',
+            'ga' => 'Téigh go dtí an bunachar eolais'
         ],
         'accept_all' => [
             'es' => 'Aceptar todo',
@@ -502,7 +519,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Αποδοχή όλων',
             'hr' => 'Prihvati sve',
             'no' => 'Godta alle',
-            'lb' => 'All akzeptéieren'
+            'lb' => 'All akzeptéieren',
+            'ga' => 'Glac le gach ceann'
         ],
         'reject_all' => [
             'es' => 'Rechazar todo',
@@ -529,7 +547,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Απόρριψη όλων',
             'hr' => 'Odbij sve',
             'no' => 'Avvis alle',
-            'lb' => 'All ofleenen'
+            'lb' => 'All ofleenen',
+            'ga' => 'Diúltaigh do gach ceann'
         ],
         'settings' => [
             'es' => 'Configurar',
@@ -556,7 +575,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Ρυθμίσεις',
             'hr' => 'Postavke',
             'no' => 'Innstillinger',
-            'lb' => 'Astellungen'
+            'lb' => 'Astellungen',
+            'ga' => 'Socruithe'
         ],
         'privacy_policy' => [
             'es' => 'Política de privacidad',
@@ -583,7 +603,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Πολιτική Απορρήτου',
             'hr' => 'Pravila privatnosti',
             'no' => 'Personvernerklæring',
-            'lb' => 'Dateschutzpolitik'
+            'lb' => 'Dateschutzpolitik',
+            'ga' => 'Beartas Príobháideachta'
         ],
         'cookie_policy' => [
             'es' => 'Política de cookies',
@@ -610,7 +631,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Πολιτική Cookies',
             'hr' => 'Pravila o kolačićima',
             'no' => 'Informasjonskapselpolicy',
-            'lb' => 'Cookie-Politik'
+            'lb' => 'Cookie-Politik',
+            'ga' => 'Beartas Fianán'
         ],
         'information' => [
             'es' => 'Información',
@@ -637,7 +659,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Πληροφορίες',
             'hr' => 'Informacije',
             'no' => 'Informasjon',
-            'lb' => 'Informatioun'
+            'lb' => 'Informatioun',
+            'ga' => 'Faisnéis'
         ],
         'disclaimer' => [
             'es' => 'Aviso legal',
@@ -664,7 +687,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Αποποίηση ευθυνών',
             'hr' => 'Izjava o odricanju odgovornosti',
             'no' => 'Ansvarsfraskrivelse',
-            'lb' => 'Haftungsausschloss'
+            'lb' => 'Haftungsausschloss',
+            'ga' => 'Séanadh'
         ],
         'related_articles' => [
             'es' => 'Artículos relacionados',
@@ -691,7 +715,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Σχετικά άρθρα',
             'hr' => 'Povezani članci',
             'no' => 'Relaterte artikler',
-            'lb' => 'Verwandt Artikelen'
+            'lb' => 'Verwandt Artikelen',
+            'ga' => 'Ailt Ghaolmhara'
         ],
         'pages' => [
             'es' => 'Páginas',
@@ -718,7 +743,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Σελίδες',
             'hr' => 'Stranice',
             'no' => 'Sider',
-            'lb' => 'Säiten'
+            'lb' => 'Säiten',
+            'ga' => 'Leathanaigh'
         ],
         'news' => [
             'es' => 'Noticias',
@@ -745,7 +771,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Νέα',
             'hr' => 'Vijesti',
             'no' => 'Nyheter',
-            'lb' => 'Neiegkeeten'
+            'lb' => 'Neiegkeeten',
+            'ga' => 'Nuacht'
         ],
         'home' => [
             'es' => 'Inicio',
@@ -772,7 +799,8 @@ function get_site_translation($key = 'read_more')
             'el' => 'Αρχική',
             'hr' => 'Početna',
             'no' => 'Hjem',
-            'lb' => 'Heem'
+            'lb' => 'Heem',
+            'ga' => 'Baile'
         ],
         'sitemap-description' => [
             'es' => "Mapa del sitio $siteName: lista completa de secciones y páginas.",
@@ -800,6 +828,7 @@ function get_site_translation($key = 'read_more')
             'hr' => "Karta web stranice $siteName: kompletan popis sekcija i stranica.",
             'no' => "Nettstedskart $siteName: fullstendig liste over seksjoner og sider.",
             'lb' => "Saiteplang $siteName: vollständeg Lëscht vu Sektiounen a Säiten.",
+            'ga' => "Léarscáil suímh $siteName: liosta iomlán de rannóga agus leathanaigh.",
         ],
     ];
 

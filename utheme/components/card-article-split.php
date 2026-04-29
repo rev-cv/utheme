@@ -18,7 +18,7 @@ $img_url = get_the_post_thumbnail_url($post_id, 'medium_large');
         <div class="card-split__image" <?php if ($img_url) : ?>style="background-image: url('<?php echo esc_url($img_url); ?>');"<?php endif; ?>></div>
         <div class="card-split__overlay">
             <div class="card-split__content">
-                <h3><?php echo esc_html($title); ?></h3>
+                <h2><?php echo esc_html($title); ?></h2>
                 <p><?php echo wp_trim_words(get_the_excerpt($post_id), 15); ?></p>
                 <span class="card-split__read-more"><?php echo get_site_translation('read_more'); ?></span>
             </div>

@@ -4,7 +4,7 @@
 .yesno-box {
     margin: 2rem 0;
     overflow: hidden;
-    border-radius: 3px 3px f.get-radius() f.get-radius();
+    border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
 
     // Сетка для колонок.
     // Учитываем структуру WP: .wp-block-group > .wp-block-group__inner-container > col1 + col2

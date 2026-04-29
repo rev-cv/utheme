@@ -5,6 +5,7 @@ Desktop.ini
 # .vscode/
 .idea/
 CLAUDE.md
+TASKS.md
 
 # --- Python & Automation ---
 __pycache__/

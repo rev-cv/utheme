@@ -39,7 +39,8 @@
             flex-direction: column;
             flex-grow: 1;
 
-            h3 {
+            h2 {
+                @include f.font-hd;
                 margin: 0 0 10px 0;
                 font-size: clamp(.8rem, 2vw, 1rem);
 

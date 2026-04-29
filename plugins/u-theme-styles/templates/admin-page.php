@@ -339,7 +339,7 @@ function u_color_field(string $name, string $value): void {
                         'desc'        => 'Стиль отображения главного меню сайта.',
                         'options'     => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic', 'hierarchical'],
                         'switch'      => 'is-menu-title',
-                        'switch_desc' => 'Показывать название сайта в главном меню (только для boring)',
+                        'switch_desc' => 'Показывать название сайта в главном меню',
                     ],
                     'footer-menu' => [
                         'title'   => 'Footer Menu',
@@ -481,30 +481,6 @@ function u_color_field(string $name, string $value): void {
             <section id="colors" class="tab-pane">
                 <h2>Colors</h2>
 
-                <div class="u-theme-mode-wrap">
-                    <span class="u-theme-mode-label">Theme Mode</span>
-                    <div class="u-theme-mode-group">
-                        <?php
-                        $mode_options = [
-                            'dark-only'  => 'Dark Only',
-                            'both'       => 'Dark &amp; Light',
-                            'light-only' => 'Light Only',
-                        ];
-                        foreach ($mode_options as $val => $lbl): ?>
-                            <label class="u-mode-btn <?= $theme_mode === $val ? 'is-active' : '' ?>">
-                                <input type="radio" name="u_theme_mode" value="<?= $val ?>"
-                                       <?= $theme_mode === $val ? 'checked' : '' ?>>
-                                <?= $lbl ?>
-                            </label>
-                        <?php endforeach; ?>
-                    </div>
-                    <p class="u-desc" style="margin-top:6px">
-                        <b>Dark Only</b> — сайт всегда тёмный независимо от системных настроек.<br>
-                        <b>Dark &amp; Light</b> — адаптируется к системной теме пользователя.<br>
-                        <b>Light Only</b> — сайт всегда светлый.
-                    </p>
-                </div>
-
                 <div class="color-mode-switcher">
                     <label class="switcher-label">
                         <span>Auto Generator</span>
@@ -520,6 +496,24 @@ function u_color_field(string $name, string $value): void {
                           id="color-mode-status">
                         <?= $manual_mode ? 'Manual' : 'Auto' ?>
                     </span>
+                </div>
+
+                <div class="u-theme-mode-wrap">
+                    <div class="u-theme-mode-group">
+                        <?php
+                        $mode_options = [
+                            'dark-only'  => 'Dark Only',
+                            'both'       => 'Dark &amp; Light',
+                            'light-only' => 'Light Only',
+                        ];
+                        foreach ($mode_options as $val => $lbl): ?>
+                            <label class="u-mode-btn <?= $theme_mode === $val ? 'is-active' : '' ?>">
+                                <input type="radio" name="u_theme_mode" value="<?= $val ?>"
+                                       <?= $theme_mode === $val ? 'checked' : '' ?>>
+                                <?= $lbl ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
 
                 <!-- Auto mode -->

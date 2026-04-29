@@ -45,6 +45,17 @@ article {
         }
     }
 
+    @if conf.$is-img_contain == 'true' {
+        figure:has(img):first-of-type img {
+            min-height: 30vh;
+            width: 80%;
+
+            @media (max-width: 800px) {
+                width: 100%;
+            }
+        }
+    }
+
     figure:has(:has(img), .mobile-betting-container, .platforms-comparison, .bottom-space-p) {
         margin-bottom: 1.6rem;
     }

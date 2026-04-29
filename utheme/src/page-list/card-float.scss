@@ -41,7 +41,8 @@
             object-fit: cover;
         }
 
-        h3 {
+        h2 {
+            @include f.font-hd;
             background: #000;
             color: #fff;
             padding: 10px 15px;
@@ -71,6 +72,12 @@
             margin: 0;
             font-size: 0.9rem;
             color: rgba(conf.$color-text-light, 0.7);
+
+            // Ограничение в 3 строки
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
 
             @media (prefers-color-scheme: dark) {
                 color: rgba(conf.$color-text-dark, 0.7);

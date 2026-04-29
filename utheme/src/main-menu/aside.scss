@@ -267,18 +267,18 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             /* Если есть кнопка подменю — убираем правый бордер и скругление у ссылки */
             &.has-submenu .menu-item-row > a {
                 border-right: none;
-                border-radius: f.get-radius() 0 0 f.get-radius();
+                border-radius: f.get-radius-single() 0 0 f.get-radius-single();
             }
 
             /* При наведении на строку — восстанавливаем скругление на стыке */
             &.has-submenu .menu-item-row:hover > a {
-                border-top-right-radius: f.get-radius();
-                border-bottom-right-radius: f.get-radius();
+                border-top-right-radius: f.get-radius-single();
+                border-bottom-right-radius: f.get-radius-single();
             }
 
             &.has-submenu .menu-item-row:hover > .submenu-toggle {
-                border-top-left-radius: f.get-radius();
-                border-bottom-left-radius: f.get-radius();
+                border-top-left-radius: f.get-radius-single();
+                border-bottom-left-radius: f.get-radius-single();
             }
 
             /* Кнопка раскрытия подменю */
@@ -287,7 +287,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 background: conf.$color-section-light;
                 border: 1px solid transparent;
                 border-left: none;
-                border-radius: 0 f.get-radius() f.get-radius() 0;
+                border-radius: 0 f.get-radius-single() f.get-radius-single() 0;
                 padding: 0 10px;
                 cursor: pointer;
                 color: conf.$color-text-light;

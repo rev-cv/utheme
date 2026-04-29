@@ -51,16 +51,19 @@
             margin-bottom: 15px;
         }
 
-        h3 {
+        h2 {
             @include f.font-hd;
             font-size: clamp(1rem, 2vw, 1.1rem);
             margin: 0;
             padding: 0 5px;
             text-align: center;
-            // Truncate long titles to a single line
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            @include f.mode((background-color: (conf.$color-accent-light, conf.$color-accent-dark)));
         }
 
         // No <p> tag in this card style

@@ -22,7 +22,6 @@ $colorH1-dark: conf.$color-H1-dark;
 article,
 aside,
 .header-box {
-
     h1,
     h2,
     .page-toc-title,
@@ -72,7 +71,12 @@ aside,
             display: block;
         }
     }
+}
 
+.sitemap-container,
+article,
+aside,
+.header-box {
     h2,
     .page-toc-title {
         @include f.font-hd;
@@ -86,9 +90,7 @@ aside,
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        @include f.mode(( //
-                background-color: (conf.$color-accent-light, conf.$color-accent-dark),
-            ));
+        @include f.mode((background-color: (conf.$color-accent-light, conf.$color-accent-dark)));
 
         // &::after {
         //     content: "";
@@ -126,31 +128,22 @@ aside,
         @include f.font-txt;
         font-size: clamp(0.8rem, 2.5vw, 1.3rem);
         font-weight: 500;
-
-        @include f.mode(( //
-                color: (conf.$color-primary-light, conf.$color-primary-dark),
-            ));
+        @include f.mode((color: (conf.$color-primary-light, conf.$color-primary-dark)));
     }
 
     h4 {
         @include f.font-txt;
-        @include f.mode(( //
-                color: (conf.$color-primary-light, conf.$color-primary-dark),
-            ));
+        @include f.mode((color: (conf.$color-primary-light, conf.$color-primary-dark)));
     }
 
     h5 {
         @include f.font-txt;
-        @include f.mode(( //
-                color: (conf.$color-primary-light, conf.$color-primary-dark),
-            ));
+        @include f.mode((color: (conf.$color-primary-light, conf.$color-primary-dark)));
     }
 
     h6 {
         @include f.font-txt;
-        @include f.mode(( //
-                color: (conf.$color-primary-light, conf.$color-primary-dark),
-            ));
+        @include f.mode((color: (conf.$color-primary-light, conf.$color-primary-dark)));
     }
 
     hr+ :is(h3, h4, h5, h6, h1, h2) {

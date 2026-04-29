@@ -189,6 +189,14 @@ for page_file in /tmp/staging/pages/*.wp; do
 done
 echo "Placeholders resolved."
 
+# Заменяем плейсхолдеры внутренних ссылок %%PAGEURL:slug%% → реальный URL
+echo "Resolving internal link placeholders in .wp files..."
+for page_file in /tmp/staging/pages/*.wp; do
+    [ -f "$page_file" ] || continue
+    sed -i -E "s|%%PAGEURL:([^%]+)%%|${SITE_URL}/\1/|g" "$page_file"
+done
+echo "Internal link placeholders resolved."
+
 # ===========================================================================
 # 8. PAGES
 # Все страницы создаются в одном PHP-процессе (один бутстрап WP).

@@ -302,10 +302,20 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
     if not container:
         return ""
 
-    # модификация всех ссылок для открытия в новой вкладке
+    # внешние ссылки → новая вкладка; внутренние → плейсхолдер %%PAGEURL:slug%%
     for a_tag in container.find_all('a', href=True):
-        a_tag['target'] = '_blank'
-        a_tag['rel'] = 'noopener'
+        href = a_tag['href']
+        if href.startswith(('http://', 'https://', 'mailto:', 'tel:', '#', '//', 'javascript:')):
+            a_tag['target'] = '_blank'
+            a_tag['rel'] = 'noopener'
+        else:
+            # извлекаем slug — последний непустой сегмент пути
+            from urllib.parse import urlparse
+            path = urlparse(href).path.rstrip('/')
+            slug = path.split('/')[-1] if path else ''
+            if slug:
+                a_tag['href'] = f'%%PAGEURL:{slug}%%'
+            # не добавляем target="_blank" для внутренних ссылок
 
     
     # все DIV распаковываются и удаляются за исключением тех, что в этом списке

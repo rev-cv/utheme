@@ -23,7 +23,13 @@ article {
         p, a, div, time, span {
             @include f.font-txt;
             font-size: clamp(14px, 2vw, 18px);
-            text-wrap: nowrap; 
+            text-wrap: nowrap;
+
+            &.author {
+                text-wrap: wrap;
+                word-break: break-word;
+                max-width: 100%;
+            }
             user-select: none;
             text-decoration: none;
             line-height: 1em;

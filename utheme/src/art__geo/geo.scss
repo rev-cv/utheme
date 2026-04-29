@@ -1,0 +1,471 @@
+@use 'sass:color';
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$sp:    conf.$default-space;
+$sp-sm: calc(#{$sp} * 0.55);
+$sp-xs: calc(#{$sp} * 0.35);
+
+/* ─── Brand-list card widget ─────────────────────────────── */
+
+.dynamic-injection-container {
+
+    .tc-brand-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(444px, 1fr));
+        gap: $sp-xs;
+
+        @media (max-width: 540px) {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+    }
+
+    /* ── Card ──────────────────────────────────────────────── */
+    .tc-card {
+        display: grid;
+        grid-template-columns: 4.5rem 1fr auto;
+        grid-template-areas:
+            "logo info  cta"
+            ".    extra extra";
+        align-items: center;
+        column-gap: $sp-sm;
+        row-gap: 0;
+        padding: $sp-sm $sp;
+
+        position: relative;
+        background: conf.$color-section-light;
+        border-radius: f.get-radius("card");
+        transition: box-shadow 200ms ease;
+        cursor: pointer;
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid conf.$color-border-light;
+
+            @media (prefers-color-scheme: dark) {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            background: conf.$color-section-dark;
+        }
+
+        &:hover {
+            box-shadow: conf.$shadow-section-hover;
+        }
+    }
+
+    /* ── Rank badge (скрыт визуально, остаётся в DOM) ──────── */
+    .tc-rank {
+        display: none;
+    }
+
+    /* ── Logo — stretched link на всю карточку ─────────────── */
+    .tc-card > button:first-of-type {
+        grid-area: logo;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: block;
+        border-radius: f.get-radius-single("card");
+
+        // покрывает всю карточку, перехватывает клик везде кроме z-index выше
+        &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+        }
+
+        &:focus-visible::after {
+            outline: 2px solid conf.$color-accent-light;
+            outline-offset: 2px;
+
+            @media (prefers-color-scheme: dark) {
+                outline-color: conf.$color-accent-dark;
+            }
+        }
+    }
+
+    // кнопки поверх stretched-link overlay
+    .tc-btn.visit,
+    .tc-toggle-details {
+        position: relative;
+        z-index: 2;
+    }
+
+    .tc-logo {
+        width: 4rem;
+        height: 4rem;
+        border-radius: f.get-radius-single("card");
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            display: block;
+            // масштаб к размеру контейнера
+            transform: scale(0.6);
+        }
+    }
+
+    /* ── Info block ────────────────────────────────────────── */
+    .tc-info {
+        grid-area: info;
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        min-width: 0;
+
+        .h3 {
+            margin: 0;
+
+            button {
+                @include f.font-hd;
+                background: none;
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                font-size: clamp(.85rem, 2.5vw, 1rem);
+                color: conf.$color-text-light;
+                text-align: left;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+                display: block;
+                transition: color 150ms;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+
+                &:hover {
+                    color: conf.$color-accent-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        color: conf.$color-accent-dark;
+                    }
+                }
+            }
+        }
+
+        p {
+            margin: 0;
+            font-size: clamp(.7rem, 2vw, .82rem);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: color.change(conf.$color-text-light, $alpha: .6);
+
+            @media (prefers-color-scheme: dark) {
+                color: color.change(conf.$color-text-dark, $alpha: .65);
+            }
+        }
+
+        .tc-rating {
+            font-size: .72rem;
+            color: conf.$color-accent-light;
+            line-height: 1;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-accent-dark;
+            }
+        }
+    }
+
+    /* ── CTA ───────────────────────────────────────────────── */
+    .tc-info-bottom {
+        grid-area: cta;
+        display: flex;
+        align-items: center;
+    }
+
+    /* ── Details (expand/collapse) ─────────────────────────── */
+    .tc-toggle-details {
+        grid-area: extra;
+        margin-top: $sp-xs;
+        background: none;
+        border: 1px solid conf.$color-border-light;
+        border-radius: f.get-radius("button");
+        padding: .3em .9em;
+        font-size: .75rem;
+        cursor: pointer;
+        color: conf.$color-text-light;
+        transition: background 150ms, color 150ms;
+        justify-self: start;
+
+        @media (prefers-color-scheme: dark) {
+            border-color: conf.$color-border-dark;
+            color: conf.$color-text-dark;
+        }
+
+        &:hover {
+            background: conf.$color-accent-light;
+            color: #fff;
+            border-color: transparent;
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-accent-dark;
+            }
+        }
+    }
+
+    .tc-details {
+        grid-area: extra;
+        padding-top: $sp-sm;
+        border-top: 1px solid conf.$color-border-light;
+        margin-top: $sp-xs;
+
+        @media (prefers-color-scheme: dark) {
+            border-color: conf.$color-border-dark;
+        }
+    }
+
+    .tc-details-info-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: .35rem $sp-sm;
+    }
+
+    .tc-details-info-item {
+        display: flex;
+        gap: .35rem;
+        font-size: .78rem;
+        align-items: baseline;
+    }
+
+    .tc-details-info-name {
+        white-space: nowrap;
+        color: color.change(conf.$color-text-light, $alpha: .65);
+
+        @media (prefers-color-scheme: dark) {
+            color: color.change(conf.$color-text-dark, $alpha: .65);
+        }
+    }
+
+    .tc-details-info-value {
+        color: conf.$color-text-light;
+        font-weight: 600;
+
+        @media (prefers-color-scheme: dark) {
+            color: conf.$color-text-dark;
+        }
+    }
+
+    /* ── Error fallback ────────────────────────────────────── */
+    .tc-error {
+        padding: $sp;
+        text-align: center;
+        color: conf.$color-error;
+
+        p { margin: 0 0 .5em; }
+
+        button {
+            @include f.font-hd;
+            background: conf.$color-accent-light;
+            color: #fff;
+            border: none;
+            border-radius: f.get-radius("button");
+            padding: .4em 1.2em;
+            cursor: pointer;
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-accent-dark;
+            }
+        }
+    }
+
+    /* ── Visit / play button ───────────────────────────────── */
+    .tc-btn.visit {
+        @include f.font-hd;
+        display: inline-block;
+        padding: .55em 1.1em;
+        border-radius: f.get-radius("button");
+        border: none;
+        cursor: pointer;
+        font-size: clamp(.7rem, 2vw, .82rem);
+        white-space: nowrap;
+        background: conf.$color-accent-light;
+        color: #fff;
+        transition: filter 180ms ease, transform 150ms ease;
+
+        @media (prefers-color-scheme: dark) {
+            background: conf.$color-accent-dark;
+        }
+
+        &:hover {
+            filter: brightness(1.12);
+        }
+    }
+
+    /* ── Mobile (≤ 540px) — вертикальная компановка ────────── */
+    @media (max-width: 540px) {
+        .tc-card {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "logo"
+                "info"
+                "cta"
+                "extra";
+            justify-items: center;
+            row-gap: $sp-xs;
+            padding: $sp-sm;
+            text-align: center;
+            gap: 15px;
+        }
+
+        .tc-info {
+            align-items: center;
+
+            .h3 button {
+                text-align: center;
+                white-space: normal;
+            }
+
+            p {
+                white-space: normal;
+            }
+        }
+
+        .tc-info-bottom {
+            width: 100%;
+
+            .tc-btn.visit {
+                width: 100%;
+                display: block;
+            }
+        }
+
+        .tc-logo {
+            width: 4.5rem;
+            height: 4.5rem;
+        }
+
+        .tc-toggle-details {
+            width: 100%;
+            text-align: center;
+        }
+    }
+}
+
+/* ─── Floating sticky banner ─────────────────────────────── */
+
+.tc-floating-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    padding: .6rem 1rem;
+    // фон задаётся inline-стилем из JS (цвет бренда)
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, .35);
+    transform: translateY(110%);
+    transition: transform 320ms cubic-bezier(.4, 0, .2, 1);
+
+    &.show {
+        transform: translateY(0);
+    }
+
+    .banner-container {
+        max-width: conf.$max-width;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .tc-banner-content {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex: 1;
+        min-width: 0;
+        cursor: pointer;
+
+        img {
+            width: 44px;
+            height: 44px;
+            border-radius: f.get-radius-single();
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+    }
+
+    .tc-banner-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+
+        strong {
+            @include f.font-hd;
+            font-size: clamp(.82rem, 3vw, 1rem);
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        span {
+            font-size: .75rem;
+            color: rgba(255, 255, 255, .78);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .tc-banner-actions {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        flex-shrink: 0;
+    }
+
+    // кнопка "Jetzt spielen" внутри баннера
+    .tc-btn.visit {
+        @include f.font-hd;
+        padding: .5em 1.2em;
+        border-radius: f.get-radius("button");
+        border: 2px solid rgba(255, 255, 255, .7);
+        background: rgba(255, 255, 255, .15);
+        color: #fff;
+        font-size: clamp(.72rem, 2vw, .85rem);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 180ms;
+
+        &:hover {
+            background: rgba(255, 255, 255, .28);
+        }
+    }
+
+    .tc-banner-close {
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .3);
+        color: #fff;
+        border-radius: 50%;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: .85rem;
+        line-height: 1;
+        flex-shrink: 0;
+        transition: background 180ms;
+
+        &:hover {
+            background: rgba(255, 255, 255, .28);
+        }
+    }
+}

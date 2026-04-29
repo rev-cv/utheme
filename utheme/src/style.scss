@@ -60,6 +60,7 @@
 @use "selection/selection.scss";
 
 @use "cookie-modal/cookie-modal.scss";
+@use "art__geo/geo.scss";
 
 // блок вставки разных меню
 @if conf.$main-menu =='island' {
@@ -145,9 +146,3 @@
 
 
 
-
-.tc-brand-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
