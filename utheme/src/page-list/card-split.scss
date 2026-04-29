@@ -78,10 +78,10 @@
                 margin: 0;
                 font-size: 0.9rem;
                 opacity: 0.8;
-                // Ограничение в 4 строки
+                // Ограничение в 3 строки
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
-                -webkit-line-clamp: 4;
+                -webkit-line-clamp: 3;
                 overflow: hidden;
                 @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
             }

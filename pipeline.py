@@ -312,7 +312,7 @@ def _copy_branding_to_build(out_dir: Path):
     from PIL import Image
 
     for stems, max_kb, max_height in (
-        (["favicon", "icon"], 15,  None),
+        (["favicon", "icon"], 15,  64),
         (["logo"],            50,  100),
     ):
         src = _find_branding_file(stems)
