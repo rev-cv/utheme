@@ -152,11 +152,14 @@ foreach (glob('/tmp/staging/images/*') as \$file) {
     if (!is_file(\$file)) continue;
     \$fname = basename(\$file);
     \$arr   = ['name' => \$fname, 'tmp_name' => \$file];
-    \$id    = media_handle_sideload(\$arr, 0);
+    \$post_data = ['post_name' => sanitize_title(\$fname)];
+    \$id    = media_handle_sideload(\$arr, 0, null, \$post_data);
     if (is_wp_error(\$id)) {
         \$results[] = 'WARN' . chr(9) . \$fname . chr(9) . '';
         continue;
     }
+    // Force slug to include extension so it never collides with a page slug
+    wp_update_post(['ID' => \$id, 'post_name' => str_replace('.', '-', \$fname)]);
     \$results[] = \$fname . chr(9) . \$id . chr(9) . wp_get_attachment_url(\$id);
 }
 ob_end_clean();
