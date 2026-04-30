@@ -20,6 +20,7 @@ $space: conf.$default-space;
         grid-template-columns: 1fr;
         gap: 1rem;
         user-select: none;
+        contain: layout style;
 
         .page-toc-title {
             margin: 0 0 .8em;
@@ -61,10 +62,10 @@ $space: conf.$default-space;
 
                 &::before {
                     content: counter(toc-counter, decimal-leading-zero);
-                    font-size: 1em;
+                    font-size: 1rem;
                     font-weight: 700;
                     color: $act-light;
-                    min-width: 1.5em;
+                    min-width: 1.5rem;
 
                     @media (prefers-color-scheme: dark) {
                         color: $act-dark;

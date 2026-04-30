@@ -19,6 +19,7 @@ $space: conf.$default-space;
         grid-template-columns: 1fr;
         gap: 1rem;
         user-select: none;
+        contain: layout style;
 
         .page-toc-title {
             margin: 0 0 .8em;
@@ -72,8 +73,8 @@ $space: conf.$default-space;
                     display: flex; // Чтобы работал размер и центровка
                     align-items: center; // Центрируем цифру вертикально
                     justify-content: center; // Центрируем цифру горизонтально
-                    width: 1.6em; // Фиксированная ширина
-                    height: 1.6em; // Фиксированная высота (равна ширине)
+                    width: 1.4rem; // rem: стабильно при смене шрифта
+                    height: 1.4rem;
                     flex-shrink: 0; // Чтобы круг не сжимался текстом
                     border-radius: 50%; // Идеальный круг
 

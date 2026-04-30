@@ -1,10 +1,35 @@
 <?php
 
+/**
+ * Парсит h2-заголовки из HTML и возвращает готовый HTML блока TOC.
+ * Возвращает пустую строку если заголовков нет.
+ */
+function build_toc_html(string $content): string
+{
+    preg_match_all('/<h2.*?>(.*?)<\/h2>/i', $content, $matches, PREG_OFFSET_CAPTURE);
+
+    if (empty($matches[0])) return '';
+
+    $toc_title = get_site_translation('toc');
+    $toc_items = '';
+
+    foreach ($matches[0] as $index => $match) {
+        $text_content = strip_tags($matches[1][$index][0]);
+        $slug = sanitize_title($text_content) . '-' . $index;
+        $toc_items .= '<li class="page-toc-level-2"><a href="#' . $slug . '" title="move to this section">' . esc_html($text_content) . '</a></li>';
+    }
+
+    $toc_tag = my_theme_get_config('is-not-section', false) ? 'div' : 'section';
+
+    return '<' . $toc_tag . ' class="toc">'
+        . '<div class="page-toc-title">' . $toc_title . '</div>'
+        . '<ol class="page-toc-list">' . $toc_items . '</ol>'
+        . '</' . $toc_tag . '>';
+}
+
 function my_theme_dynamic_content_injection($content)
 {
     if (!is_single() && !is_page()) return $content;
-
-    $toc_title = get_site_translation('toc');
 
     // Регулярка захватывает h2 и контент внутри него
     preg_match_all('/<h2.*?>(.*?)<\/h2>/i', $content, $matches, PREG_OFFSET_CAPTURE);
@@ -41,26 +66,23 @@ function my_theme_dynamic_content_injection($content)
         if ($is_inside_section) {
             // Удаляем старый ID у секции, если он есть, чтобы не дублировать
             $modified_content = preg_replace('/ id=["\'].*?["\']/i', '', $modified_content, 1, $count);
-            // (Внимание: прямая вставка по смещению в секцию сложна, упростим до добавления ID к заголовку, 
-            // но если нужна именно секция, то логика ниже)
             $id_attr = ' id="' . $slug . '"';
             $modified_content = substr_replace($modified_content, $id_attr, $section_pos + 8, 0);
-            
+
             $local_shift = strlen($id_attr);
             $offset_shift += $local_shift;
             $current_pos += $local_shift;
             $target_pos_for_this_item = $section_pos;
         } else {
-            // Исправленная логика для H2:
             // 1. Очищаем старый ID (и с двойными, и с одинарными кавычками)
             $cleaned_h2 = preg_replace('/ id=["\'].*?["\']/i', '', $full_tag);
-            
+
             // 2. Вставляем новый чистый ID
             $new_h2 = str_replace('<h2', '<h2 id="' . $slug . '"', $cleaned_h2);
-            
+
             // 3. Заменяем в контенте
             $modified_content = substr_replace($modified_content, $new_h2, $current_pos, strlen($full_tag));
-            
+
             $local_shift = strlen($new_h2) - strlen($full_tag);
             $offset_shift += $local_shift;
             $target_pos_for_this_item = $current_pos;
@@ -73,16 +95,7 @@ function my_theme_dynamic_content_injection($content)
         $toc_items .= '<li class="page-toc-level-2"><a href="#' . $slug . '" title="move to this section">' . $text_content . '</a></li>';
     }
 
-    // --- ГЕНЕРАЦИЯ И ВСТАВКА TOC ---
-    $toc_tag = 'section';
-    if (my_theme_get_config('is-not-section', false)) {
-        $toc_tag = 'div';
-    }
-
-    $toc_html = '<' . $toc_tag . ' class="toc">
-                    <div class="page-toc-title">' . $toc_title . '</div>
-                    <ol class="page-toc-list">' . $toc_items . '</ol>
-                 </' . $toc_tag . '>';
+    $toc_html = build_toc_html($content);
 
     $shortcode = '[geo_info]';
 

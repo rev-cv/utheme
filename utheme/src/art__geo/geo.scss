@@ -18,12 +18,30 @@ $sp-xs: calc(#{$sp} * 0.35);
         @media (max-width: 540px) {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         }
+
+        @if conf.$is-not-section == 'false' {
+            margin-bottom: 2rem;
+        }
+
+        // Last card stretches to fill the orphan empty column.
+        // Breakpoints derived from: content = viewport − 2×clamp(16px,3vw,32px), max-width 1200px.
+        // 3-col never occurs: max content ~1136px < 444px×3.
+        .tc-card:last-child {
+            // Mobile 2-col (minmax 200px): content ≥ 400px → viewport ≥ 426px
+            @media (min-width: 426px) and (max-width: 540px) {
+                &:nth-child(2n + 1) { grid-column: span 2; }
+            }
+            // Desktop 2-col (minmax 444px): content ≥ 888px → viewport ≥ 945px
+            @media (min-width: 945px) {
+                &:nth-child(2n + 1) { grid-column: span 2; }
+            }
+        }
     }
 
     /* ── Card ──────────────────────────────────────────────── */
     .tc-card {
         display: grid;
-        grid-template-columns: 4.5rem 1fr auto;
+        grid-template-columns: 135px 1fr auto;
         grid-template-areas:
             "logo info  cta"
             ".    extra extra";
@@ -97,8 +115,8 @@ $sp-xs: calc(#{$sp} * 0.35);
     }
 
     .tc-logo {
-        width: 4rem;
-        height: 4rem;
+        width: 135px;
+        aspect-ratio: 270 / 163;
         border-radius: f.get-radius-single("card");
         overflow: hidden;
         display: flex;
@@ -106,12 +124,10 @@ $sp-xs: calc(#{$sp} * 0.35);
         justify-content: center;
 
         img {
-            width: 80px;
-            height: 80px;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             display: block;
-            // масштаб к размеру контейнера
-            transform: scale(0.6);
         }
     }
 
@@ -344,8 +360,8 @@ $sp-xs: calc(#{$sp} * 0.35);
         }
 
         .tc-logo {
-            width: 4.5rem;
-            height: 4.5rem;
+            width: 100%;
+            max-width: 135px;
         }
 
         .tc-toggle-details {
@@ -391,8 +407,8 @@ $sp-xs: calc(#{$sp} * 0.35);
         cursor: pointer;
 
         img {
-            width: 44px;
-            height: 44px;
+            width: 135px;
+            aspect-ratio: 270 / 163;
             border-radius: f.get-radius-single();
             object-fit: contain;
             flex-shrink: 0;

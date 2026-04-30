@@ -8,7 +8,7 @@ $tx-dark: conf.$color-text-dark;
 $act-light: conf.$color-accent-light;
 $act-dark: conf.$color-accent-dark;
 $space: conf.$default-space;
-$marker-size: 1.1em;
+$marker-size: 1.1rem;
 // Вставьте сюда свой SVG в формате Data URI.
 
 
@@ -23,6 +23,7 @@ $icon-svg: conf.$toc-icon-select;
         grid-template-columns: 1fr;
         gap: 1rem;
         user-select: none;
+        contain: layout style;
 
         .page-toc-title {
             margin: 0 0 .8em;

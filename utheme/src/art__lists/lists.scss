@@ -65,6 +65,10 @@ aside .wp-block-list {
 }
 
 
+article h2 + .wp-block-list {
+    margin-top: 0.6em;
+}
+
 aside .wp-block-list {
     padding-left: 1em !important;
     margin-top: .3em;

@@ -27,7 +27,7 @@ $footer-menu: "2columns"; // 2columns, central
 $toc-menu: "icon"; // circle, number, icon
 // меню должно быть в секции или располагаться открыто?
 $is-not-section: "true"; // true, false
-$toc-icon: "football";
+$toc-icon: "star";
 $toc-icon-select: map.get(ico.$icon-tuple, $toc-icon);
 
 // стилизация блока details
