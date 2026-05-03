@@ -15,18 +15,10 @@
             get_template_part('components/main-menu-new-aside');
         } elseif ($menu_type === 'boring') {
             get_template_part('components/main-menu-boring');
-        } elseif ($menu_type === 'marquee') {
-            get_template_part('components/main-menu-marquee');
         } elseif ($menu_type === 'docs') {
             get_template_part('components/main-menu-docs');
-        } elseif ($menu_type === 'circle') {
-            get_template_part('components/main-menu-circle');
         } elseif ($menu_type === 'newspaper') {
             get_template_part('components/main-menu-newspaper');
-        } elseif ($menu_type === 'console') {
-            get_template_part('components/main-menu-console');
-        } elseif ($menu_type === 'dynamic') {
-            get_template_part('components/main-menu-dynamic');
         } elseif ($menu_type === 'hierarchical') {
             get_template_part('components/main-menu-hierarchical');
         } else {

@@ -44,15 +44,34 @@ jQuery(document).ready(function ($) {
     }
 
     // ─── Переключение вкладок ───────────────────────────────────────────────
-    $('.tab-btn').on('click', function (e) {
-        e.preventDefault();
+    function activateTab(tabId) {
+        var $btn = $('.tab-btn[data-target="' + tabId + '"]');
+        if (!$btn.length) return;
         $('.tab-btn').removeClass('active');
         $('.tab-pane').removeClass('active');
-        $(this).addClass('active');
-        var $target = $('#' + $(this).data('target'));
+        $btn.addClass('active');
+        var $target = $('#' + tabId);
         $target.addClass('active');
         initColorPickers($target);
+    }
+
+    $('.tab-btn').on('click', function (e) {
+        e.preventDefault();
+        var tabId = $(this).data('target');
+        activateTab(tabId);
+        var url = new URL(window.location.href);
+        url.searchParams.set('tab', tabId);
+        history.replaceState(null, '', url.toString());
     });
+
+    // Восстановление вкладки из URL при загрузке
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var tab = params.get('tab');
+        if (tab && $('.tab-btn[data-target="' + tab + '"]').length) {
+            activateTab(tab);
+        }
+    })();
 
     // ─── Применить hex-цвет ко всем элементам u-color-field ────────────────
     function setColorField(name, hex) {
@@ -152,51 +171,47 @@ jQuery(document).ready(function ($) {
         }
     }
 
-    // При изменении селекта toc-menu
     $(document).on('change', 'select[name="u_fields[toc-menu]"]', function () {
         updateTocIconVisibility($(this));
     });
 
-    // ─── TOC Icon: кастомный dropdown ──────────────────────────────────────
+    // ─── Icon dropdowns: универсальный обработчик ─────────────────────────
     // Открыть/закрыть
-    $(document).on('click', '#toc-icon-trigger', function (e) {
+    $(document).on('click', '.u-icon-trigger', function (e) {
         e.stopPropagation();
-        var $dd   = $('#toc-icon-dropdown');
-        var $list = $('#toc-icon-list');
+        var $dd    = $(this).closest('.u-icon-dropdown');
+        var $list  = $dd.find('.u-icon-list');
         var isOpen = $dd.hasClass('is-open');
+        // Закрываем другие открытые дропдауны
+        $('.u-icon-dropdown.is-open').not($dd).removeClass('is-open').find('.u-icon-list').hide();
         $dd.toggleClass('is-open', !isOpen);
         $list.toggle(!isOpen);
     });
 
     // Выбор опции
     $(document).on('click', '.u-icon-item', function () {
-        var val  = $(this).data('value');
-        var svg  = $(this).find('.u-icon-svg').html();
-        var name = $(this).find('.u-icon-item-name').text();
+        var $item      = $(this);
+        var val        = $item.data('value');
+        var svg        = $item.find('.u-icon-svg').html();
+        var name       = $item.find('.u-icon-item-name').text();
+        var $dd        = $item.closest('.u-icon-dropdown');
+        var inputName  = $dd.data('input-name');
 
-        // Обновляем триггер
-        $('#toc-icon-trigger .u-icon-svg').html(svg);
-        $('#toc-icon-label').text(name);
+        $dd.find('.u-icon-trigger .u-icon-svg').html(svg);
+        $dd.find('.u-icon-trigger-name').text(name);
+        $dd.find('.u-icon-item').removeClass('is-selected');
+        $item.addClass('is-selected');
+        $dd.removeClass('is-open').find('.u-icon-list').hide();
 
-        // Обновляем скрытый input
-        $('#toc-icon-value').val(val);
-
-        // Подсветка выбранного
-        $('.u-icon-item').removeClass('is-selected');
-        $(this).addClass('is-selected');
-
-        // Закрываем
-        $('#toc-icon-dropdown').removeClass('is-open');
-        $('#toc-icon-list').hide();
-
-        markDirty($('#toc-icon-value'));
+        var $hidden = $('input[name="u_fields[' + inputName + ']"]');
+        $hidden.val(val);
+        markDirty($hidden);
     });
 
     // Закрываем при клике вне
     $(document).on('click', function (e) {
-        if (!$(e.target).closest('#toc-icon-dropdown').length) {
-            $('#toc-icon-dropdown').removeClass('is-open');
-            $('#toc-icon-list').hide();
+        if (!$(e.target).closest('.u-icon-dropdown').length) {
+            $('.u-icon-dropdown').removeClass('is-open').find('.u-icon-list').hide();
         }
     });
 

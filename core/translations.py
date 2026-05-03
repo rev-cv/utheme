@@ -291,6 +291,17 @@ def get_page_title(slug: str, lang: str) -> str:
     return titles.get(lang) or titles.get("EN") or slug
 
 
+def get_page_seo_title(slug: str, lang: str) -> str | None:
+    """Возвращает SEO-заголовок «Название | $$SITENAME$$» для articles/news/sitemap."""
+    if slug not in ("articles", "news", "sitemap"):
+        return None
+    titles = PAGE_TITLES.get(slug, {})
+    title = titles.get(lang) or titles.get("EN")
+    if not title:
+        return None
+    return f"{title} | $$SITENAME$$"
+
+
 def get_page_description(slug: str, lang: str, site_title: str) -> str | None:
     """Возвращает SEO-описание технической страницы с подставленным названием сайта."""
     descs = PAGE_DESCRIPTIONS.get(slug, {})

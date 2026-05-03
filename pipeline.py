@@ -215,6 +215,7 @@ def _build_manifest(structure: dict, pics: list[dict]) -> dict:
     for item in structural_pages:
         slug = item["slug"]
         item["title"]     = translations.get_page_title(slug, lang)
+        item["seo_title"] = translations.get_page_seo_title(slug, lang)
         item["seo_descr"] = translations.get_page_description(slug, lang, site_title)
 
     # ── объединяем в исходном порядке ─────────────────────────────────────────

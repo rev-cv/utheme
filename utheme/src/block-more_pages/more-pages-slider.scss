@@ -1,0 +1,184 @@
+@use 'sass:color';
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$sp:    conf.$default-space;
+$sp-sm: calc(#{$sp} * 0.55);
+
+@mixin styles {
+    .more-pages--slider {
+        padding: $sp 0;
+        width: 100%;
+
+        /* ── Items: full-width CSS scroll-snap slider ───────────── */
+        .more-pages__items {
+            display: flex;
+            overflow-x: scroll;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            cursor: grab;
+
+            /* Desktop: hide scrollbar (JS controls navigation) */
+            @media (min-width: 769px) {
+                scrollbar-width: none;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+            }
+
+            /* Mobile: thin accent scrollbar as scroll indicator */
+            @media (max-width: 768px) {
+                scrollbar-width: thin;
+                scrollbar-color: conf.$color-accent-light transparent;
+
+                &::-webkit-scrollbar {
+                    height: 4px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background: conf.$color-accent-light;
+                    border-radius: 2px;
+
+                    @media (prefers-color-scheme: dark) {
+                        background: conf.$color-accent-dark;
+                    }
+                }
+            }
+
+            &:active {
+                cursor: grabbing;
+            }
+        }
+
+        /* ── Card ───────────────────────────────────────────────── */
+        .more-pages__card {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+            min-height: clamp(280px, 45vw, 480px);
+            background: conf.$color-section-light;
+            cursor: pointer;
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-section-dark;
+            }
+        }
+
+        /* ── Stretched link ─────────────────────────────────────── */
+        .more-pages__link {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+
+            &:focus-visible {
+                outline: 2px solid conf.$color-accent-light;
+                outline-offset: 2px;
+
+                @media (prefers-color-scheme: dark) {
+                    outline-color: conf.$color-accent-dark;
+                }
+            }
+        }
+
+        /* ── Thumbnail ──────────────────────────────────────────── */
+        .more-pages__thumb {
+            position: absolute;
+            inset: 0;
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    to top,
+                    rgba(0, 0, 0, .80) 0%,
+                    rgba(0, 0, 0, .25) 50%,
+                    rgba(0, 0, 0, .05) 100%
+                );
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                min-height: 0 !important;
+                object-fit: cover;
+                transition: filter 400ms ease;
+            }
+        }
+
+        .more-pages__card:hover .more-pages__thumb img {
+            filter: blur(3px);
+        }
+
+        /* ── Info overlay ───────────────────────────────────────── */
+        .more-pages__info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: $sp;
+            z-index: 1;
+            max-width: conf.$max-width;
+            margin: 0 auto;
+
+            @media (max-width: 768px) {
+                padding: $sp-sm;
+            }
+        }
+
+        .more-pages__card-title {
+            @include f.font-hd;
+            color: #fff;
+            margin: 0 0 .4rem;
+            font-size: clamp(1.2rem, 3.5vw, 2rem);
+            text-wrap: balance;
+        }
+
+        .more-pages__desc {
+            color: rgba(255, 255, 255, .82);
+            font-size: clamp(.82rem, 2vw, 1rem);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-width: 60ch;
+            text-wrap: balance;
+        }
+
+        /* ── Fallback: no featured image ────────────────────────── */
+        .more-pages__card:not(.has-thumb) {
+            display: flex;
+            align-items: flex-end;
+
+            .more-pages__info {
+                position: relative;
+                padding: $sp;
+            }
+
+            .more-pages__card-title {
+                color: conf.$color-text-light;
+                font-size: clamp(1rem, 2.5vw, 1.5rem);
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+            }
+
+            .more-pages__desc {
+                color: color.change(conf.$color-text-light, $alpha: .65);
+
+                @media (prefers-color-scheme: dark) {
+                    color: color.change(conf.$color-text-dark, $alpha: .65);
+                }
+            }
+        }
+    }
+}

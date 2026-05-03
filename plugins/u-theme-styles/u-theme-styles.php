@@ -21,9 +21,15 @@ class UThemeConfigurator {
 
     // Конфиг рандомизации — повторяет randomize_theme.py
     private array $random_config = [
-        'main-menu'      => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic', 'hierarchical'],
-        'footer-menu'    => ['2columns', 'central'],
-        'toc-menu'       => ['circle', 'number', 'icon'],
+        'main-menu'        => ['island', 'aside', 'boring', 'docs', 'newspaper', 'hierarchical'],
+        'menu-accent-align' => ['left', 'center', 'right'],
+        'footer-menu'    => ['2columns', '4columns'],
+        'more-pages'     => ['grid', 'list', 'slider', 'carousel'],
+        'toc-menu'       => ['circle', 'number', 'icon', 'tags'],
+        'stt-icon'       => [
+            'chevron-one', 'chevron-two', 'triple-filled-arrow', 'triple-arrow', 
+            'double-filled-arrow', 'double-arrow', 'circle-filled-1', 'circle-1', 
+            'circle-2', 'arrow-warm', 'arrow-short', 'arrow-big', 'arrow-pin'],
         'is-not-section' => ['true', 'false'],
         'details'        => ['plus', 'arrow'],
         'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
@@ -144,10 +150,10 @@ class UThemeConfigurator {
         // Цветовые переменные ($color_vars) — не трогаем в основном теле никогда,
         // там map.get-выражения которые должны оставаться нетронутыми.
         $string_vars = [
-            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card',
-            'font-vibe', 'radius-vibe', 'style', 'toc-icon',
+            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages',
+            'font-vibe', 'radius-vibe', 'style', 'toc-icon', 'stt-icon',
             'is-menu-title', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
-            'breadcrumbs-separator',
+            'breadcrumbs-separator', 'menu-accent-align',
         ];
 
         // Чекбоксы: если не отмечен — браузер не отправляет поле вовсе.
@@ -200,6 +206,15 @@ class UThemeConfigurator {
         }
 
         file_put_contents($this->scss_file, $content);
+
+        // Save site classification options (WP options, not SCSS vars)
+        if (isset($_POST['site_stream'])) {
+            update_option('site_stream', sanitize_text_field($_POST['site_stream']));
+        }
+        if (isset($_POST['site_subject'])) {
+            update_option('site_subject', sanitize_text_field($_POST['site_subject']));
+        }
+
         add_settings_error('u_theme', 'saved', 'Настройки сохранены. Docker запустил пересборку!', 'updated');
     }
 
@@ -211,7 +226,7 @@ class UThemeConfigurator {
         $string_vars = [
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card',
             'font-vibe', 'style', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
-            'font-size',
+            'font-size', 'stt-icon', 'menu-accent-align',
         ];
 
         // Переменные-списки

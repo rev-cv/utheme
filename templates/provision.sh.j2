@@ -261,7 +261,8 @@ foreach (\$pages as \$p) {
     \$page_ids[\$p['slug']] = \$id;
     if (!empty(\$p['cats']))       wp_set_object_terms(\$id, \$p['cats'], 'category', false);
     if (\$p['thumb'] !== '' && isset(\$media_ids[\$p['thumb']])) update_post_meta(\$id, '_thumbnail_id', \$media_ids[\$p['thumb']]);
-    update_post_meta(\$id, '_custom_seo_title', base64_decode(\$p['title']));
+    \$seo_t = \$p['seo_headline'] !== '' ? base64_decode(\$p['seo_headline']) : base64_decode(\$p['title']);
+    update_post_meta(\$id, '_custom_seo_title', \$seo_t);
     if (\$p['seo_headline'] !== '') update_post_meta(\$id, '_custom_seo_headline', base64_decode(\$p['seo_headline']));
     if (\$p['seo_desc']     !== '') update_post_meta(\$id, '_custom_seo_desc',     base64_decode(\$p['seo_desc']));
     ob_end_clean();

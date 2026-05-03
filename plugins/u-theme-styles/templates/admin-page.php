@@ -29,6 +29,7 @@ function u_color_field(string $name, string $value): void {
             <button class="tab-btn active" data-target="basic">Basic</button>
             <button class="tab-btn" data-target="components">Components</button>
             <button class="tab-btn" data-target="colors">Colors</button>
+            <button class="tab-btn" data-target="site-info">Site Info</button>
             <div class="tabs-nav-spacer"></div>
             <button type="submit" name="u_randomize_scss" value="1" class="button tabs-random-btn">&#x2684; Random</button>
             <button type="submit" name="u_save_scss" value="1" class="button button-primary tabs-save-btn">Save Settings</button>
@@ -309,6 +310,7 @@ function u_color_field(string $name, string $value): void {
                 // Извлекаем SVG-код из url('data:image/svg+xml;utf8,...') для inline-рендера.
                 $toc_icons  = []; // ['name' => '<svg>...</svg>']
                 $icons_file = get_template_directory() . '/src/scheme.icons.scss';
+
                 if (file_exists($icons_file)) {
                     $icons_raw = file_get_contents($icons_file);
                     // Матчим: 'name': url('...') или 'name': url("...") — захватываем до закрывающих кавычек + )
@@ -333,23 +335,40 @@ function u_color_field(string $name, string $value): void {
                     }
                 }
 
+                $stt_icons  = [];
+                $arrows_file = get_template_directory() . '/src/scheme.icons.arrows.scss';
+                if (file_exists($arrows_file)) {
+                    $arrows_raw = file_get_contents($arrows_file);
+                    preg_match_all("/'([\w-]+)'\s*:\s*url\('(.+?)'\)/", $arrows_raw, $arr_single);
+                    preg_match_all('/\'([\w-]+)\'\s*:\s*url\("(.+?)"\)/', $arrows_raw, $arr_double);
+                    foreach ($arr_single[1] as $i => $icon_name) {
+                        $svg_data = preg_replace('/^data:image\/svg\+xml(;utf8)?,/', '', trim($arr_single[2][$i]));
+                        $stt_icons[$icon_name] = rawurldecode($svg_data);
+                    }
+                    foreach ($arr_double[1] as $i => $icon_name) {
+                        $svg_data = preg_replace('/^data:image\/svg\+xml(;utf8)?,/', '', trim($arr_double[2][$i]));
+                        $stt_icons[$icon_name] = rawurldecode($svg_data);
+                    }
+                }
+
                 $components = [
                     'main-menu' => [
                         'title'       => 'Main Menu',
                         'desc'        => 'Стиль отображения главного меню сайта.',
-                        'options'     => ['island', 'aside', 'marquee', 'boring', 'docs', 'circle', 'newspaper', 'console', 'dynamic', 'hierarchical'],
+                        'options'     => ['island', 'aside', 'boring', 'docs', 'newspaper', 'hierarchical'],
                         'switch'      => 'is-menu-title',
                         'switch_desc' => 'Показывать название сайта в главном меню',
                     ],
                     'footer-menu' => [
                         'title'   => 'Footer Menu',
-                        'desc'    => 'Стиль отображения меню в подвале сайта.<br><b>2columns</b> — два столбца со ссылками.<br><b>Central</b> — горизонтальный ряд по центру.',
-                        'options' => ['2columns', 'central'],
+                        'desc'    => 'Стиль отображения меню в подвале сайта.<br><b>2columns</b> — два столбца со ссылками.<br><b>4columns</b> — четыре колонки: брендинг, ответственная игра, юридическое, страницы.',
+                        'options' => ['2columns', '4columns'],
                     ],
                     'toc-menu' => [
                         'title'       => 'Table of Contents',
-                        'desc'        => 'Оглавление статьи.<br><b>Circle</b> — круглые маркеры.<br><b>Number</b> — нумерованный список. <br><b>Icon</b> — иконки перед пунктами.',
-                        'options'     => ['circle', 'number', 'icon'],
+                        // 'desc'        => 'Оглавление статьи.<br><b>Circle</b> — круглые маркеры.<br><b>Number</b> — нумерованный список. <br><b>Icon</b> — иконки перед пунктами.<br><b>Tags</b> — теги-кнопки в ряд.',
+                        'desc'        => '',
+                        'options'     => ['circle', 'number', 'icon', 'tags'],
                         'switch'      => 'is-not-section',
                         'switch_desc' => 'Отобразить оглавление без секции',
                         'icon_select' => true,
@@ -358,6 +377,11 @@ function u_color_field(string $name, string $value): void {
                         'title'   => 'Article Card',
                         'desc'    => 'Внешний вид карточки статьи в списках и архивах.',
                         'options' => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
+                    ],
+                    'more-pages' => [
+                        'title'   => 'More Pages',
+                        'desc'    => 'Блок "ещё почитать" под основным контентом страницы.<br><b>Grid</b> — мозаичная сетка с картинками.<br><b>List</b> — компактный список в несколько колонок.<br><b>Slider</b> — CSS-слайдер, одна статья на весь экран.<br><b>Carousel</b> — JS-карусель: 2–3 карточки одновременно, drag + автопрокрутка.',
+                        'options' => ['grid', 'list', 'slider', 'carousel'],
                     ],
                 ];
 
@@ -401,6 +425,21 @@ function u_color_field(string $name, string $value): void {
                                     </label>
                                 <?php endif; ?>
 
+                                <?php if ($id === 'main-menu'): ?>
+                                    <div style="display:flex; flex-direction:column; gap:4px;">
+                                        <span class="u-basic-field-label">Accent text align</span>
+                                        <?php foreach (['left', 'center', 'right'] as $align_opt): ?>
+                                            <label class="u-checkbox-label">
+                                                <input type="radio"
+                                                       name="u_fields[menu-accent-align]"
+                                                       value="<?= $align_opt ?>"
+                                                       <?= ($v['menu-accent-align'] ?? 'center') === $align_opt ? 'checked' : '' ?>>
+                                                <span><?= ucfirst($align_opt) ?></span>
+                                            </label>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+
                                 <?php if (!empty($data['icon_select']) && !empty($toc_icons)): ?>
                                     <?php
                                     $current_icon     = $v['toc-icon'] ?? array_key_first($toc_icons);
@@ -418,7 +457,7 @@ function u_color_field(string $name, string $value): void {
                                                value="<?= esc_attr($current_icon) ?>">
 
                                         <!-- Кнопка-триггер dropdown -->
-                                        <div class="u-icon-dropdown" id="toc-icon-dropdown">
+                                        <div class="u-icon-dropdown" id="toc-icon-dropdown" data-input-name="toc-icon">
                                             <button type="button" class="u-icon-trigger" id="toc-icon-trigger">
                                                 <span class="u-icon-svg"><?= $current_icon_svg ?></span>
                                                 <span class="u-icon-trigger-name" id="toc-icon-label"><?= esc_html($current_icon) ?></span>
@@ -439,6 +478,35 @@ function u_color_field(string $name, string $value): void {
                                     </div>
                                 <?php endif; ?>
 
+                                <?php if ($id === 'toc-menu' && !empty($stt_icons)): ?>
+                                    <?php
+                                    $current_stt_icon     = $v['stt-icon'] ?? array_key_first($stt_icons);
+                                    $current_stt_icon_svg = $stt_icons[$current_stt_icon] ?? '';
+                                    ?>
+                                    <div class="u-icon-select-wrap">
+                                        <label class="u-basic-field-label">Scroll to Top Icon</label>
+                                        <input type="hidden" name="u_fields[stt-icon]"
+                                               id="stt-icon-value"
+                                               value="<?= esc_attr($current_stt_icon) ?>">
+                                        <div class="u-icon-dropdown" id="stt-icon-dropdown" data-input-name="stt-icon">
+                                            <button type="button" class="u-icon-trigger" id="stt-icon-trigger">
+                                                <span class="u-icon-svg"><?= $current_stt_icon_svg ?></span>
+                                                <span class="u-icon-trigger-name" id="stt-icon-label"><?= esc_html($current_stt_icon) ?></span>
+                                                <span class="u-icon-chevron">▾</span>
+                                            </button>
+                                            <div class="u-icon-list" id="stt-icon-list" style="display:none">
+                                                <?php foreach ($stt_icons as $icon_name => $svg): ?>
+                                                    <div class="u-icon-item <?= $current_stt_icon === $icon_name ? 'is-selected' : '' ?>"
+                                                         data-value="<?= esc_attr($icon_name) ?>">
+                                                        <span class="u-icon-svg"><?= $svg ?></span>
+                                                        <span class="u-icon-item-name"><?= esc_html($icon_name) ?></span>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+
                                 <p class="u-desc"><?= $data['desc'] ?? '' ?></p>
                             </div>
 
@@ -447,7 +515,8 @@ function u_color_field(string $name, string $value): void {
                                     <img src="<?= plugins_url("assets/media/{$id}-" . ($v[$id] ?? $data['options'][0] ?? $id) . ".webp", dirname(__FILE__)) ?>"
                                          data-base-url="<?= plugins_url("assets/media/{$id}-", dirname(__FILE__)) ?>"
                                          alt="<?= esc_attr($data['title']) ?>"
-                                         class="u-component-preview-img">
+                                         class="u-component-preview-img"
+                                         onerror="this.closest('.u-card-right').style.display='none'">
                                 </div>
                             </div>
                         </div>
@@ -637,6 +706,68 @@ function u_color_field(string $name, string $value): void {
                                 <?php u_color_field("u_fields[{$key}]", $v[$key] ?? $cfg['default']) ?>
                             </div>
                         <?php endforeach; ?>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Site Info ──────────────────────────────────────────────── -->
+            <section id="site-info" class="tab-pane">
+                <h2>Site Info</h2>
+                <?php
+                $streams = [
+                    'stream-1' => 'Stream 1',
+                    'stream-2' => 'Stream 2',
+                    'stream-3' => 'Stream 3',
+                    'stream-4' => 'Stream 4',
+                ];
+                $subjects = [
+                    'alpine_skiing', 'american_footbal', 'aussie_rules', 'badminton',
+                    'baseball', 'basketball', 'biathlon', 'boxing', 'cricket',
+                    'crosscountry', 'cycling', 'darts', 'english', 'esports',
+                    'field_hockey', 'floorball', 'football', 'formula1', 'golf',
+                    'greyhound_racing', 'handball', 'hockey', 'horse_racing', 'ice_hockey',
+                    'mma', 'motorsport', 'padel', 'rugby', 'rugby_league', 'snooker',
+                    'squash', 'table_tennis', 'tennis', 'volleyball', 'waterpolo',
+                ];
+                $cur_stream  = get_option('site_stream',  '');
+                $cur_subject = get_option('site_subject', '');
+                ?>
+                <div class="u-card">
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">Stream of Site</div>
+                                <div class="u-basic-field-control">
+                                    <select name="site_stream">
+                                        <option value="">— not set —</option>
+                                        <?php foreach ($streams as $val => $label): ?>
+                                            <option value="<?= esc_attr($val) ?>"
+                                                <?= selected($cur_stream, $val, false) ?>>
+                                                <?= esc_html($label) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">Subject of Site</div>
+                                <div class="u-basic-field-control">
+                                    <select name="site_subject">
+                                        <option value="">— not set —</option>
+                                        <?php foreach ($subjects as $subject): ?>
+                                            <?php $label = ucwords(str_replace('_', ' ', $subject)); ?>
+                                            <option value="<?= esc_attr($subject) ?>"
+                                                <?= selected($cur_subject, $subject, false) ?>>
+                                                <?= esc_html($label) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </section>

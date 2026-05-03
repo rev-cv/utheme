@@ -34,6 +34,9 @@ function my_theme_get_config($key = null, $default = null)
             if (preg_match('/\$is-not-section:\s*["\']?(true|false)["\']?/', $content, $m)) {
                 $config['is-not-section'] = ($m[1] === 'true');
             }
+            if (preg_match('/\$is-menu-title:\s*["\']?(true|false)["\']?/', $content, $m)) {
+                $config['is-menu-title'] = $m[1];
+            }
             if (preg_match('/\$article-card:\s*["\']?([a-zA-Z0-9_-]+)["\']?/', $content, $m)) {
                 $config['article-card'] = $m[1];
             }

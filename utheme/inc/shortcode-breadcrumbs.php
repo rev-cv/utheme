@@ -1,26 +1,7 @@
 <?php
 
 /**
- * 1. РЕГИСТРАЦИЯ НАСТРОЕК (Settings API)
- * Позволяет управлять крошками через админку, REST API и WP-CLI
- */
-add_action('admin_init', 'my_custom_breadcrumbs_settings');
-function my_custom_breadcrumbs_settings() {
-    register_setting('general', 'bc_enable', [
-        'type' => 'boolean',
-        'show_in_rest' => true,
-        'default' => true,
-    ]);
-    add_settings_section('bc_section', 'Breadcrumbs Settings', null, 'general');
-
-    add_settings_field('bc_enable', 'Enable Breadcrumbs', function() {
-        $val = get_option('bc_enable', 1);
-        echo '<input type="checkbox" name="bc_enable" value="1" ' . checked(1, $val, false) . ' />';
-    }, 'general', 'bc_section');
-}
-
-/**
- * 2. ЛОГИКА ПОСТРОЕНИЯ ХЛЕБНЫХ КРОШЕК
+ * ЛОГИКА ПОСТРОЕНИЯ ХЛЕБНЫХ КРОШЕК
  */
 
 /**
@@ -95,8 +76,6 @@ function get_my_breadcrumbs_items() {
 }
 
 function get_my_breadcrumbs() {
-    if (!get_option('bc_enable', 1)) return '';
-
     $breadcrumb_items = get_my_breadcrumbs_items();
 
     // Don't show breadcrumbs if there's only one item (e.g., just "Home").
@@ -136,22 +115,9 @@ add_shortcode('my_breadcrumbs', 'get_my_breadcrumbs');
 
 /*
 
-КАК ЭТИМ УПРАВЛЯТЬ?
-
-1. В админке: 
-Перейдите в Settings -> General (Настройки -> Общие). 
-В самом низу появятся поля для включения и выбора сепаратора.
-
-2. Через WP-CLI:
-Включить/выключить: wp option update bc_enable 1
-Изменить сепаратор: wp option update bc_separator "»"
-
-3. Через REST API (Application API):
-Отправить POST запрос на /wp-json/wp/v2/settings с телом {"bc_enable": false, "bc_separator": "/"}.
-
-4. В шаблоне/теме:
-Шорткодом: [my_breadcrumbs]
-
-5. PHP кодом: <?php echo get_my_breadcrumbs(); ?>
+Использование:
+- Шорткодом: [my_breadcrumbs]
+- PHP: <?php echo get_my_breadcrumbs(); ?>
+- Изменить сепаратор: wp option update bc_separator "»"
 
 */

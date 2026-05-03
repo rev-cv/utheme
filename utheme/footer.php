@@ -6,10 +6,8 @@
 
             if ($menu_type === '2columns') {
                 get_template_part('components/footer-2columns');
-            } elseif ($menu_type === 'marquee') {
-                get_template_part('components/main-menu-marquee');
-            } elseif ($menu_type === 'central') {
-                get_template_part('components/footer-central');
+            } elseif ($menu_type === '4columns') {
+                get_template_part('components/footer-4columns');
             } else {
                 get_template_part('components/footer-2columns');
             }

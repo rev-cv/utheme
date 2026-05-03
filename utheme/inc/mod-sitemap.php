@@ -1,4 +1,22 @@
 <?php
+
+// Убираем wp-sitemap-users-1.xml
+add_filter('wp_sitemaps_add_provider', function ($provider, $name) {
+    if ($name === 'users') return false;
+    return $provider;
+}, 10, 2);
+
+// Убираем wp-sitemap-taxonomies-category-1.xml
+add_filter('wp_sitemaps_taxonomies', function ($taxonomies) {
+    unset($taxonomies['category']);
+    return $taxonomies;
+});
+
+
+
+
+
+
 /**
  * Заменяем ссылки вида /category/news/ на /news/ при генерации URL
  */

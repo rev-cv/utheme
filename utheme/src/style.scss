@@ -4,17 +4,13 @@
 
 @use "main-menu/island.scss" as island;
 @use "main-menu/aside.scss" as aside;
-@use "main-menu/marquee.scss" as marquee;
 @use "main-menu/boring.scss" as boring;
 @use "main-menu/docs.scss" as docs;
-@use "main-menu/circle.scss" as circle;
 @use "main-menu/newspaper.scss" as newspaper;
-@use "main-menu/console.scss" as console;
-@use "main-menu/dynamic.scss" as dynamic;
 @use "main-menu/hierarchical.scss" as hierarchical;
 
 @use 'footer/2column.scss' as footer_2columns;
-@use 'footer/central.scss' as footer_central;
+@use 'footer/4columns.scss' as footer_4columns;
 
 @use "page/page.scss";
 @use "page-single/single.scss";
@@ -37,6 +33,7 @@
 @use "art__toc/toc-number.scss" as toc_number;
 @use "art__toc/toc-circle.scss" as toc_circle;
 @use "art__toc/toc-icon.scss" as toc_icon;
+@use "art__toc/toc-tags.scss" as toc_tags;
 @use "art__lists/lists.scss";
 @use "art__table/tables.scss";
 @use "art__images/images.scss";
@@ -55,6 +52,10 @@
 @use "header-section-box/header-box.scss";
 @use "block-autor/block-autor.scss";
 @use "block-related_articles/related-art.scss";
+@use "block-more_pages/more-pages-grid.scss" as more_pages_grid;
+@use "block-more_pages/more-pages-list.scss" as more_pages_list;
+@use "block-more_pages/more-pages-slider.scss" as more_pages_slider;
+@use "block-more_pages/more-pages-carousel.scss" as more_pages_carousel;
 
 @use "scrollbar/scrollbar.scss";
 @use "selection/selection.scss";
@@ -69,26 +70,14 @@
 @else if conf.$main-menu =='aside' {
     @include aside.styles;
 }
-@else if conf.$main-menu =='marquee' {
-    @include marquee.styles;
-}
 @else if conf.$main-menu =='boring' {
     @include boring.styles;
 }
 @else if conf.$main-menu =='docs' {
     @include docs.styles;
 }
-@else if conf.$main-menu =='circle' {
-    @include circle.styles;
-}
 @else if conf.$main-menu =='newspaper' {
     @include newspaper.styles;
-}
-@else if conf.$main-menu =='console' {
-    @include console.styles;
-}
-@else if conf.$main-menu =='dynamic' {
-    @include dynamic.styles;
 }
 @else if conf.$main-menu =='hierarchical' {
     @include hierarchical.styles;
@@ -103,6 +92,9 @@
 }
 @else if conf.$toc-menu =='icon' {
     @include toc_icon.styles;
+}
+@else if conf.$toc-menu =='tags' {
+    @include toc_tags.styles;
 }
 
 // блок стилизация карточек статей
@@ -132,8 +124,8 @@
 @if conf.$footer-menu =='2columns' {
     @include footer_2columns.styles;
 }
-@else if conf.$footer-menu =='central' {
-    @include footer_central.styles;
+@else if conf.$footer-menu =='4columns' {
+    @include footer_4columns.styles;
 }
 
 @if conf.$details =='plus' {
@@ -142,6 +134,12 @@
 @else if conf.$details =='arrow' {
     @include details_arrow.styles;
 }
+
+// блок "ещё почитать" — все варианты компилируются всегда (переключение через CSS-класс)
+@include more_pages_grid.styles;
+@include more_pages_list.styles;
+@include more_pages_slider.styles;
+@include more_pages_carousel.styles;
 
 
 

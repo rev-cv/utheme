@@ -8,6 +8,7 @@
         margin: 20px auto;
         padding: 0 conf.$default-space;
         max-width: conf.$max-width;
+        width: 100%;
 
         a {
             @include f.font-hd;
@@ -22,9 +23,7 @@
                 color: (conf.$color-text-light, conf.$color-text-dark),
             ));
 
-            @if conf.$is-left-align == 'false' {
-                text-align: center;
-            }
+            text-align: #{conf.$menu-accent-align};
         }
     }
 
@@ -33,8 +32,10 @@
         position: sticky;
         top: 0;
         z-index: 999;
-
-        padding: 15px 0;
+        width: 100%;
+        margin: 20px auto;
+        padding: 15px conf.$default-space;
+        max-width: conf.$max-width;
 
         @include f.mode((
             background: (rgba(conf.$color-bg-light, 0.95), rgba(conf.$color-bg-dark, 0.95)),
@@ -55,12 +56,9 @@
         padding: 0;
         margin: 0;
         display: flex;
-        justify-content: center;
+        justify-content: #{conf.$menu-accent-align};
         flex-wrap: wrap;
-        max-width: 700px;
-        margin: 0 auto;
         gap: .5em clamp(1em, 1.5vw, 2em);
-        padding: 0 conf.$default-space;
 
         li a {
             @include f.font-txt;

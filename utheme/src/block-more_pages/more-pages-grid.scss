@@ -1,0 +1,187 @@
+@use 'sass:color';
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$sp:    conf.$default-space;
+$sp-sm: calc(#{$sp} * 0.55);
+$sp-xs: calc(#{$sp} * 0.35);
+
+@mixin styles {
+    .more-pages--grid {
+        max-width: conf.$max-width;
+        width: 100%;
+        margin: 0 auto;
+        padding: $sp clamp(1rem, 3vw, 2rem);
+
+        /* ── Items: bento grid ──────────────────────────────────── */
+        .more-pages__items {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-auto-rows: clamp(140px, 20vw, 200px);
+            gap: $sp-xs;
+
+            @media (max-width: 768px) {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 160px;
+            }
+
+            @media (max-width: 480px) {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 220px;
+            }
+        }
+
+        /* ── Card ───────────────────────────────────────────────── */
+        .more-pages__card {
+            grid-column: span 2;
+            position: relative;
+            overflow: hidden;
+            border-radius: f.get-radius("card");
+            background: conf.$color-section-light;
+            cursor: pointer;
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-section-dark;
+            }
+
+            // First card — large (4/6 cols × 2 rows)
+            &:nth-child(1) {
+                grid-column: span 4;
+                grid-row: span 2;
+
+                @media (max-width: 768px) {
+                    grid-column: span 2;
+                    grid-row: span 2;
+                }
+
+                @media (max-width: 480px) {
+                    grid-column: span 1;
+                    grid-row: span 1;
+                }
+            }
+
+            // 4th and 5th — half the bottom row each
+            &:nth-child(4),
+            &:nth-child(5) {
+                grid-column: span 3;
+
+                @media (max-width: 768px) {
+                    grid-column: span 1;
+                }
+
+                @media (max-width: 480px) {
+                    grid-column: span 1;
+                }
+            }
+
+            // Single card — full row
+            &:first-child:last-child {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* ── Stretched link ─────────────────────────────────────── */
+        .more-pages__link {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+
+            &:focus-visible {
+                outline: 2px solid conf.$color-accent-light;
+                outline-offset: 2px;
+
+                @media (prefers-color-scheme: dark) {
+                    outline-color: conf.$color-accent-dark;
+                }
+            }
+        }
+
+        /* ── Thumbnail ──────────────────────────────────────────── */
+        .more-pages__thumb {
+            position: absolute;
+            inset: 0;
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(
+                    to top,
+                    rgba(0, 0, 0, .80) 0%,
+                    rgba(0, 0, 0, .30) 50%,
+                    rgba(0, 0, 0, .05) 100%
+                );
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                min-height: 0 !important;
+                object-fit: cover;
+                transition: transform 350ms ease, filter 350ms ease;
+            }
+        }
+
+        .more-pages__card:hover .more-pages__thumb img {
+            transform: scale(1.05);
+            filter: blur(2px);
+        }
+
+        /* ── Info overlay ───────────────────────────────────────── */
+        .more-pages__info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: $sp-sm;
+            z-index: 1;
+        }
+
+        .more-pages__card-title {
+            @include f.font-hd;
+            color: #fff;
+            margin: 0 0 .25rem;
+            font-size: clamp(.82rem, 2.2vw, 1rem);
+            text-wrap: balance;
+        }
+
+        .more-pages__card:nth-child(1) .more-pages__card-title {
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+        }
+
+        .more-pages__desc {
+            color: rgba(255, 255, 255, .80);
+            font-size: clamp(.7rem, 1.8vw, .8rem);
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-wrap: balance;
+        }
+
+        /* ── Fallback: no featured image ────────────────────────── */
+        .more-pages__card:not(.has-thumb) {
+            .more-pages__info {
+                position: relative;
+                padding: $sp-sm;
+            }
+
+            .more-pages__card-title {
+                color: conf.$color-text-light;
+
+                @media (prefers-color-scheme: dark) {
+                    color: conf.$color-text-dark;
+                }
+            }
+
+            .more-pages__desc {
+                color: color.change(conf.$color-text-light, $alpha: .65);
+
+                @media (prefers-color-scheme: dark) {
+                    color: color.change(conf.$color-text-dark, $alpha: .65);
+                }
+            }
+        }
+    }
+}

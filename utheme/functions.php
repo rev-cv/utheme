@@ -14,6 +14,7 @@ $includes = array(
     'custom-styles.php',
     'shortcode-post-meta.php',
     'shortcode-related-articles.php',
+    'shortcode-more-pages.php',
     'shortcode-about-autor.php',
     'shortcode-breadcrumbs.php',
     "shortcode-inline.php",
@@ -24,7 +25,7 @@ $includes = array(
     'mod_img-lazy.php',
     'mod-toc-and-plugin.php',
     'mod_img-walker.php',
-    'mod-redirect-categories.php',
+    'mod-sitemap.php',
 );
 
 foreach ($includes as $file) {

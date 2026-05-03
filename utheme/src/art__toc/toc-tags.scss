@@ -1,0 +1,111 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$tx-light: conf.$color-text-light;
+$tx-dark:  conf.$color-text-dark;
+$bg-light: conf.$color-section-light;
+$bg-dark:  conf.$color-section-dark;
+
+$gap:   calc(conf.$default-space / 3);
+$pad-y: calc(conf.$default-space / 3);
+$pad-x: calc(conf.$default-space / 2);
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: $gap;
+        user-select: none;
+        contain: layout style;
+
+        .page-toc-title {
+            margin: 0;
+            padding: $pad-y $pad-x $pad-y 0;
+            flex-shrink: 0;
+            align-self: center;
+            font-size: clamp(.8rem, 3vw, 1rem);
+            font-weight: 600;
+            white-space: nowrap;
+            color: $tx-light;
+
+            @media (prefers-color-scheme: dark) {
+                color: $tx-dark;
+            }
+
+            &::after {
+                content: ':';
+            }
+        }
+
+        ol.page-toc-list {
+            display: contents;
+        }
+
+        li.page-toc-level-2 {
+            flex: 1 1 auto;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            min-width: 0;
+
+            a {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                padding: $pad-y $pad-x;
+                background-color: $bg-light;
+                color: $tx-light;
+                text-decoration: none;
+                font-size: clamp(.75rem, 2.5vw, .9rem);
+                font-weight: normal;
+                border-radius: f.get-radius();
+                transition: background-color 200ms ease;
+                text-align: center;
+
+                @if conf.$is-border == 'true' {
+                    border: 1px solid conf.$color-border-light;
+
+                    @media (prefers-color-scheme: dark) {
+                        border-color: conf.$color-border-dark;
+                    }
+                }
+
+                @media (prefers-color-scheme: dark) {
+                    background-color: $bg-dark;
+                    color: $tx-dark;
+                }
+
+                &:hover {
+                    text-decoration: none;
+                    background-color: sys.adjust($bg-light, $lightness: -8%);
+
+                    @media (prefers-color-scheme: dark) {
+                        background-color: sys.adjust($bg-dark, $lightness: 8%);
+                    }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title {
+            font-size: .75em;
+        }
+
+        li.page-toc-level-2 a {
+            font-size: .7em;
+        }
+    }
+
+    article div.toc {
+        margin-bottom: clamp(.7em, 5vw, 2em) !important;
+        margin-top: clamp(1.4em, 5vw, 3em) !important;
+    }
+
+}

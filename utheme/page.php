@@ -27,6 +27,12 @@
             <?php echo $extracted['content']; ?>
         </article>
     </main>
+    <?php
+    $_utility = get_term_by('name', 'Utility Pages', 'category');
+    if (!$_utility || !has_term($_utility->term_id, 'category', get_the_ID())) {
+        echo render_more_pages(5);
+    }
+    ?>
 <?php endwhile; ?>
 
 <?php

@@ -48,6 +48,7 @@
             align-items: center;
             height: 100%;
             padding: 0 20px;
+            position: relative;
         }
 
         .site-logo {
@@ -85,11 +86,25 @@
                     color: ($text-light, $text-dark),
                 ));
             }
+
+            @if conf.$menu-accent-align == 'center' {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-left: 0;
+            } @else if conf.$menu-accent-align == 'right' and conf.$is-menu-title == 'true' {
+                margin-left: auto;
+                margin-right: 0;
+            }
         }
 
         .menu-toggle {
             flex-shrink: 0;
-            margin-left: auto;
+            @if conf.$menu-accent-align == 'right' and conf.$is-menu-title == 'true' {
+                margin-left: 10px;
+            } @else {
+                margin-left: auto;
+            }
             background: none;
             border: none;
             cursor: pointer;

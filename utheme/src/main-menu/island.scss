@@ -95,7 +95,8 @@
         .island-main {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            position: relative;
             padding: 10px 25px 10px 22px;
             height: 60px;
 
@@ -159,6 +160,16 @@
             @media (max-width: 768px) {
                 display: none;
             }
+        }
+
+        @if conf.$menu-accent-align == 'center' {
+            .island-trigger { margin-left: auto; }
+            .island-name { position: absolute; left: 50%; transform: translateX(-50%); }
+        } @else if conf.$menu-accent-align == 'right' and conf.$is-menu-title == 'true' {
+            .island-name { margin-left: auto; }
+            .island-trigger { margin-left: 10px; }
+        } @else {
+            .island-trigger { margin-left: auto; }
         }
 
         .menu-title {

@@ -3,8 +3,6 @@
  * Template Name: PAGE LIST
  */
 
-get_header();
-
 // 1. Конфигурация
 $TEXT_NO_FOUND = get_site_translation('not_found');
 $TEXT_READING  = get_site_translation('read_more');
@@ -15,18 +13,16 @@ $current_slug  = get_post_field('post_name', get_post());
 
 // 2. Логика определения запроса
 if ($current_slug === 'news') {
-    // Настройки для НОВОСТЕЙ (Записи)
     $args = array(
-        'post_type'      => 'post',      // Тянем посты
-        'category_name'  => 'news',      // Категория news
+        'post_type'      => 'post',
+        'category_name'  => 'news',
         'posts_per_page' => 12,
         'paged'          => $paged,
     );
 } else {
-    // Настройки для СТАТЕЙ (Страницы)
     $home_id = get_option('page_on_front');
     $args = array(
-        'post_type'      => 'page',      // Тянем страницы
+        'post_type'      => 'page',
         'posts_per_page' => 12,
         'paged'          => $paged,
         'post__not_in'   => array($home_id),
@@ -39,12 +35,20 @@ if ($current_slug === 'news') {
             ),
         ),
     );
-    
-    // Если есть ID категории, которую нужно исключить (из твоего шорткода)
     $args['category__not_in'] = array(15);
 }
 
 $query = new WP_Query($args);
+
+if ($query->found_posts <= 1) {
+    add_filter('wp_robots', function ($robots) {
+        $robots['noindex'] = true;
+        $robots['follow']  = true;
+        return $robots;
+    });
+}
+
+get_header();
 ?>
 
 <main id="site-main" class="site-main">

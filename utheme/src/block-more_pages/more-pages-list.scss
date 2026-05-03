@@ -1,0 +1,166 @@
+@use 'sass:color';
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$sp:    conf.$default-space;
+$sp-sm: calc(#{$sp} * 0.55);
+$sp-xs: calc(#{$sp} * 0.35);
+
+@mixin styles {
+    .more-pages--list {
+        max-width: conf.$max-width;
+        width: 100%;
+        margin: 0 auto;
+        padding: $sp clamp(1rem, 3vw, 2rem);
+
+        /* ── Items: multi-column list ───────────────────────────── */
+        .more-pages__items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(444px, 1fr));
+            gap: $sp-xs;
+
+            @media (max-width: 540px) {
+                grid-template-columns: 1fr;
+            }
+
+            // Orphan last card stretches to fill the empty column
+            .more-pages__card:last-child {
+                @media (min-width: 945px) {
+                    &:nth-child(2n + 1) { grid-column: span 2; }
+                }
+            }
+        }
+
+        /* ── Card ───────────────────────────────────────────────── */
+        .more-pages__card {
+            display: grid;
+            grid-template-columns: 135px 1fr;
+            align-items: center;
+            column-gap: $sp-sm;
+            padding: $sp-sm $sp;
+            position: relative;
+            background: conf.$color-section-light;
+            border-radius: f.get-radius("card");
+            transition: box-shadow 200ms ease;
+            cursor: pointer;
+
+            @if conf.$is-border == 'true' {
+                border: 1px solid conf.$color-border-light;
+
+                @media (prefers-color-scheme: dark) {
+                    border-color: conf.$color-border-dark;
+                }
+            }
+
+            @media (prefers-color-scheme: dark) {
+                background: conf.$color-section-dark;
+            }
+
+            &:hover {
+                box-shadow: conf.$shadow-section-hover;
+            }
+
+            // No thumbnail — single column layout
+            &:not(.has-thumb) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Stretched link ─────────────────────────────────────── */
+        .more-pages__link {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+
+            &:focus-visible {
+                outline: 2px solid conf.$color-accent-light;
+                outline-offset: 2px;
+                border-radius: f.get-radius("card");
+
+                @media (prefers-color-scheme: dark) {
+                    outline-color: conf.$color-accent-dark;
+                }
+            }
+        }
+
+        /* ── Thumbnail ──────────────────────────────────────────── */
+        .more-pages__thumb {
+            width: 135px;
+            aspect-ratio: 270 / 163;
+            border-radius: f.get-radius-single("card");
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                min-height: 0 !important;
+                object-fit: cover;
+                display: block;
+            }
+        }
+
+        /* ── Info ───────────────────────────────────────────────── */
+        .more-pages__info {
+            min-width: 0;
+        }
+
+        .more-pages__card-title {
+            @include f.font-hd;
+            margin: 0 0 .2rem;
+            font-size: clamp(.85rem, 2.5vw, 1rem);
+            color: conf.$color-text-light;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 150ms;
+            text-wrap: balance;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-text-dark;
+            }
+        }
+
+        .more-pages__card:hover .more-pages__card-title {
+            color: conf.$color-accent-light;
+
+            @media (prefers-color-scheme: dark) {
+                color: conf.$color-accent-dark;
+            }
+        }
+
+        .more-pages__desc {
+            margin: 0;
+            font-size: clamp(.7rem, 2vw, .82rem);
+            color: color.change(conf.$color-text-light, $alpha: .6);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-wrap: balance;
+
+            @media (prefers-color-scheme: dark) {
+                color: color.change(conf.$color-text-dark, $alpha: .65);
+            }
+        }
+
+        /* ── Mobile (≤ 480px) — vertical card layout ────────────── */
+        @media (max-width: 480px) {
+            .more-pages__card {
+                grid-template-columns: 1fr;
+                justify-items: center;
+                text-align: center;
+                padding: $sp-sm;
+                gap: 10px;
+            }
+
+            .more-pages__thumb {
+                width: 100%;
+                max-width: 135px;
+            }
+
+            .more-pages__card-title,
+            .more-pages__desc {
+                white-space: normal;
+            }
+        }
+    }
+}

@@ -39,7 +39,8 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             padding: 8px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
+            position: relative;
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15);
 
             /* Плавная компенсация сдвига при JS-блокировке скролла */
@@ -96,7 +97,6 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 word-spacing: .5em;
                 letter-spacing: .2em;
                 line-height: 1.1em;
-                text-align: center;
                 flex-grow: 1;
                 display: flex;
                 padding-right: 1em;
@@ -108,6 +108,16 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                     color: conf.$color-primary-dark;
                 }
             }
+        }
+
+        @if conf.$menu-accent-align == 'center' {
+            .menu-toggle { margin-left: auto; }
+            .site-name { position: absolute; left: 50%; transform: translateX(-50%); }
+        } @else if conf.$menu-accent-align == 'right' and conf.$is-menu-title == 'true' {
+            .site-name { margin-left: auto; }
+            .menu-toggle { margin-left: 10px; }
+        } @else {
+            .menu-toggle { margin-left: auto; }
         }
 
         /* Кнопка Бургер */

@@ -19,7 +19,7 @@ function my_theme_setup()
     register_nav_menus(
         array(
             'header-menu' => __('MainMenu'),
-            'footer-menu' => __('FooterMenu')
+            'footer-menu' => __('FooterMenu'),
         )
     );
 
@@ -366,3 +366,5 @@ add_filter('wp_calculate_image_sizes', function($sizes, $size) {
     // Если это миниатюра в списке постов, ограничиваем её "аппетиты"
     return '(max-width: 450px) 100vw, 400px';
 }, 10, 2);
+
+require_once __DIR__ . '/site-meta.php';
