@@ -56,6 +56,10 @@ $footer-border-dark: rgba(conf.$color-text-dark, .1);
             @media (max-width: 540px) {
                 grid-template-columns: 1fr;
                 text-align: if(conf.$is-left-align == 'true', left, center);
+
+                &.footer-4col--compact-brand {
+                    grid-template-columns: 1fr;
+                }
             }
         }
 

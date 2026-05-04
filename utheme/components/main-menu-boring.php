@@ -63,15 +63,10 @@
 
         // ── Открытие / закрытие ───────────────────────────────────────────────
 
-        function getScrollbarWidth() {
-            return window.innerWidth - document.documentElement.clientWidth;
-        }
-
         function openMenu() {
             menuIsOpen = true;
-            var sw = getScrollbarWidth();
             body.classList.add('menu-open');
-            if (sw) body.style.paddingRight = sw + 'px';
+            viewport.style.overflowY = 'hidden';
 
             // Measure natural height (capped at 80vh)
             panel.style.height = 'auto';
@@ -87,13 +82,15 @@
             function onOpen() {
                 panel.removeEventListener('transitionend', onOpen);
                 panel.style.transition = '';
-                // keep height at target px so drill-viewport can scroll
+                viewport.style.overflowY = '';
             }
             panel.addEventListener('transitionend', onOpen);
         }
 
         function closeMenu() {
             menuIsOpen = false;
+            viewport.style.overflowY = 'hidden';
+
             // Pin current height, then animate to 0
             panel.style.height = panel.offsetHeight + 'px';
             panel.offsetHeight; // eslint-disable-line no-unused-expressions
@@ -103,8 +100,7 @@
             function onClose() {
                 panel.removeEventListener('transitionend', onClose);
                 body.classList.remove('menu-open');
-                body.style.paddingRight = '';
-                if (headerIsland) headerIsland.style.marginRight = '';
+                viewport.style.overflowY = '';
                 resetDrill();
             }
             panel.addEventListener('transitionend', onClose);

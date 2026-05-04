@@ -33,6 +33,7 @@ MANIFEST     = ROOT_DIR / "manifest.json"
 def run():
     _header("PIPELINE START")
     _check_lang()
+    _check_admin_user()
 
     STAGING_DIR.mkdir(exist_ok=True)
     (STAGING_DIR / "images").mkdir(exist_ok=True)
@@ -130,50 +131,126 @@ def _convert_html_to_wp(pages: list[dict], out_dir: Path):
 
 def _compress_images(pics: list[dict], out_dir: Path, max_kb: int):
     import shutil
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
     from core import convertation_images as cimg
 
     col = 42
+    n_workers = 4
+
+    valid = [p for p in pics if p.get("selected_image") and Path(p["selected_image"]).exists()]
+    n_slots = min(n_workers, len(valid))
+
     print(f"\n  {'Файл':<{col}} {'До':>8}   {'После':>8}   Статус")
     print(f"  {'─'*col} {'─'*8}   {'─'*8}   {'─'*8}")
 
-    done = skipped = errors = 0
+    if not n_slots:
+        print(f"\n  Нет изображений для обработки.")
+        return
 
-    for pic in pics:
+    states: list[tuple[str, float, str, str]] = [("", 0.0, "", "—")] * n_slots
+    lock = threading.Lock()
+
+    thread_slots: dict[int, int] = {}
+    next_slot = [0]
+    slot_assign_lock = threading.Lock()
+
+    def get_slot() -> int:
+        tid = threading.get_ident()
+        with slot_assign_lock:
+            if tid not in thread_slots:
+                thread_slots[tid] = next_slot[0]
+                next_slot[0] += 1
+        return thread_slots[tid]
+
+    for _ in range(n_slots):
+        print()
+
+    def _draw_slots() -> None:
+        for name, src_kb, after_str, status in states:
+            line = f"  {name:<{col}} {src_kb:>6.1f} KB   {after_str:>8}   {status}"
+            sys.stdout.write(f"\r\033[2K{line[:120]}\n")
+
+    def redraw() -> None:
+        """Перерисовать живую область (прогресс)."""
+        sys.stdout.write(f"\033[{n_slots}A")
+        _draw_slots()
+        sys.stdout.flush()
+
+    def emit_completed(line_text: str) -> None:
+        """Вставить постоянную строку над живой областью, сдвинув её вниз."""
+        sys.stdout.write(f"\033[{n_slots}A")   # к началу живой области
+        sys.stdout.write("\033[L")              # вставить пустую строку → живая область уходит вниз
+        sys.stdout.write(f"\r{line_text[:120]}\n")  # заполнить вставленную строку результатом
+        _draw_slots()                           # перерисовать живую область (теперь на строку ниже)
+        sys.stdout.flush()
+
+    counters = {"done": 0, "skipped": 0, "errors": 0}
+
+    def process(pic: dict) -> None:
         src = pic.get("selected_image")
         if not src or not Path(src).exists():
-            continue
-        src     = Path(src)
-        dst     = out_dir / src.with_suffix(".webp").name
-        src_kb  = src.stat().st_size / 1024
-        name    = src.name[:col]
+            return
+
+        slot   = get_slot()
+        src    = Path(src)
+        dst    = out_dir / src.with_suffix(".webp").name
+        src_kb = src.stat().st_size / 1024
+        name   = src.name[:col]
+
+        with lock:
+            states[slot] = (name, src_kb, "", "→ ...")
+            redraw()
 
         if dst.exists():
             dst_kb = dst.stat().st_size / 1024
-            print(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   пропуск")
             pic["selected_image"] = dst
-            skipped += 1
-            continue
+            with lock:
+                states[slot] = (name, src_kb, f"{dst_kb:.1f} KB", "пропуск")
+                counters["skipped"] += 1
+                emit_completed(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   пропуск")
+            return
 
         if src_kb < max_kb and src.suffix.lower() == ".webp":
             shutil.copy2(src, dst)
             dst_kb = dst.stat().st_size / 1024
-            print(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   копия")
             pic["selected_image"] = dst
-            done += 1
-            continue
+            with lock:
+                states[slot] = (name, src_kb, f"{dst_kb:.1f} KB", "копия")
+                counters["done"] += 1
+                emit_completed(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   копия")
+            return
 
-        tmp = cimg.convert_to_webp_and_compress(src, max_kb)
+        def on_progress(status_text: str) -> None:
+            with lock:
+                states[slot] = (name, src_kb, "", status_text)
+                redraw()
+
+        tmp = cimg.convert_to_webp_and_compress(src, max_kb, on_progress=on_progress)
+
         if tmp and Path(tmp).exists():
             dst_kb = Path(tmp).stat().st_size / 1024
             shutil.move(str(tmp), dst)
             pic["selected_image"] = dst
-            print(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   ✓")
-            done += 1
+            with lock:
+                states[slot] = (name, src_kb, f"{dst_kb:.1f} KB", "✓")
+                counters["done"] += 1
+                emit_completed(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   ✓")
         else:
-            print(f"  {name:<{col}} {src_kb:>6.1f} KB   {'—':>8}   ошибка")
-            errors += 1
+            with lock:
+                states[slot] = (name, src_kb, "—", "ошибка")
+                counters["errors"] += 1
+                emit_completed(f"  {name:<{col}} {src_kb:>6.1f} KB   {'—':>8}   ошибка")
 
-    print(f"\n  Сжато: {done}  |  Пропущено (уже есть): {skipped}  |  Ошибок: {errors}")
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+        list(executor.map(process, pics))
+
+    # Удалить живую область (все результаты уже напечатаны выше через emit_completed)
+    with lock:
+        sys.stdout.write(f"\033[{n_slots}A\033[{n_slots}M")
+        sys.stdout.flush()
+
+    print(f"\n  Сжато: {counters['done']}  |  Пропущено (уже есть): {counters['skipped']}  |  Ошибок: {counters['errors']}")
 
 
 # ─── Шаг 7: сборка манифеста ─────────────────────────────────────────────────
@@ -426,7 +503,7 @@ def _install_and_activate_plugin(slug: str):
     result = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
          "wp", "plugin", "install", slug, "--activate", "--path=/var/www/html"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if result.returncode != 0:
         output = (result.stdout + result.stderr).strip()
@@ -441,13 +518,28 @@ def _activate_plugin(slug: str):
     result = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
          "wp", "plugin", "activate", slug, "--path=/var/www/html"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if result.returncode != 0:
         output = (result.stdout + result.stderr).strip()
         print(f"  [!] Не удалось активировать плагин: {output}")
     else:
         print(f"  Плагин '{slug}' активирован.")
+
+
+# ─── Проверка конфигурации ───────────────────────────────────────────────────
+
+def _check_admin_user():
+    import re
+    raw = os.environ.get("ADMIN_USER", "").strip()
+    if not raw:
+        print("\n  ОШИБКА: переменная ADMIN_USER не задана в .env.")
+        sys.exit(1)
+    if not re.fullmatch(r"[a-zA-Z0-9_.\-@]+", raw):
+        invalid = "".join(sorted({c for c in raw if not re.match(r"[a-zA-Z0-9_.\-@]", c)}))
+        print(f"\n  ОШИБКА: ADMIN_USER={raw!r} содержит недопустимые символы: {invalid!r}")
+        print("  WordPress разрешает только: a-z A-Z 0-9 _ . - @")
+        sys.exit(1)
 
 
 # ─── Проверка языка ──────────────────────────────────────────────────────────

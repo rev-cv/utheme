@@ -106,7 +106,7 @@ function render_more_pages(int $count = 5, string $style = ''): string {
                 $img_url   = get_the_post_thumbnail_url($pid, 'large');
                 $has_thumb = $img_url ? ' has-thumb' : '';
             ?>
-                <article class="more-pages__card<?php echo esc_attr($has_thumb); ?>">
+                <div class="more-pages__card<?php echo esc_attr($has_thumb); ?>">
                     <a class="more-pages__link"
                        href="<?php echo esc_url($url); ?>"
                        aria-label="<?php echo esc_attr($title); ?>"></a>
@@ -123,7 +123,7 @@ function render_more_pages(int $count = 5, string $style = ''): string {
                             <p class="more-pages__desc"><?php echo esc_html($desc); ?></p>
                         <?php endif; ?>
                     </div>
-                </article>
+                </div>
             <?php endforeach;
             wp_reset_postdata(); ?>
         </div>

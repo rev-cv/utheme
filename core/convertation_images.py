@@ -7,7 +7,7 @@ import requests
 from pathlib import Path
 from PIL import Image
 
-def convert_to_webp_and_compress(file_path, max_size_kb):
+def convert_to_webp_and_compress(file_path, max_size_kb, on_progress=None):
     """Специализированная функция для принудительного WebP"""
     target_size = max_size_kb * 1024
     temp_dir = Path(tempfile.mkdtemp())
@@ -28,26 +28,33 @@ def convert_to_webp_and_compress(file_path, max_size_kb):
             curr_img = img
             if resize_factor < 1.0:
                 curr_img = img.resize((int(img.width * resize_factor), int(img.height * resize_factor)), Image.Resampling.LANCZOS)
-            
+
             curr_img.save(buf, format='WEBP', quality=quality, method=6) # method 6 = лучшее сжатие
-            
-            print(f"    сжимаю {file_path.name} до <{max_size_kb} KB: {buf.tell() / 1024:.2f} KB | Q={quality} | Resize={resize_factor:.2f}", end="\r", flush=True)
+
+            current_kb = buf.tell() / 1024
+            if on_progress:
+                on_progress(f"→ {current_kb:.0f}KB Q={quality} R={resize_factor:.2f}")
+            else:
+                print(f"    сжимаю {file_path.name} до <{max_size_kb} KB: {current_kb:.2f} KB | Q={quality} | Resize={resize_factor:.2f}", end="\r", flush=True)
 
             if buf.tell() <= target_size:
-                print(f"\r{' ' * 100}\r", end="", flush=True)
+                if not on_progress:
+                    print(f"\r{' ' * 100}\r", end="", flush=True)
                 temp_path.write_bytes(buf.getvalue())
                 return temp_path
-            
+
             if quality > 25:
                 quality -= 10
             elif resize_factor > 0.3:
                 resize_factor -= 0.1
                 quality = 85
             else:
-                print(f"\r{' ' * 100}\r", end="", flush=True)
+                if not on_progress:
+                    print(f"\r{' ' * 100}\r", end="", flush=True)
                 return None
     except Exception as e:
-        print(f"    Ошибка конвертации в WebP: {e}")
+        if not on_progress:
+            print(f"    Ошибка конвертации в WebP: {e}")
         return None
 
 

@@ -140,8 +140,8 @@
                 @include f.font-txt;
                 font-weight: 700;
                 text-decoration: none;
-                padding-left: clamp(1em, 2vw, 3em);
-                padding-right: clamp(1em, 2vw, 3em);
+                // padding-left: clamp(1em, 2vw, 3em);
+                // padding-right: clamp(1em, 2vw, 3em);
                 // padding-right: clamp(1.3em, 3vw, 4em);
                 transform: translateX(-.3em) translateY(2px);
                 font-size: clamp(.6em, 1vw, 1em);

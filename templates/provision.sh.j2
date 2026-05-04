@@ -278,11 +278,12 @@ done < <(wp eval-file /tmp/create_pages.php 2>/dev/null)
 rm -f /tmp/create_pages.php /tmp/media_ids.json
 
 # Homepage and privacy page
-wp eval "
-update_option('show_on_front', 'page');
-update_option('page_on_front', ${PAGE_IDS[index]});
-update_option('wp_page_for_privacy_policy', ${PAGE_IDS[privacy-policy]});
-"
+if [ -n "${PAGE_IDS[index]}" ]; then
+    wp eval "update_option('show_on_front', 'page'); update_option('page_on_front', ${PAGE_IDS[index]});"
+fi
+if [ -n "${PAGE_IDS[privacy-policy]}" ]; then
+    wp eval "update_option('wp_page_for_privacy_policy', ${PAGE_IDS[privacy-policy]});"
+fi
 
 # ===========================================================================
 # 9. WELCOME NEWS POST
