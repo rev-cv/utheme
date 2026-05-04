@@ -17,60 +17,29 @@
 }
 
 @mixin font-hd {
-    @if map.has-key(conf.$active-pair, 'hd-family') {
-        font-family: string.unquote(map.get(conf.$active-pair, 'hd-family'));
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-weight') {
-        font-weight: map.get(conf.$active-pair, 'hd-weight');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-case') {
-        text-transform: map.get(conf.$active-pair, 'hd-case');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-letter-spacing') {
-        letter-spacing: map.get(conf.$active-pair, 'hd-letter-spacing');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-height') {
-        line-height: map.get(conf.$active-pair, 'hd-height');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-style') {
-        font-style: map.get(conf.$active-pair, 'hd-style');
-    }
+    font-family:    string.unquote(map.get(conf.$active-pair, 'hd-family'));
+    font-weight:    conf.$hd-weight;
+    font-style:     conf.$hd-italic;
+    text-transform: conf.$hd-case;
+    letter-spacing: conf.$hd-letter-spacing;
+    line-height:    conf.$hd-height;
 }
 
 @mixin font-txt {
-    @if map.has-key(conf.$active-pair, 'txt-family') {
-        font-family: string.unquote(map.get(conf.$active-pair, 'txt-family'));
-    }
-
-    font-weight: 400; // Обычно текст всегда 400
+    font-family:    string.unquote(map.get(conf.$active-pair, 'txt-family'));
+    font-weight:    conf.$txt-weight;
     text-transform: none;
+    letter-spacing: conf.$txt-letter-spacing;
+    line-height:    conf.$txt-height;
 }
 
 @mixin font-logo {
-    @if map.has-key(conf.$active-pair, 'hd-family') {
-        font-family: string.unquote(map.get(conf.$active-pair, 'hd-family'));
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-weight') {
-        font-weight: map.get(conf.$active-pair, 'hd-weight');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-case') {
-        text-transform: map.get(conf.$active-pair, 'hd-case');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-letter-spacing') {
-        letter-spacing: map.get(conf.$active-pair, 'hd-letter-spacing');
-    }
-
-    @if map.has-key(conf.$active-pair, 'hd-height') {
-        line-height: map.get(conf.$active-pair, 'hd-height');
-    }
+    font-family:    string.unquote(map.get(conf.$active-pair, 'hd-family'));
+    font-weight:    conf.$hd-weight;
+    font-style:     conf.$hd-italic;
+    text-transform: conf.$hd-case;
+    letter-spacing: conf.$hd-letter-spacing;
+    line-height:    conf.$hd-height;
 }
 
 

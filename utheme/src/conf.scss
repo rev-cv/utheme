@@ -57,6 +57,18 @@ $is-border: "true"; // true, false
 $font-vibe: "velocity";
 $active-pair: map.get(font.$font-pairs, $font-vibe);
 
+// типографика заголовков
+$hd-weight:         900;
+$hd-height:         1em;
+$hd-letter-spacing: -0.02em;
+$hd-case:           uppercase;
+$hd-italic:         normal;
+
+// типографика основного текста
+$txt-weight:         400;
+$txt-height:         1.55em;
+$txt-letter-spacing: 0em;
+
 // какой радиус использовать для секций, меню, карточек и прочее?
 $radius-vibe: "neutral";
 

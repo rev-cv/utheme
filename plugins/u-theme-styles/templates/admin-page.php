@@ -39,121 +39,34 @@ function u_color_field(string $name, string $value): void {
 
             <!-- ── Basic ──────────────────────────────────────────────────── -->
             <section id="basic" class="tab-pane active">
-                <h2>Basic Settings</h2>
                 <?php
                 $font_vibes = [
-                    'google' => [
-                        'label' => 'Google',  
-                        'desc' => 'Дружелюбие, мягкость, инновации. Идеальное решение для экосистемных продуктов и интерфейсов, ориентированных на пользователя. Создает ощущение доступности, простоты и технологичного комфорта..'
-                    ],
-                    'strict' => [
-                        'label' => 'Strict',
-                        'desc' => 'Дисциплина, точность, функциональность. Отлично подходит для дашбордов, CRM-систем и инструментов разработки. Подчеркивает аналитический характер продукта и фокус на данных.'
-                    ],
-                    'editorial' => [
-                        'label' => 'Editorial',
-                        'desc' => 'Эстетика, глубина, интеллектуальность. Превосходно подходит для лонгридов, медиа-проектов или брендов в сфере lifestyle. Передает атмосферу дорогого печатного издания и уважения к качественному контенту.'
-                    ],
-                    'startup' => [
-                        'label' => 'Startup',
-                        'desc' => 'Чистота, контроль, современность. Идеально для IT-сервисов и SaaS. Вызывает доверие и ощущение «отточенного» продукта.'
-                    ],
-                    'space' => [
-                        'label' => 'Space',
-                        'desc' => 'Открытость, дружелюбие. Широкие буквы Montserrat дают ощущение масштаба, а Open Sans легко читается в длинных текстах.'
-                    ],
-                    'syntax' => [
-                        'label' => 'Syntax',
-                        'desc' => 'Инженерная эстетика. Использование моноширинного шрифта в заголовках намекает на код, данные и точность.'
-                    ],
-                    'neo-swiss' => [
-                        'label' => 'Neo Swiss',
-                        'desc' => 'Функциональность без эмоций. Стиль швейцарской школы дизайна. Ничего лишнего, только информация.'
-                    ],
-                    'engineer' => [
-                        'label' => 'Engineer',
-                        'desc' => 'Дисциплина, точность, наследие. Это стиль чертежей, патентных бюро и серьезных лонгридов. Он выглядит так, будто информацию тщательно структурировали и проверили трижды.'
-                    ],
-                    'vogue' => [
-                        'label' => 'Vogue',
-                        'desc' => 'Роскошь, классика, высокий чек. Ассоциируется с модой, дорогими отелями и ювелирными брендами.'
-                    ],
-                    'boutique' => [
-                        'label' => 'Boutique',
-                        'desc' => 'Изящество и воздух. Тонкие засечки заголовка выглядят как искусство, а Montserrat придает современности.'
-                    ],
-                    'wisdom' => [
-                        'label' => 'Wisdom',
-                        'desc' => 'Античность, история. Для сайтов с глубоким смыслом: виноделие, архитектура, философия или дорогие аксессуары.'
-                    ],
-                    'noble' => [
-                        'label' => 'Noble',
-                        'desc' => 'Крафтовый премиум. Мягкие, «вкусные» формы Fraunces создают уютное, но очень дорогое ощущение (например, органика, кофе, мебель).'
-                    ],
-                    'manuscript' => [
-                        'label' => 'Manuscript',
-                        'desc' => 'Рукописная элегантность. DM Serif Display с высоким контрастом штрихов создаёт атмосферу литературного журнала или авторского блога.'
-                    ],
-                    'brutal' => [
-                        'label' => 'Brutal',
-                        'desc' => 'Энергия, бескомпромиссность, акцент. Лучший выбор для промо-страниц, креативных агентств или манифестов. Выглядит громко и уверенно, мгновенно захватывая внимание за счет массивных заголовков.'
-                    ],
-                    'urban' => [
-                        'label' => 'Urban',
-                        'desc' => 'Сила, агрессия, скорость. Уличная мода, спорт, энергетические напитки. Заголовки «бьют» в глаза.'
-                    ],
-                    'manifesto' => [
-                        'label' => 'Manifesto',
-                        'desc' => 'Газетный напор. Узкие и высокие заголовки напоминают плакаты или заголовки новостей. Вызывает чувство срочности и важности.'
-                    ],
-                    'black-metal' => [
-                        'label' => 'Black Metal',
-                        'desc' => 'Техно-футуризм. Широкие, массивные буквы Unbounded выглядят как нечто из будущего или ночного клуба.'
-                    ],
-                    'raw' => [
-                        'label' => 'Raw',
-                        'desc' => 'Диджитал-арт. Немного «сломанные» формы букв создают ощущение эксперимента, креативного агентства или крипто-проекта.'
-                    ],
-                    'velocity' => [
-                        'label' => 'Velocity',
-                        'desc' => 'Скорость, напор и мощь. Большие буквы в заголовках создают эффект громкого заявления, не оставляя места для сомнений.'
-                    ],
-                    'courtside' => [
-                        'label' => 'Courtside',
-                        'desc' => 'Спортивная энергия. Широкие заголовки Big Shoulders Display в капсе — ощущение стадиона и трибун. Saira Condensed держит читаемость в теле текста.'
-                    ],
-                    'district' => [
-                        'label' => 'District',
-                        'desc' => 'Городской конструктивизм. Ruslan Display отсылает к советскому плакату и уличной типографике, Inter обеспечивает нейтральность основного текста.'
-                    ],
-                    'blast' => [
-                        'label' => 'Blast',
-                        'desc' => 'Монолитный удар. Rubik Mono One — единственный вес, максимальная масса. Заголовок занимает всё пространство, Inter сохраняет читаемость тела.'
-                    ],
-                    'industry' => [
-                        'label' => 'Industry',
-                        'desc' => 'Промышленная чёткость. Oswald в капсе — архивы, документация, технические издания. Source Sans 3 обеспечивает максимальную читаемость текста.'
-                    ],
-                    'overdrive' => [
-                        'label' => 'Overdrive',
-                        'desc' => 'Энергия, плакатность, уверенность. Это классика современного маркетинга. Выглядит как заголовок крутого YouTube-канала, афиша блокбастера или лендинг фитнес-клуба.'
-                    ],
-                    'organic' => [
-                        'label' => 'Organic',
-                        'desc' => 'Мягкость, доброта, экология. Округлые формы успокаивают. Идеально для детских товаров или товаров для йоги и здоровья.'
-                    ],
-                    'vintage' => [
-                        'label' => 'Vintage',
-                        'desc' => 'Надежность прошлого. Напоминает старые книги или качественную журналистику 70-х. Вызывает ностальгию и доверие.'
-                    ],
-                    'interface' => [
-                        'label' => 'Interface',
-                        'desc' => 'Чистый интерфейс. Два нейтральных гротеска без стилистических акцентов — идеально для SaaS, документации и продуктовых лендингов.'
-                    ],
-                    'antidesign' => [
-                        'label' => 'Anti Design',
-                        'desc' => 'Ироничный примитивизм. Выглядит «никак», и в этом его сила. Для тех, кто настолько крут, что ему не нужен дизайн (арт-галереи, модные фотографы).'
-                    ],
+                    'google'      => ['label' => 'Google',      'desc' => 'Heading: Google Sans · Text: Google Sans'],
+                    'strict'      => ['label' => 'Strict',      'desc' => 'Heading: Inter · Text: Roboto Mono'],
+                    'editorial'   => ['label' => 'Editorial',   'desc' => 'Heading: Playfair Display · Text: Lora'],
+                    'startup'     => ['label' => 'Startup',     'desc' => 'Heading: Inter · Text: Inter'],
+                    'space'       => ['label' => 'Space',       'desc' => 'Heading: Montserrat · Text: Open Sans'],
+                    'syntax'      => ['label' => 'Syntax',      'desc' => 'Heading: JetBrains Mono · Text: Inter'],
+                    'neo-swiss'   => ['label' => 'Neo Swiss',   'desc' => 'Heading: Arimo · Text: Heebo'],
+                    'engineer'    => ['label' => 'Engineer',    'desc' => 'Heading: Barlow Condensed · Text: Source Serif 4'],
+                    'boutique'    => ['label' => 'Boutique',    'desc' => 'Heading: Cormorant Garamond · Text: Montserrat'],
+                    'wisdom'      => ['label' => 'Wisdom',      'desc' => 'Heading: Cinzel · Text: Fauna One'],
+                    'noble'       => ['label' => 'Noble',       'desc' => 'Heading: Fraunces · Text: Manrope'],
+                    'manuscript'  => ['label' => 'Manuscript',  'desc' => 'Heading: DM Serif Display · Text: Source Sans 3'],
+                    'brutal'      => ['label' => 'Brutal',      'desc' => 'Heading: Archivo Black · Text: Archivo'],
+                    'manifesto'   => ['label' => 'Manifesto',   'desc' => 'Heading: Roboto · Text: Oswald'],
+                    'black-metal' => ['label' => 'Black Metal', 'desc' => 'Heading: Jost · Text: Unbounded'],
+                    'raw'         => ['label' => 'Raw',         'desc' => 'Heading: Space Mono · Text: Space Grotesk'],
+                    'velocity'    => ['label' => 'Velocity',    'desc' => 'Heading: Exo 2 · Text: Red Hat Display'],
+                    'courtside'   => ['label' => 'Courtside',   'desc' => 'Heading: Big Shoulders Display · Text: Saira Condensed'],
+                    'district'    => ['label' => 'District',    'desc' => 'Heading: Ruslan Display · Text: Inter'],
+                    'blast'       => ['label' => 'Blast',       'desc' => 'Heading: Rubik Mono One · Text: Inter'],
+                    'industry'    => ['label' => 'Industry',    'desc' => 'Heading: Oswald · Text: Source Sans 3'],
+                    'overdrive'   => ['label' => 'Overdrive',   'desc' => 'Heading: Bebas Neue · Text: Montserrat'],
+                    'organic'     => ['label' => 'Organic',     'desc' => 'Heading: Nunito · Text: Comfortaa'],
+                    'vintage'     => ['label' => 'Vintage',     'desc' => 'Heading: DM Sans · Text: DM Serif Display'],
+                    'interface'   => ['label' => 'Interface',   'desc' => 'Heading: DM Sans · Text: Source Sans 3'],
+                    'antidesign'  => ['label' => 'Anti Design', 'desc' => 'Heading: Arial · Text: Times New Roman'],
                 ];
                 $font_sizes = range(14, 22);
                 $current_font_vibe = $v['font-vibe'] ?? 'neo-swiss';
@@ -167,28 +80,37 @@ function u_color_field(string $name, string $value): void {
                     'velocity' => ['label' => 'Velocity', 'desc' => 'Скорость и напор. Диагональная асимметрия — острый угол спереди, скругление сзади.'],
                     'chess'   => ['label' => 'Chess',   'desc' => 'Шахматный паттерн. Скруглены два противоположных угла по другой диагонали — карточки и кнопки выглядят как вырезанные из бумаги.'],
                     'sticker' => ['label' => 'Sticker', 'desc' => 'Бейдж и стикер. Крупные фиксированные радиусы, шапка скруглена только снизу — сайт выглядит как набор карточек-наклеек.'],
-
                 ];
                 $current_radius_vibe = $v['radius-vibe'] ?? 'neutral';
                 ?>
+
+                <!-- ── Card 1: Font Size ──────────────────────────────────── -->
                 <div class="u-card">
+                    <div class="u-card-header">
+                        <h3>Font Size</h3>
+                    </div>
+                    <div class="u-basic-field">
+                        <div class="u-basic-field-control">
+                            <select name="u_fields[font-size]">
+                                <?php foreach ($font_sizes as $size): ?>
+                                    <option value="<?= $size ?>px"
+                                        <?= ($v['font-size'] ?? '16px') === $size . 'px' ? 'selected' : '' ?>>
+                                        <?= $size ?>px
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <p class="u-desc">Базовый размер шрифта сайта. Все остальные размеры масштабируются относительно него.</p>
+                    </div>
+                </div>
+
+                <!-- ── Card 2: Font Vibe + Typography ────────────────────── -->
+                <div class="u-card">
+                    <div class="u-card-header">
+                        <h3>Font &amp; Typography</h3>
+                    </div>
                     <div class="u-card-body">
                         <div class="u-card-left">
-
-                            <div class="u-basic-field">
-                                <div class="u-basic-field-label">Font Size</div>
-                                <div class="u-basic-field-control">
-                                    <select name="u_fields[font-size]">
-                                        <?php foreach ($font_sizes as $size): ?>
-                                            <option value="<?= $size ?>px"
-                                                <?= ($v['font-size'] ?? '16px') === $size . 'px' ? 'selected' : '' ?>>
-                                                <?= $size ?>px
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <p class="u-desc">Базовый размер шрифта сайта. Все остальные размеры масштабируются относительно него.</p>
-                            </div>
 
                             <div class="u-basic-field">
                                 <div class="u-basic-field-label">Font Vibe</div>
@@ -211,6 +133,125 @@ function u_color_field(string $name, string $value): void {
                                 ?>;
                                 </script>
                             </div>
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">Typography</div>
+                                <?php
+                                $hd_weight    = $v['hd-weight']          ?? '900';
+                                $hd_height    = $v['hd-height']          ?? '1em';
+                                $hd_ls        = $v['hd-letter-spacing']  ?? '-0.02em';
+                                $hd_case      = $v['hd-case']            ?? 'uppercase';
+                                $hd_italic    = $v['hd-italic']          ?? 'normal';
+                                $txt_weight   = $v['txt-weight']         ?? '400';
+                                $txt_height   = $v['txt-height']         ?? '1.55em';
+                                $txt_ls       = $v['txt-letter-spacing'] ?? '0em';
+                                $hd_height_n  = rtrim($hd_height, 'em') ?: '1';
+                                $hd_ls_n      = rtrim($hd_ls,     'em') ?: '-0.02';
+                                $txt_height_n = rtrim($txt_height, 'em') ?: '1.55';
+                                $txt_ls_n     = rtrim($txt_ls,     'em') ?: '0';
+                                ?>
+                                <div class="u-typo-presets">
+                                    <span class="u-typo-presets-label">Presets:</span>
+                                    <button type="button" class="u-typo-preset button" data-preset="soft">Soft</button>
+                                    <button type="button" class="u-typo-preset button" data-preset="impact">Impact</button>
+                                    <button type="button" class="u-typo-preset button" data-preset="monolith">Monolith</button>
+                                    <button type="button" class="u-typo-preset button" data-preset="open">Open</button>
+                                </div>
+
+                                <div class="u-typo-table">
+
+                                    <span></span>
+                                    <span class="u-typo-col-head">Heading</span>
+                                    <span class="u-typo-col-head">Text</span>
+
+                                    <span class="u-typo-label">Weight</span>
+                                    <div class="u-typo-ctrl">
+                                        <input type="range" name="u_fields[hd-weight]"
+                                               min="100" max="900" step="100"
+                                               value="<?= esc_attr($hd_weight) ?>"
+                                               oninput="document.getElementById('hd-weight-output').textContent = this.value">
+                                        <output id="hd-weight-output"><?= esc_html($hd_weight) ?></output>
+                                    </div>
+                                    <div class="u-typo-ctrl">
+                                        <input type="range" name="u_fields[txt-weight]"
+                                               min="100" max="900" step="100"
+                                               value="<?= esc_attr($txt_weight) ?>"
+                                               oninput="document.getElementById('txt-weight-output').textContent = this.value">
+                                        <output id="txt-weight-output"><?= esc_html($txt_weight) ?></output>
+                                    </div>
+
+                                    <span class="u-typo-label">Line Height</span>
+                                    <div class="u-typo-ctrl">
+                                        <input type="range" name="u_fields[hd-height]"
+                                               min="0.8" max="1.6" step="0.05"
+                                               value="<?= esc_attr($hd_height_n) ?>"
+                                               oninput="document.getElementById('hd-height-output').textContent = fmtEm(this.value)">
+                                        <output id="hd-height-output"><?= esc_html($hd_height) ?></output>
+                                    </div>
+                                    <div class="u-typo-ctrl">
+                                        <input type="range" name="u_fields[txt-height]"
+                                               min="1.2" max="2.2" step="0.05"
+                                               value="<?= esc_attr($txt_height_n) ?>"
+                                               oninput="document.getElementById('txt-height-output').textContent = fmtEm(this.value)">
+                                        <output id="txt-height-output"><?= esc_html($txt_height) ?></output>
+                                    </div>
+
+                                    <span class="u-typo-label">Spacing</span>
+                                    <div class="u-typo-ctrl">
+                                        <input type="range" name="u_fields[hd-letter-spacing]"
+                                               min="-0.08" max="0.08" step="0.005"
+                                               value="<?= esc_attr($hd_ls_n) ?>"
+                                               oninput="document.getElementById('hd-ls-output').textContent = fmtEm(this.value)">
+                                        <output id="hd-ls-output"><?= esc_html($hd_ls) ?></output>
+                                    </div>
+                                    <div class="u-typo-ctrl">
+                                        <input type="range" name="u_fields[txt-letter-spacing]"
+                                               min="-0.04" max="0.04" step="0.005"
+                                               value="<?= esc_attr($txt_ls_n) ?>"
+                                               oninput="document.getElementById('txt-ls-output').textContent = fmtEm(this.value)">
+                                        <output id="txt-ls-output"><?= esc_html($txt_ls) ?></output>
+                                    </div>
+
+                                    <span class="u-typo-label">Case</span>
+                                    <select name="u_fields[hd-case]" class="u-typo-case-select">
+                                        <option value="none"      <?= $hd_case === 'none'      ? 'selected' : '' ?>>Normal</option>
+                                        <option value="uppercase" <?= $hd_case === 'uppercase' ? 'selected' : '' ?>>Uppercase</option>
+                                        <option value="lowercase" <?= $hd_case === 'lowercase' ? 'selected' : '' ?>>Lowercase</option>
+                                    </select>
+                                    <span></span>
+
+                                    <span class="u-typo-label">Style</span>
+                                    <select name="u_fields[hd-italic]" class="u-typo-case-select">
+                                        <option value="normal" <?= $hd_italic === 'normal' ? 'selected' : '' ?>>Normal</option>
+                                        <option value="italic" <?= $hd_italic === 'italic' ? 'selected' : '' ?>>Italic</option>
+                                    </select>
+                                    <span></span>
+
+                                </div>
+                                <p class="u-desc">Типографика заголовков и основного текста. Пресеты задают базовые комбинации, значения можно скорректировать вручную.</p>
+                            </div>
+
+                        </div>
+
+                        <div class="u-card-right">
+                            <div class="u-preview u-preview--tall">
+                                <img src="<?= plugins_url("assets/media/font-vibe-{$current_font_vibe}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/font-vibe-', dirname(__FILE__)) ?>"
+                                     alt="Font preview"
+                                     class="u-font-preview-img u-component-preview-img"
+                                     id="font-vibe-preview">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Card 3: General ────────────────────────────────────── -->
+                <div class="u-card">
+                    <div class="u-card-header">
+                        <h3>General</h3>
+                    </div>
+                    <div class="u-card-body">
+                        <div class="u-card-left">
 
                             <div class="u-basic-field">
                                 <div class="u-basic-field-label">Radius Vibe</div>
@@ -281,13 +322,6 @@ function u_color_field(string $name, string $value): void {
                         </div>
 
                         <div class="u-card-right">
-                            <div class="u-preview u-preview--tall">
-                                <img src="<?= plugins_url("assets/media/font-vibe-{$current_font_vibe}.webp", dirname(__FILE__)) ?>"
-                                     data-base-url="<?= plugins_url('assets/media/font-vibe-', dirname(__FILE__)) ?>"
-                                     alt="Font preview"
-                                     class="u-font-preview-img u-component-preview-img"
-                                     id="font-vibe-preview">
-                            </div>
                             <div class="u-preview u-preview--tall">
                                 <img src="<?= plugins_url("assets/media/radius-vibe-{$current_radius_vibe}.webp", dirname(__FILE__)) ?>"
                                      data-base-url="<?= plugins_url('assets/media/radius-vibe-', dirname(__FILE__)) ?>"

@@ -221,6 +221,38 @@ jQuery(document).ready(function ($) {
         $(this).closest('.u-mode-btn').addClass('is-active');
     });
 
+    // ─── Typography presets ──────────────────────────────────────────────────
+    var uTypoPresets = {
+        soft:     { 'hd-weight': 500,  'hd-height': 1.20, 'hd-ls': -0.020, 'hd-case': 'none',      'txt-weight': 400, 'txt-height': 1.55, 'txt-ls': 0 },
+        impact:   { 'hd-weight': 900,  'hd-height': 1.00, 'hd-ls': -0.020, 'hd-case': 'uppercase', 'txt-weight': 400, 'txt-height': 1.55, 'txt-ls': 0 },
+        monolith: { 'hd-weight': 700,  'hd-height': 1.05, 'hd-ls': -0.050, 'hd-case': 'uppercase', 'txt-weight': 400, 'txt-height': 1.55, 'txt-ls': 0 },
+        open:     { 'hd-weight': 400,  'hd-height': 1.40, 'hd-ls':  0.020, 'hd-case': 'none',      'txt-weight': 400, 'txt-height': 1.65, 'txt-ls': 0 },
+    };
+
+    // Форматирует числовое значение как em-строку без лишних нулей: 0.020 → "0.02em"
+    window.fmtEm = function (val) {
+        return parseFloat(val).toFixed(3).replace(/(\.\d*[1-9])0+$/, '$1').replace(/\.0+$/, '') + 'em';
+    };
+
+    function setTypoSlider(inputName, outputId, value, isEm) {
+        var $input = $('[name="u_fields[' + inputName + ']"]');
+        $input.val(isEm ? parseFloat(value).toFixed(3) : value);
+        $('#' + outputId).text(isEm ? fmtEm(value) : value);
+    }
+
+    $(document).on('click', '.u-typo-preset', function () {
+        var p = uTypoPresets[$(this).data('preset')];
+        if (!p) return;
+        setTypoSlider('hd-weight',         'hd-weight-output',  p['hd-weight'],  false);
+        setTypoSlider('hd-height',         'hd-height-output',  p['hd-height'],  true);
+        setTypoSlider('hd-letter-spacing', 'hd-ls-output',      p['hd-ls'],      true);
+        setTypoSlider('txt-weight',        'txt-weight-output', p['txt-weight'], false);
+        setTypoSlider('txt-height',        'txt-height-output', p['txt-height'], true);
+        setTypoSlider('txt-letter-spacing','txt-ls-output',     p['txt-ls'],     true);
+        $('[name="u_fields[hd-case]"]').val(p['hd-case']);
+        markDirty($(this));
+    });
+
     // ─── Первичная инициализация ─────────────────────────────────────────────
     initColorPickers($('.tab-pane.active'));
 });

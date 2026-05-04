@@ -152,6 +152,31 @@ input:checked + .slider:before { transform: translateX(24px); }
 /* Range inputs */
 input[type="range"] { width: 200px; vertical-align: middle; }
 
+/* ── Typography controls ─────────────────────────────────────────────────── */
+.u-typo-presets { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.u-typo-presets-label { font-size: 12px; color: #777; }
+.u-typo-preset { padding: 3px 10px; font-size: 12px; height: auto; line-height: 1.6; }
+
+/* Таблицеподобная сетка: label | hd-ctrl | txt-ctrl */
+.u-typo-table {
+    display: grid;
+    grid-template-columns: 76px 1fr 1fr;
+    column-gap: 14px;
+    row-gap: 7px;
+    align-items: center;
+    margin-top: 6px;
+}
+.u-typo-col-head { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #999; padding-bottom: 3px; border-bottom: 1px solid #eee; }
+.u-typo-label { font-size: 12px; font-weight: 600; color: #444; white-space: nowrap; }
+
+/* Ячейка с ползунком + значением */
+.u-typo-ctrl { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.u-typo-ctrl input[type="range"] { flex: 1; min-width: 0; width: auto; }
+.u-typo-ctrl output { font-size: 12px; font-weight: 700; color: #2271b1; white-space: nowrap; min-width: 46px; text-align: right; }
+
+/* Select для Case — без output-ячейки справа */
+.u-typo-case-select { width: 100%; font-size: 12px; }
+
 /* Seed Hue Preview */
 .seed-hue-preview { display: inline-block; width: 24px; height: 24px; border-radius: 4px; border: 2px solid #ccd0d4; margin-right: 8px; vertical-align: middle; }
 

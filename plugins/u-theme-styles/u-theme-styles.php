@@ -38,8 +38,8 @@ class UThemeConfigurator {
         'is-border'      => ['true', 'false'],
         'font-vibe'      => [
             'google', 'strict', 'editorial', 'startup', 'space', 'syntax', 'neo-swiss',
-            'engineer', 'vogue', 'boutique', 'wisdom', 'noble', 'manuscript', 'brutal',
-            'urban', 'manifesto', 'black-metal', 'raw', 'velocity', 'courtside', 'district',
+            'engineer', 'boutique', 'wisdom', 'noble', 'manuscript', 'brutal',
+            'manifesto', 'black-metal', 'raw', 'velocity', 'courtside', 'district',
             'blast', 'industry', 'overdrive', 'organic', 'vintage', 'interface', 'antidesign',
         ],
         'font-size'   => ['16px', '17px', '18px', '19px', '20px', '21px', '22px', '23px', '24px'],
@@ -164,6 +164,22 @@ class UThemeConfigurator {
             if (!isset($fields[$bvar])) {
                 $fields[$bvar] = 'false';
             }
+        }
+
+        // Типографические параметры с единицей em: слайдер присылает число, пишем с суффиксом.
+        $em_vars = ['hd-height', 'hd-letter-spacing', 'txt-height', 'txt-letter-spacing'];
+        foreach ($em_vars as $var) {
+            if (isset($fields[$var]) && !str_ends_with($fields[$var], 'em')) {
+                $fields[$var] = $fields[$var] . 'em';
+            }
+        }
+
+        // hd-case и hd-italic принимают только CSS-ключевые слова (без кавычек в SCSS).
+        if (isset($fields['hd-case']) && !in_array($fields['hd-case'], ['none', 'uppercase', 'lowercase'], true)) {
+            $fields['hd-case'] = 'none';
+        }
+        if (isset($fields['hd-italic']) && !in_array($fields['hd-italic'], ['normal', 'italic'], true)) {
+            $fields['hd-italic'] = 'normal';
         }
 
         foreach ($fields as $key => $value) {
