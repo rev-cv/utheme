@@ -33,6 +33,11 @@
             color: inherit;
         }
 
+        picture {
+            min-height: 70px;
+            display: block;
+        }
+        
         picture img {
             display: block;
             width: 100%;
