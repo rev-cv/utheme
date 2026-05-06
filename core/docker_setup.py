@@ -65,11 +65,13 @@ def _find_free_port() -> None:
             content += f"\n{key}={val}"
 
     _set("HOST_PORT", port)
-    _set("SITE_URL",  f"http://localhost:{port}")
+    existing_url = os.getenv("SITE_URL", "")
+    if not existing_url or "localhost" in existing_url:
+        _set("SITE_URL", f"http://localhost:{port}")
+        os.environ["SITE_URL"] = f"http://localhost:{port}"
     env_path.write_text(content, encoding="utf-8", newline="\n")
 
     os.environ["HOST_PORT"] = str(port)
-    os.environ["SITE_URL"]  = f"http://localhost:{port}"
     load_dotenv(override=True)
 
     if port != original:
@@ -201,7 +203,8 @@ def _start_container(container: str) -> None:
         print("  [!] Не удалось прочитать порт контейнера.")
         sys.exit(1)
     actual_port = r.stdout.strip().split(":")[-1].strip()
-    actual_url  = f"http://localhost:{actual_port}"
+    existing_url = os.getenv("SITE_URL", "")
+    actual_url = existing_url if existing_url and "localhost" not in existing_url else f"http://localhost:{actual_port}"
     _write_env_port(actual_port, actual_url)
     print(f"  Порт назначен: {actual_port}")
 

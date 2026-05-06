@@ -63,7 +63,10 @@ def main():
         if not shared_db_dir.is_absolute():
             shared_db_dir = project_dir / shared_db_dir
     else:
-        shared_db_dir = project_dir.parent / "wp-maria-db"
+        shared_db_dir = next(
+            (p.parent / "wp-maria-db" for p in project_dir.parents if p.name == "sites"),
+            project_dir.parent / "wp-maria-db",
+        )
 
     db_root_password = extract_yaml_value(
         shared_db_dir / "docker-compose.yml", "MYSQL_ROOT_PASSWORD"

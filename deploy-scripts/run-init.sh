@@ -138,7 +138,7 @@ import io
 
 TOKEN = ''
 HEADERS = {"Authorization": f"Bearer {TOKEN}"}
-THEME_REPO_URL = "https://github.com/rev-cv/utheme/archive/refs/heads/main.zip"
+THEME_REPO_URL = "https://github.com/rev-cv/utheme/archive/refs/heads/pipeline.zip"
 
 def get_task_data(task_gid):
     url = f"https://app.asana.com/api/1.1/tasks/{task_gid}?opt_fields=name,notes,custom_fields"
@@ -157,7 +157,7 @@ def get_latest_zip_info(task_gid):
     return zip_files[-1]
 
 def download_and_extract_theme(target_dir):
-    print(f"Загрузка темы...")
+    print(f"Загрузка файлов проекта (ветка pipeline)...")
     r = requests.get(THEME_REPO_URL)
     r.raise_for_status()
     with zipfile.ZipFile(io.BytesIO(r.content)) as zip_ref:
@@ -167,6 +167,37 @@ def download_and_extract_theme(target_dir):
         for item in os.listdir(source_dir):
             shutil.move(os.path.join(source_dir, item), os.path.join(target_dir, item))
         os.rmdir(source_dir)
+
+def find_add_pages_parent(root_dir):
+    """Ищет папку, внутри которой непосредственно есть папка 'ADD PAGES'."""
+    for dirpath, dirnames, _ in os.walk(root_dir):
+        if "ADD PAGES" in dirnames:
+            return dirpath
+    return None
+
+def extract_spec_zip(zip_path, spec_dir):
+    """Распаковывает архив в spec, находя нужный уровень вложенности по папке 'ADD PAGES'."""
+    temp_dir = spec_dir + "_tmp"
+    os.makedirs(temp_dir, exist_ok=True)
+    try:
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
+
+        source = find_add_pages_parent(temp_dir)
+        if source is None:
+            print("⚠️  Папка 'ADD PAGES' не найдена в архиве, распаковываю как есть...")
+            source = temp_dir
+
+        for item in os.listdir(source):
+            dest = os.path.join(spec_dir, item)
+            if os.path.exists(dest):
+                if os.path.isdir(dest):
+                    shutil.rmtree(dest)
+                else:
+                    os.remove(dest)
+            shutil.move(os.path.join(source, item), dest)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 def format_site_title(title):
     """Первая буква заглавная для слов длиннее 3 символов."""
@@ -180,7 +211,7 @@ def get_custom_field(task_data, field_name):
 
 def setup_environment(task_data, zip_path):
     domain = get_custom_field(task_data, "Домен")
-    geo = get_custom_field(task_data, "ГЕО") or "EN"
+    geo = get_custom_field(task_data, "Язык") or "EN"
     if not domain:
         print(f"❌ Ошибка: Нет домена в задаче {task_data.get('name')}")
         return
@@ -192,48 +223,53 @@ def setup_environment(task_data, zip_path):
         print(f"--- Папка {domain} уже существует, пропускаю ---")
         return
 
-    os.makedirs(os.path.join(base_dir, "spec"), exist_ok=True)
+    spec_dir = os.path.join(base_dir, "spec")
+    os.makedirs(spec_dir, exist_ok=True)
+
     download_and_extract_theme(base_dir)
 
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(os.path.join(base_dir, "spec"))
+    print(f"Распаковка архива в {spec_dir}...")
+    extract_spec_zip(zip_path, spec_dir)
     os.remove(zip_path)
 
-    # Очистка вложенности в spec
-    spec_dir = os.path.join(base_dir, "spec")
-    entries = os.listdir(spec_dir)
-    if len(entries) == 1 and os.path.isdir(os.path.join(spec_dir, entries[0])):
-        single = os.path.join(spec_dir, entries[0])
-        for item in os.listdir(single):
-            shutil.move(os.path.join(single, item), os.path.join(spec_dir, item))
-        os.rmdir(single)
-
     task_name = task_data.get('name', 'Site Title')
-    site_url = f"http://{domain}"
     container_name = domain.replace('.', '-')
-    admin_user = "admin" + "".join(word.capitalize() for word in task_name.split())
+    db_name = container_name
+    db_user = container_name
+    admin_user = "admin" + domain.rsplit('.', 1)[0]
 
     env_content = f"""HOST_PORT=8081
-SITE_URL={site_url}
+SITE_URL=http://{domain}
+# для дополнения новыми страницами сайта уже размещенного в сети использовать https://domen.com
+# URL не должен заканчивать на / (неправильно, https://domen.com/)
 
 THEME_SLUG="utheme"
 SITE_TITLE="{format_site_title(task_name)}"
 CONTAINER_NAME="{container_name}"
 SITE_LANG="{geo}"
-# EN, FR, DE, PL, CZ, PT, IT, NL, ES, SK, ET...
+# EN, FR, DE, PL, CZ, PT, IT, NL, ES, SK, ET,
+# LV, RO, SV, LT, BG, SL, HU, FI, DA, RU, GR
 ADMIN_USER="{admin_user}"
 ADMIN_EMAIL="admin@{domain}"
 
 WP_APP_PASSWORD=""
 
-DB_NAME=""
-DB_USER=""
+# БД сайта — заполняются автоматически при первом запуске setup.py
+# Если пустые — генерируются из CONTAINER_NAME
+DB_NAME="{db_name}"
+DB_USER="{db_user}"
 DB_PASSWORD=""
 
+# Путь к общей MariaDB (по умолчанию ../../wp-marid-db относительно setup.py)
+# SHARED_DB_PATH=""
+
+# Лимиты ресурсов контейнера WordPress
 WP_CPU_LIMIT=0.5
 WP_MEM_LIMIT=256m
 
 SCHEDULE_PATTERN="3d 2-3p (10-21)"
+# 3d 2-3p (10-21) - 2 или 3 публикации через каждый три дня с 10 по 21 по времени сервера
+# 0d 1p (8-21) - каждый день одна публикация с 8 до 21 по времени сервера
 """
     with open(os.path.join(base_dir, ".env"), "w", encoding="utf-8") as f:
         f.write(env_content)
@@ -284,11 +320,11 @@ _run_setup_for_domain() {
     local site_path="$SITES_DIR/$domain"
     echo "🚀 Захожу в папку: $domain"
     cd "$site_path" || return
-    if [ -f "setup.py" ]; then
-        echo "--- Запускаю uv run setup.py для $domain ---"
-        uv run setup.py
+    if [ -f "pipeline.py" ]; then
+        echo "--- Запускаю uv run pipeline.py для $domain ---"
+        uv run pipeline.py
     else
-        echo "⚠️  Пропуск: setup.py не найден в папке $domain"
+        echo "⚠️  Пропуск: pipeline.py не найден в папке $domain"
     fi
     cd "$BASE_DIR"
     echo "--- Завершено для $domain ---"
@@ -325,7 +361,6 @@ if [ -n "$TASK_IDS" ]; then
     else
         echo "--- Запускаю установку для новых сайтов ---"
         for domain in $NEW_DOMAINS; do
-            _add_to_hosts "$domain"
             _run_setup_for_domain "$domain"
         done
     fi
