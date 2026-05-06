@@ -42,7 +42,7 @@ echo "Language set to $WP_LANG."
 # Ensure all DB URLs use HTTPS (NPM/Cloudflare terminate SSL externally)
 HTTPS_URL="$(echo "$SITE_URL" | sed 's|^http://|https://|')"
 if [ "$HTTPS_URL" != "$SITE_URL" ]; then
-    wp search-replace "$SITE_URL" "$HTTPS_URL" --all-tables
+    wp search-replace "$SITE_URL" "$HTTPS_URL" --all-tables --quiet
     SITE_URL="$HTTPS_URL"
     echo "URLs upgraded to HTTPS."
 fi

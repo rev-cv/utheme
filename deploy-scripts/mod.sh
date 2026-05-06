@@ -127,7 +127,7 @@ for site_name in "${SITES[@]}"; do
         continue
     fi
 
-    htaccess_file="$site_dir/core/.htaccess"
+    htaccess_file="$site_dir/wp-conf/.htaccess"
 
     case "$MODE" in
         prod)
