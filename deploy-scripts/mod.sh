@@ -12,9 +12,11 @@ usage() {
     echo "  prod — остановить $SERVICE + деактивировать плагин $PLUGIN_SLUG"
     echo "  dev  — запустить $SERVICE + активировать плагин $PLUGIN_SLUG"
     echo ""
-    echo "  Если сайты не указаны — применяется ко всем в $SITES_DIR"
+    echo "  Для dev сайты обязательны (запуск сразу на всех запрещён)"
+    echo "  Для prod сайты опциональны — если не указаны, применяется ко всем в $SITES_DIR"
     echo "  Примеры:"
-    echo "    $0 dev                        — все сайты в режим dev"
+    echo "    $0 dev domen.com              — только указанный сайт в dev"
+    echo "    $0 prod                       — все сайты в prod"
     echo "    $0 prod domen.com domen2.com  — только указанные сайты в prod"
     exit 1
 }
@@ -92,6 +94,13 @@ wp_cmd() {
 
 MODE="$1"; shift
 [[ "$MODE" != "prod" && "$MODE" != "dev" ]] && usage
+
+# dev без указания сайтов запрещён
+if [[ "$MODE" == "dev" && $# -eq 0 ]]; then
+    echo "Ошибка: для режима dev необходимо указать хотя бы один сайт"
+    echo ""
+    usage
+fi
 
 # Собираем список сайтов
 if [[ $# -gt 0 ]]; then

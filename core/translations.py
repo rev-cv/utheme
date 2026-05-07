@@ -9,7 +9,15 @@ LANG_MAP = {
     "LT": "lt_LT", "BG": "bg_BG", "SL": "sl_SI", "HU": "hu_HU",
     "FI": "fi_FI", "DA": "da_DK", "GR": "el",
     "HR": "hr_HR", "NO": "nb_NO", "LB": "lb_LU",
-    "GA": "ga",
+    "GA": "ga",   "TR": "tr_TR",
+}
+
+# Country code → WP locale: позволяет использовать коды стран вместо кодов языков
+# EE (Эстония) → et_EE, SE (Швеция) → sv_SE, AT (Австрия) → de_AT
+COUNTRY_ALIASES = {
+    "EE": "et_EE",
+    "SE": "sv_SE",
+    "AT": "de_AT",
 }
 
 # slug → lang_code → title
@@ -24,7 +32,7 @@ PAGE_TITLES = {
         "SL": "Domov",       "HU": "Főoldal",       "FI": "Koti",
         "DA": "Forside",     "GR": "Αρχική",
         "HR": "Početna",     "NO": "Hjem",          "LB": "Heem",
-        "GA": "Baile",
+        "GA": "Baile",       "TR": "Ana Sayfa",
     },
     "articles": {
         "EN": "All Posts",          "RU": "Все статьи",          "FR": "Tous les articles",
@@ -36,7 +44,7 @@ PAGE_TITLES = {
         "SL": "Vsi prispevki",      "HU": "Összes bejegyzés",    "FI": "Kaikki kirjoitukset",
         "DA": "Alle indlæg",        "GR": "Όλα τα άρθρα",
         "HR": "Sve objave",         "NO": "Alle innlegg",        "LB": "All Artikelen",
-        "GA": "Gach Alt",
+        "GA": "Gach Alt",           "TR": "Tüm Yazılar",
     },
     "about-us": {
         "EN": "About Us",       "RU": "О нас",          "FR": "À propos",
@@ -48,7 +56,7 @@ PAGE_TITLES = {
         "SL": "O nas",          "HU": "Rólunk",          "FI": "Meistä",
         "DA": "Om os",          "GR": "Σχετικά με εμάς",
         "HR": "O nama",         "NO": "Om oss",              "LB": "Iwwer eis",
-        "GA": "Fúinn",
+        "GA": "Fúinn",          "TR": "Hakkımızda",
     },
     "cookie-policy": {
         "EN": "Cookie Policy",          "RU": "Политика Cookie",          "FR": "Politique cookies",
@@ -60,7 +68,7 @@ PAGE_TITLES = {
         "SL": "Pravilnik o piškotkih",  "HU": "Süti szabályzat",          "FI": "Evästekäytäntö",
         "DA": "Cookiepolitik",          "GR": "Πολιτική Cookies",
         "HR": "Pravila o kolačićima",   "NO": "Informasjonskapselpolicy", "LB": "Cookie-Politik",
-        "GA": "Beartas Fianán",
+        "GA": "Beartas Fianán",         "TR": "Çerez Politikası",
     },
     "privacy-policy": {
         "EN": "Privacy Policy",             "RU": "Политика конфиденциальности", "FR": "Confidentialité",
@@ -72,7 +80,7 @@ PAGE_TITLES = {
         "SL": "Pravilnik o zasebnosti",     "HU": "Adatvédelmi irányelvek",      "FI": "Tietosuojaseloste",
         "DA": "Privatlivspolitik",          "GR": "Πολιτική Απορρήτου",
         "HR": "Pravila privatnosti",        "NO": "Personvernerklæring",     "LB": "Dateschutzpolitik",
-        "GA": "Beartas Príobháideachta",
+        "GA": "Beartas Príobháideachta",    "TR": "Gizlilik Politikası",
     },
     "legal-notice": {
         "EN": "Legal Notice",           "RU": "Юридическая информация",  "FR": "Mentions légales",
@@ -84,7 +92,7 @@ PAGE_TITLES = {
         "SL": "Pravno obvestilo",       "HU": "Jogi nyilatkozat",        "FI": "Oikeudellinen huomautus",
         "DA": "Juridisk meddelelse",    "GR": "Νομική Σημείωση",
         "HR": "Pravna napomena",        "NO": "Juridisk merknad",        "LB": "Rechtleche Vermerk",
-        "GA": "Fógra Dlíthiúil",
+        "GA": "Fógra Dlíthiúil",        "TR": "Yasal Uyarı",
     },
     "sitemap": {
         "EN": "Sitemap",        "RU": "Карта сайта",    "FR": "Plan du site",
@@ -96,7 +104,7 @@ PAGE_TITLES = {
         "SL": "Kazalo strani",  "HU": "Oldaltérkép",    "FI": "Sivukartta",
         "DA": "Sitemap",        "GR": "Χάρτης Ιστότοπου",
         "HR": "Karta stranice", "NO": "Nettstedskart",           "LB": "Saiteplang",
-        "GA": "Léarscáil Suímh",
+        "GA": "Léarscáil Suímh",    "TR": "Site Haritası",
     },
     "news": {
         "EN": "News",       "RU": "Новости",    "FR": "Actualités",
@@ -108,7 +116,7 @@ PAGE_TITLES = {
         "SL": "Novice",     "HU": "Hírek",      "FI": "Uutiset",
         "DA": "Nyheder",    "GR": "Νέα",
         "HR": "Vijesti",    "NO": "Nyheter",    "LB": "Neiegkeeten",
-        "GA": "Nuacht",
+        "GA": "Nuacht",     "TR": "Haberler",
     },
 }
 
@@ -141,6 +149,7 @@ PAGE_DESCRIPTIONS = {
         "NO": "Alle artikler på «$$SITENAME$$» — ekspertguider, anmeldelser og nyttige tips.",
         "LB": "All Artikelen op «$$SITENAME$$» — Experteführeren, Rezensiounen a nëtzlech Tipps.",
         "GA": "Gach alt ar «$$SITENAME$$» — treoir saineolaithe, léirmheasanna agus leideanna úsáideacha.",
+        "TR": "«$$SITENAME$$» sitesindeki tüm makaleler — uzman rehberleri, incelemeler ve faydalı ipuçları.",
     },
     "news": {
         "EN": "Latest news and updates from «$$SITENAME$$» — stay informed with the most recent publications.",
@@ -170,6 +179,7 @@ PAGE_DESCRIPTIONS = {
         "NO": "Siste nyheter fra «$$SITENAME$$» — hold deg oppdatert med de nyeste innleggene.",
         "LB": "Déi lescht Neiegkeeten vun «$$SITENAME$$» — bleift mat de neisten Artikelen um Lafenden.",
         "GA": "An nuacht is déanaí ó «$$SITENAME$$» — fan ar an eolas le foilseacháin is nua.",
+        "TR": "«$$SITENAME$$» sitesinden en son haberler — en yeni yayınlarla güncel kalın.",
     },
     "sitemap": {
         "EN": "Sitemap «$$SITENAME$$»: complete list of all sections and pages on the site.",
@@ -199,6 +209,7 @@ PAGE_DESCRIPTIONS = {
         "NO": "Nettstedskart «$$SITENAME$$»: fullstendig liste over alle seksjoner og sider.",
         "LB": "Saiteplang «$$SITENAME$$»: vollständeg Lëscht vun alle Sektiounen a Säiten.",
         "GA": "Léarscáil suímh «$$SITENAME$$»: liosta iomlán de gach rannóg agus leathanach.",
+        "TR": "«$$SITENAME$$» site haritası: tüm bölümlerin ve sayfaların tam listesi.",
     },
 }
 
@@ -213,7 +224,7 @@ EDITORIAL = {
     "SL": "Uredništvo",      "HU": "Szerkesztőség",   "FI": "Toimitus",
     "DA": "Redaktion",       "GR": "Σύνταξη",
     "HR": "Uredništvo",      "NO": "Redaksjon",      "LB": "Redaktioun",
-    "GA": "An Eagarthóireacht",
+    "GA": "An Eagarthóireacht",  "TR": "Editöryal Ekip",
 }
 
 
@@ -245,6 +256,7 @@ WELCOME_NEWS_TITLE = {
     "NO": "Velkommen! Vi har lansert!",
     "LB": "Wëllkomm! Mir hunn gestart!",
     "GA": "Fáilte! Tá muid ar líne!",
+    "TR": "Hoş Geldiniz! Yayına Geçtik!",
 }
 
 WELCOME_NEWS_CONTENT = {
@@ -275,6 +287,7 @@ WELCOME_NEWS_CONTENT = {
     "NO": "Vi er begeistret for å kunngjøre lanseringen av vår nye nettside, «$$SITENAME$$»! Dette er begynnelsen på vår reise, og vi er glade for å dele den med deg. Her finner du de siste nyhetene, interessante artikler og viktige oppdateringer. Følg med og takk for at du er med oss!",
     "LB": "Mir si frou déi Lancéierung vun eisem neien Internetsite, «$$SITENAME$$», unzekënnegen! Dëst ass den Ufank vun eisem Wee an mir freeën eis dësen mat Iech ze deelen. Hei fannt Dir déi lescht Neiegkeeten, interessant Artikelen an wichteg Aktualiséierungen. Bleift dobäi a Merci datt Dir bei eis sidd!",
     "GA": "Tá áthas orainn a fhógairt seoladh ár suímh ghréasáin nua, «$$SITENAME$$»! Seo tús ár n-aistir, agus tá muid ag súil go mór leis a roinnt libh. Anseo gheobhaidh sibh an nuacht is déanaí, ailt spéisiúla agus nuashonruithe tábhachtacha. Coinnígí súil air agus go raibh maith agaibh as bheith linn!",
+    "TR": "Yeni web sitemiz «$$SITENAME$$»'in yayına girdiğini büyük bir heyecanla duyuruyoruz! Bu yolculuğumuzun başlangıcıdır ve sizinle paylaşmaktan mutluluk duyuyoruz. Burada en son haberleri, ilginç makaleleri ve önemli güncellemeleri bulabilirsiniz. Takipte kalın ve bizimle birlikte olduğunuz için teşekkür ederiz!",
 }
 
 
@@ -313,18 +326,24 @@ def get_page_description(slug: str, lang: str, site_title: str) -> str | None:
 
 def get_lang_code(lang: str) -> str:
     """Нормализует SITE_LANG к 2-буквенному uppercase-ключу для словарей.
-    Принимает как 'FR', так и 'fr_BE' → 'FR'."""
+    Принимает 'FR', 'fr_BE' → 'FR', а также коды стран: 'EE' → 'ET', 'SE' → 'SV', 'AT' → 'DE'."""
     if "_" in lang:
         return lang[:2].upper()
-    return lang.upper()
+    upper = lang.upper()
+    if upper in COUNTRY_ALIASES:
+        return COUNTRY_ALIASES[upper][:2].upper()
+    return upper
 
 
 def get_wp_locale(lang: str) -> str:
     """Возвращает WP locale slug.
-    Принимает как 'FR' (→ fr_FR через LANG_MAP), так и 'fr_BE' (→ fr_BE напрямую)."""
+    Принимает 'FR' (→ fr_FR), 'fr_BE' (→ fr_BE напрямую), 'EE' (→ et_EE через COUNTRY_ALIASES)."""
     if "_" in lang:
         return lang
-    return LANG_MAP.get(lang.upper(), "en_US")
+    upper = lang.upper()
+    if upper in COUNTRY_ALIASES:
+        return COUNTRY_ALIASES[upper]
+    return LANG_MAP.get(upper, "en_US")
 
 
 def get_editorial_name(lang: str, site_title: str) -> str:

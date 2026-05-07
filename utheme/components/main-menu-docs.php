@@ -1,5 +1,4 @@
 <?php
-// Ищем родительскую страницу 'articles' для получения дочерних элементов.
 $parent_page_path = 'articles';
 $parent_page = get_page_by_path($parent_page_path);
 $articles = [];
@@ -8,7 +7,7 @@ $parent_page_link = home_url('/' . $parent_page_path . '/');
 if ($parent_page) {
     $parent_page_link = get_permalink($parent_page->ID);
     $args = [
-        'post_type'      => 'page', // Предполагаем, что статьи - это страницы (pages)
+        'post_type'      => 'page',
         'posts_per_page' => -1,
         'post_parent'    => $parent_page->ID,
         'orderby'        => 'menu_order title',
@@ -18,7 +17,7 @@ if ($parent_page) {
     if ($articles_query->have_posts()) {
         $articles = $articles_query->get_posts();
     }
-    wp_reset_postdata(); // Важно после кастомного WP_Query
+    wp_reset_postdata();
 }
 ?>
 
@@ -26,7 +25,6 @@ if ($parent_page) {
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13z"/><path stroke-linecap="round" d="M5.5 10h6m-5 4h4"/><path stroke-linecap="round" d="M15 21V3" opacity="0.5"/></g></svg>
 </button>
 
-<!-- Боковая панель в стиле документации -->
 <aside class="docs-menu-sidebar">
     <div class="docs-menu-header">
         <div class="site-logo">
@@ -47,7 +45,6 @@ if ($parent_page) {
                             <?php if (has_post_thumbnail($article->ID)) : ?>
                                 <?php echo get_the_post_thumbnail($article->ID, 'thumbnail', ['class' => 'docs-menu-item-img']); ?>
                             <?php else : ?>
-                                <!-- Изображение-заглушка -->
                                 <img src="<?php echo esc_url(get_template_directory_uri()); ?>/assets/images/placeholder.png" alt="" class="docs-menu-item-img">
                             <?php endif; ?>
                             <span class="docs-menu-item-title"><?php echo esc_html(get_the_title($article->ID)); ?></span>
@@ -55,7 +52,7 @@ if ($parent_page) {
                     </li>
                 <?php endforeach; ?>
             <?php else : ?>
-                <li class="docs-menu-item-empty"><?php echo get_site_translation('no_articles_found'); // Предполагается наличие функции перевода ?></li>
+                <li class="docs-menu-item-empty"><?php echo get_site_translation('no_articles_found'); ?></li>
             <?php endif; ?>
         </ul>
     </div>
@@ -70,10 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!panel || !toggleBtn) return;
 
     const DESKTOP_BREAKPOINT = 992;
-    const PANEL_WIDTH = 280; // from docs.scss
+    const PANEL_WIDTH = 280;
     let wasDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
 
-    // A single state variable for menu open/closed status
     let isMenuOpen = wasDesktop;
 
     const isDesktop = () => window.innerWidth >= DESKTOP_BREAKPOINT;
@@ -107,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setMenuState = (open) => {
         if (isMenuOpen === open) {
-            // If state is already correct, just ensure DOM matches (for cases like snapping back)
             updateDOM(open);
             return;
         }
@@ -115,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDOM(open);
     };
 
-    // --- Event Listeners ---
     toggleBtn.addEventListener('click', (e) => {
         e.preventDefault();
         setMenuState(!isMenuOpen);
@@ -123,11 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => {
         const isNowDesktop = isDesktop();
-        if (wasDesktop && !isNowDesktop) { // Desktop -> Mobile
+        if (wasDesktop && !isNowDesktop) {
             if (isMenuOpen) {
                 setMenuState(false);
             }
-        } else if (!wasDesktop && isNowDesktop) { // Mobile -> Desktop
+        } else if (!wasDesktop && isNowDesktop) {
             if (!isMenuOpen) {
                 setMenuState(true);
             }
@@ -135,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         wasDesktop = isNowDesktop;
     });
 
-    // --- Swipe Logic ---
     let touchStartX = 0;
     let touchStartY = 0;
     let touchCurrentX = 0;
@@ -168,10 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isSwiping) {
-            if (!isMenuOpen && deltaX > 0) { // Opening
+            if (!isMenuOpen && deltaX > 0) { 
                 const translateX = Math.min(0, -PANEL_WIDTH + deltaX);
                 panel.style.transform = `translateX(${translateX}px)`;
-            } else if (isMenuOpen && deltaX < 0) { // Closing
+            } else if (isMenuOpen && deltaX < 0) {
                 const translateX = Math.max(-PANEL_WIDTH, deltaX);
                 panel.style.transform = `translateX(${translateX}px)`;
             }
@@ -191,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (deltaX < -SWIPE_COMPLETE_THRESHOLD && isMenuOpen) {
             setMenuState(false);
         } else {
-            setMenuState(isMenuOpen); // Snap back
+            setMenuState(isMenuOpen);
         }
         isSwiping = false;
     };
@@ -206,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         passive: true
     });
 
-    // --- Initial Setup ---
     panel.style.transition = 'none';
     updateDOM(isMenuOpen);
     requestAnimationFrame(() => {
