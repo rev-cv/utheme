@@ -31,6 +31,9 @@ def _href_slug(href: str) -> str:
 
 
 def _replace_slug_in_href(href: str, old: str, new: str) -> str:
+    if new == '/':
+        return '/'
+
     parts = href.rstrip('/').rsplit('/', 1)
     if len(parts) == 2:
         return f"{parts[0]}/{new}"
