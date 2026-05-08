@@ -9,7 +9,7 @@
         </div>
 
         <div class="island-trigger">
-            <button id="menu-toggle">
+            <button id="menu-toggle" aria-label="Toggle Menu">
                 <span></span>
                 <span class="icon-dots"><span></span><span></span><span></span></span>
             </button>
