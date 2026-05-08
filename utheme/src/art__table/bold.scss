@@ -1,0 +1,92 @@
+﻿@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .wp-block-table {
+        width: 100% !important;
+        max-width: 100vw;
+        display: grid;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 2rem;
+        user-select: none;
+
+        &::-webkit-scrollbar { height: 6px; }
+        &::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
+        &::-webkit-scrollbar-thumb {
+            background: conf.$color-accent-light;
+            border-radius: 10px;
+            @include f.dark-mode { background: conf.$color-accent-dark; }
+        }
+
+        table {
+            margin: 0;
+            width: 100% !important;
+            min-width: 100% !important;
+            table-layout: auto !important;
+            border-collapse: collapse;
+            font-size: clamp(14px, 2vw, 16px);
+            background: transparent;
+            color: conf.$color-text-light;
+            @include f.dark-mode { color: conf.$color-text-dark; }
+
+            thead, tr, th, td {
+                border: none !important;
+                white-space: nowrap !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                hyphens: none !important;
+            }
+
+            th, td { padding: 14px 16px !important; }
+
+            thead {
+                background: conf.$color-accent-light;
+                @include f.dark-mode { background: conf.$color-accent-dark; }
+            }
+
+            th {
+                font-weight: 600;
+                font-size: 13px;
+                text-align: left;
+                color: conf.$color-bg-light;
+                @include f.dark-mode { color: conf.$color-bg-dark; }
+            }
+
+            // Vertical separator between header cells
+            thead th + th {
+                border-left: 1px solid rgba(255, 255, 255, 0.18) !important;
+            }
+
+            td {
+                border-bottom: 1px solid conf.$color-section-light !important;
+                @include f.dark-mode {
+                    border-bottom-color: conf.$color-section-dark !important;
+                }
+            }
+
+            tbody tr {
+                transition: background 100ms ease-in-out;
+                &:hover {
+                    background: sys.mix(conf.$color-bg-light, conf.$color-accent-light, 94%);
+                    @include f.dark-mode {
+                        background: sys.mix(conf.$color-bg-dark, conf.$color-accent-dark, 90%);
+                    }
+                }
+                &:last-child td { border-bottom: none !important; }
+            }
+
+            tfoot td {
+                background: sys.mix(conf.$color-bg-light, conf.$color-accent-light, 90%);
+                border-top: 2px solid conf.$color-accent-light !important;
+                border-bottom: none !important;
+                font-weight: 600;
+                @include f.dark-mode {
+                    background: sys.mix(conf.$color-bg-dark, conf.$color-accent-dark, 88%);
+                    border-top-color: conf.$color-accent-dark !important;
+                }
+            }
+        }
+    }
+}

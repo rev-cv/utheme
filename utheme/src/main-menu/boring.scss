@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -38,7 +38,7 @@
 
         @if conf.$is-border == 'true' {
             border-bottom: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
@@ -196,7 +196,7 @@
             &:hover { color: conf.$color-accent-light; }
             &[hidden] { display: none; }
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 &:hover { color: conf.$color-accent-dark; }
             }
 
@@ -435,7 +435,7 @@
                     ),
                 ));
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-accent-dark;
                 }
             }
@@ -450,7 +450,7 @@
                 background: rgba(conf.$color-accent-light, 0.35);
             }
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: rgba(conf.$color-accent-dark, 0.2);
                 color: conf.$color-accent-dark;
 

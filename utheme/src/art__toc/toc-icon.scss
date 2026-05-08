@@ -1,5 +1,6 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
 /* ------------------------------------------------------ */
 // ПЕРЕМЕННЫЕ
@@ -63,7 +64,7 @@ $icon-svg: conf.$toc-icon-select;
                 font-weight: normal;
                 text-decoration: none;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: $tx-dark;
                 }
 
@@ -84,7 +85,7 @@ $icon-svg: conf.$toc-icon-select;
                     -webkit-mask-position: center;
                     mask-position: center;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background-color: $act-dark;
                     }
                 }
@@ -94,7 +95,7 @@ $icon-svg: conf.$toc-icon-select;
                     transform: translateX(8px);
                     color: $act-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: $act-dark;
                     }
                 }

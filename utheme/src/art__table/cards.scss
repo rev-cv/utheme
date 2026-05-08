@@ -1,0 +1,96 @@
+﻿@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .wp-block-table {
+        width: 100% !important;
+        max-width: 100vw;
+        display: grid;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 2rem;
+        padding: 4px 4px 4px 0;
+        user-select: none;
+
+        &::-webkit-scrollbar { height: 6px; }
+        &::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
+        &::-webkit-scrollbar-thumb {
+            background: conf.$color-accent-light;
+            border-radius: 10px;
+            @include f.dark-mode { background: conf.$color-accent-dark; }
+        }
+
+        table {
+            margin: 0;
+            width: 100% !important;
+            min-width: 100% !important;
+            table-layout: auto !important;
+            border-collapse: separate !important;
+            border-spacing: 0 6px;
+            font-size: clamp(14px, 2vw, 16px);
+            background: transparent;
+
+            thead, tr, th, td {
+                border: none !important;
+                white-space: nowrap !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                hyphens: none !important;
+            }
+
+            thead th {
+                padding: 4px 16px 6px !important;
+                font-weight: 500;
+                font-size: 11px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                text-align: left;
+                background: transparent;
+                color: sys.adjust(conf.$color-text-light, $lightness: 25%);
+                @include f.dark-mode {
+                    color: sys.adjust(conf.$color-text-dark, $lightness: -25%);
+                }
+            }
+
+            tbody td {
+                padding: 14px 16px !important;
+                background: conf.$color-bg-light;
+                color: conf.$color-text-light;
+                box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 6px 16px -10px rgba(0, 0, 0, 0.18);
+                @include f.dark-mode {
+                    background: conf.$color-section-dark;
+                    color: conf.$color-text-dark;
+                    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 6px 16px -10px rgba(0, 0, 0, 0.6);
+                }
+            }
+
+            tbody td:first-child {
+                border-top-left-radius: conf.$default-radius;
+                border-bottom-left-radius: conf.$default-radius;
+                box-shadow: -3px 0 0 conf.$color-accent-light inset,
+                            0 1px 0 rgba(0, 0, 0, 0.04),
+                            0 6px 16px -10px rgba(0, 0, 0, 0.18);
+                @include f.dark-mode {
+                    box-shadow: -3px 0 0 conf.$color-accent-dark inset,
+                                0 1px 0 rgba(255, 255, 255, 0.03),
+                                0 6px 16px -10px rgba(0, 0, 0, 0.6);
+                }
+            }
+
+            tbody td:last-child {
+                border-top-right-radius: conf.$default-radius;
+                border-bottom-right-radius: conf.$default-radius;
+            }
+
+            tfoot td {
+                padding: 14px 16px !important;
+                color: sys.adjust(conf.$color-text-light, $lightness: 20%);
+                font-weight: 600;
+                @include f.dark-mode {
+                    color: sys.adjust(conf.$color-text-dark, $lightness: -20%);
+                }
+            }
+        }
+    }
+}

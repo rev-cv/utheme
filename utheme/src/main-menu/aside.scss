@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -48,13 +48,13 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
 
             background: conf.$color-section-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: rgba(conf.$color-section-dark, .85);
             }
 
             @if conf.$is-border == 'true' {
                 border: 1px solid conf.$color-border-light;
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     border-color: conf.$color-border-dark;
                 }
             }
@@ -104,7 +104,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 text-wrap: balance;
                 transform: translateY(.1em);
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-primary-dark;
                 }
             }
@@ -134,7 +134,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             justify-content: center;
             transition: all 0.3s ease;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-text-dark;
             }
 
@@ -143,7 +143,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 // box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
                 color: conf.$color-accent-light;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-accent-dark;
                 }
             }
@@ -175,7 +175,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
         background: conf.$color-section-light;
         user-select: none;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: rgba(conf.$color-section-dark, .85);
         }
 
@@ -192,7 +192,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             color: conf.$color-text-light;
             margin-bottom: 1em;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-text-dark;
             }
         }
@@ -206,7 +206,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             scrollbar-width: thin;
             scrollbar-color: conf.$color-border-light transparent;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 scrollbar-color: conf.$color-border-dark transparent;
             }
         }
@@ -263,7 +263,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 border: 1px solid transparent;
                 background: conf.$color-section-light;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     background: conf.$color-section-dark;
                 }
             }
@@ -305,7 +305,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 align-items: center;
                 transition: color 0.2s ease, background 0.2s ease;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     background: conf.$color-section-dark;
                     color: conf.$color-text-dark;
                 }
@@ -322,7 +322,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 &:hover {
                     color: conf.$color-accent-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: conf.$color-accent-dark;
                     }
                 }
@@ -362,7 +362,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                     box-shadow: none !important;
                     gap: 0;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: conf.$color-text-dark;
                     }
 
@@ -371,7 +371,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                         background: rgba(0, 0, 0, .04);
                         transform: translateX(-3px) !important;
 
-                        @media (prefers-color-scheme: dark) {
+                        @include f.dark-mode {
                             color: conf.$color-accent-dark;
                             background: rgba(255, 255, 255, .06);
                         }
@@ -390,7 +390,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 border-left: 2px solid conf.$color-border-light;
                 margin-left: 10px !important;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     border-left-color: conf.$color-border-dark;
                 }
             }
@@ -411,7 +411,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                     box-shadow: none !important;
                     gap: 0;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: conf.$color-text-dark;
                     }
 
@@ -421,7 +421,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                         background: rgba(0, 0, 0, .04);
                         transform: translateX(-3px) !important;
 
-                        @media (prefers-color-scheme: dark) {
+                        @include f.dark-mode {
                             color: conf.$color-accent-dark;
                             background: rgba(255, 255, 255, .06);
                         }
@@ -437,7 +437,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
                 color: conf.$color-text-light;
                 transition: color 300ms ease-in-out;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-text-dark;
                 }
             }
@@ -445,7 +445,7 @@ $transition: cubic-bezier(0.4, 0, 0.2, 1) 0.4s;
             &:hover .menu-title {
                 color: conf.$color-accent-light;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-accent-dark;
                 }
             }

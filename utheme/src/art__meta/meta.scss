@@ -1,4 +1,4 @@
-@use "../funcs.scss" as f;
+﻿@use "../funcs.scss" as f;
 @use "../conf.scss" as conf;
 
 article {
@@ -41,7 +41,7 @@ article {
                 text-align: center;
             }
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-text-dark;
             }
 

@@ -1,4 +1,4 @@
-@use "sass:color" as sys;
+﻿@use "sass:color" as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -118,7 +118,7 @@ aside,
         //     // background: linear-gradient(135deg, conf.$color-primary-light, #ff6d00);
         //     z-index: -1;
 
-        //     @media (prefers-color-scheme: dark) {
+        //     @include f.dark-mode {
         //         background: conf.$color-section-dark;
         //     }
         // }

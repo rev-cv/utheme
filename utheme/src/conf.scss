@@ -6,6 +6,7 @@
 @use "scheme.color.scss" as gen;
 @use "scheme.icons.scss" as ico;
 @use "scheme.icons.arrows.scss" as arr;
+@use "scheme.icons.callouts.scss" as callout-ico;
 
 ////////////////////////////////////////////////////////
 ///  ВАЖНО!!!
@@ -38,8 +39,23 @@ $stt-icon-select: map.get(arr.$arrow-tuple, $stt-icon);
 // стилизация блока details
 $details: "arrow"; // arrow, plus
 
+// режим темы: both — оба; dark-only — только тёмная; light-only — только светлая
+$theme-mode: "both";
+
+// вариант компонента callout (информационных блоков)
+$callout: "default"; // default, subtle-tinted, left-accent-bar, solid-filled, dashed-outline, icon-badge-card, minimal-inline
+$callout-icon-set: "circle"; // circle, shield, diamond
+$-callout-set-map:            map.get(callout-ico.$callout-icon-sets, $callout-icon-set);
+$callout-info-icon-select:    map.get($-callout-set-map, "info");
+$callout-success-icon-select: map.get($-callout-set-map, "success");
+$callout-warning-icon-select: map.get($-callout-set-map, "warning");
+$callout-danger-icon-select:  map.get($-callout-set-map, "danger");
+
 // тип используемой на сайте карточки статей
 $article-card: "float"; // default, frame, slide, windows, float, soft, split
+
+// вариант стилизации таблиц в статьях
+$table-style: "default"; // default, minimal, classic, cards, stripes, bold, outlined, dashed, tinted, editorial
 
 // вариант компонента "ещё почитать" под основным контентом
 $more-pages: "grid"; // grid, list, slider
@@ -102,10 +118,17 @@ $color-H1-dark:       map.get($scheme, "pr-d");
 $color-border-light:  map.get($scheme, "brd-l");
 $color-border-dark:   map.get($scheme, "brd-d");
 
-$color-success: #5db97a;
-$color-warning: #fcd34d;
-$color-error:   #dc2f02;
-$color-info:    #4fc3f7;
+$color-success-light: #5db97a;
+$color-success-dark:  #4caf68;
+$color-warning-light: #fcd34d;
+$color-warning-dark:  #eab308;
+$color-error-light:   #dc2f02;
+$color-error-dark:    #ff6b4a;
+$color-info-light:    #4fc3f7;
+$color-info-dark:     #29b6f6;
+$color-callout-txt-light: #1a1a2e;
+$color-callout-txt-dark:  #e8e8f0;
+
 
 // ============================================================================
 // ТИПОГРАФИКА (TYPOGRAPHY)

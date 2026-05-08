@@ -1,5 +1,6 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
 /* ------------------------------------------------------ */
 // ПЕРЕМЕННЫЕ
@@ -61,7 +62,7 @@ $space: conf.$default-space;
                 font-weight: normal;
                 text-decoration: none;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: $tx-dark;
                 }
 
@@ -90,7 +91,7 @@ $space: conf.$default-space;
                     // Установите здесь цвет фона вашей страницы (например, белый или из переменной)
                     color: #fff;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background: $act-dark;
                         // Здесь цвет фона для темной темы
                         color: #1a1a1a;
@@ -102,7 +103,7 @@ $space: conf.$default-space;
                     transform: translateX(8px);
                     color: $act-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: $act-dark;
                     }
                 }

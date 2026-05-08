@@ -1,4 +1,4 @@
-@use "sass:color";
+﻿@use "sass:color";
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -59,8 +59,12 @@
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
-                background: conf.$color-success;
+                background: conf.$color-success-light;
                 animation: post-pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
+
+                @include f.dark-mode {
+                    background: conf.$color-success-dark;
+                }
                 flex-shrink: 0;
             }
 
@@ -220,10 +224,11 @@
     }
 
     // ── Pick banner ─────────────────────────────────────────
-    $_on: color.adjust(conf.$color-success, $lightness: -38%);
+    $_on:      color.adjust(conf.$color-success-light, $lightness: -38%);
+    $_on_dark: color.adjust(conf.$color-success-dark,  $lightness: -38%);
 
     .pick {
-        background: conf.$color-success;
+        background: conf.$color-success-light;
         border-radius: conf.$default-radius;
         padding: clamp(.9rem, 3vw, 1.4rem) clamp(1rem, 4vw, 1.75rem);
         display: flex;
@@ -232,6 +237,10 @@
         justify-content: space-between;
         gap: 1rem;
         box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .3);
+
+        @include f.dark-mode {
+            background: conf.$color-success-dark;
+        }
 
         .content {
             display: flex;
@@ -248,6 +257,10 @@
                 color: $_on;
                 flex-shrink: 0;
                 display: inline-block;
+
+                @include f.dark-mode {
+                    color: $_on_dark;
+                }
             }
 
             .info {
@@ -263,6 +276,10 @@
                     letter-spacing: .2em;
                     color: $_on;
                     opacity: .7;
+
+                    @include f.dark-mode {
+                        color: $_on_dark;
+                    }
                 }
 
                 .value {
@@ -271,6 +288,10 @@
                     letter-spacing: -.02em;
                     color: $_on;
                     line-height: 1.1;
+
+                    @include f.dark-mode {
+                        color: $_on_dark;
+                    }
                 }
             }
         }

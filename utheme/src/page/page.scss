@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -36,7 +36,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
 
-    @media (prefers-color-scheme: dark) {
+    @include f.dark-mode {
         background-color: $bg-dark;
     }
 }
@@ -71,7 +71,7 @@ aside {
         color: sys.adjust($tx-light, $blackness: 15%);
         line-height: 1.5em;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: sys.adjust($tx-dark, $blackness: 15%);
         }
     }
@@ -82,7 +82,7 @@ aside {
         margin: .2em 0;
         padding: clamp(0em, 3vw, .3em);
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: $tx-dark;
             opacity: .3;
         }

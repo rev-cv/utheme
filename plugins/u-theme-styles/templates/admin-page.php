@@ -3,8 +3,8 @@
  * Вспомогательная функция: нативный цветовой пикер.
  */
 function u_color_field(string $name, string $value): void {
-    // Защищаемся от map.get-выражений (авто-режим) — показываем дефолт
-    if (str_contains($value, '(') || str_contains($value, 'map.')) {
+    // Защищаемся от map.get-выражений и SCSS-ссылок ($var) — показываем дефолт
+    if (str_contains($value, '(') || str_contains($value, 'map.') || str_starts_with($value, '$')) {
         $value = '#cccccc';
     }
     $safe_value = esc_attr($value);
@@ -412,6 +412,21 @@ function u_color_field(string $name, string $value): void {
                         'desc'    => 'Внешний вид карточки статьи в списках и архивах.',
                         'options' => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
                     ],
+                    'table-style' => [
+                        'title'   => 'Table Style',
+                        'desc'    => 'Вариант стилизации таблиц (.wp-block-table) в статьях.<br>
+                            <b>Default</b> — насыщенная шапка в цвет акцента, внешняя тень.<br>
+                            <b>Minimal</b> — без рамок, только нижние линии строк, UPPERCASE-заголовки.<br>
+                            <b>Classic</b> — полная сетка с рамками вокруг каждой ячейки.<br>
+                            <b>Cards</b> — строки как отдельные карточки с тенью и акцентной полоской слева.<br>
+                            <b>Stripes</b> — тёмная контрастная шапка + зебра чётных строк.<br>
+                            <b>Bold</b> — шапка-блок в цвет акцента с вертикальными разделителями.<br>
+                            <b>Outlined</b> — одна скруглённая рамка вокруг всей таблицы.<br>
+                            <b>Dashed</b> — пунктирные линии, заголовки и футер в цвет акцента.<br>
+                            <b>Tinted</b> — тонированная шапка и футер, вертикальные разделители.<br>
+                            <b>Editorial</b> — крупные заголовки, щедрые отступы, журнальный стиль.',
+                        'options' => ['default', 'minimal', 'classic', 'cards', 'stripes', 'bold', 'outlined', 'dashed', 'tinted', 'editorial'],
+                    ],
                     'more-pages' => [
                         'title'   => 'More Pages',
                         'desc'    => 'Блок "ещё почитать" под основным контентом страницы.<br><b>Grid</b> — мозаичная сетка с картинками.<br><b>List</b> — компактный список в несколько колонок.<br><b>Slider</b> — CSS-слайдер, одна статья на весь экран.<br><b>Carousel</b> — JS-карусель: 2–3 карточки одновременно, drag + автопрокрутка.',
@@ -557,6 +572,133 @@ function u_color_field(string $name, string $value): void {
                     </div>
                 <?php endforeach; ?>
 
+                <!-- ── Callout ─────────────────────────────────────────── -->
+                <?php
+                $callout_options     = ['default', 'subtle-tinted', 'left-accent-bar', 'solid-filled', 'dashed-outline', 'icon-badge-card', 'minimal-inline'];
+                $current_callout     = $v['callout'] ?? 'default';
+                $current_icon_set    = $v['callout-icon-set'] ?? 'circle';
+                $callout_icon_sets   = [];
+
+                // Парсим scheme.icons.callouts.scss: извлекаем наборы с 4 inline-SVG
+                $callout_icons_file = get_template_directory() . '/src/scheme.icons.callouts.scss';
+                if (file_exists($callout_icons_file)) {
+                    $raw      = file_get_contents($callout_icons_file);
+                    $cur_set  = null;
+                    $cur_icons = [];
+                    foreach (explode("\n", $raw) as $line) {
+                        // Начало набора: '    'name': ('
+                        if (preg_match("/^\s+'([\w-]+)':\s*\(\s*$/", $line, $m)) {
+                            $cur_set   = $m[1];
+                            $cur_icons = [];
+                        // Строка с иконкой (utf8 format): 'type': url('data:image/svg+xml;utf8,...'),
+                        } elseif ($cur_set && preg_match(
+                            "/^\s+'(info|success|warning|danger)':\s*url\('data:image\/svg\+xml;utf8,(.*?)'\)\s*,?\s*$/",
+                            $line, $m
+                        )) {
+                            $cur_icons[$m[1]] = trim($m[2]);
+                        // Строка с иконкой (percent-encoded format): 'type': url("data:image/svg+xml,..."),
+                        } elseif ($cur_set && preg_match(
+                            "/^\s+'(info|success|warning|danger)':\s*url\(\"data:image\/svg\+xml,(.*?)\"\)\s*,?\s*$/",
+                            $line, $m
+                        )) {
+                            $cur_icons[$m[1]] = rawurldecode(trim($m[2]));
+                        // Конец набора: '    ),'
+                        } elseif ($cur_set && preg_match("/^\s+\),?\s*$/", $line) && count($cur_icons) === 4) {
+                            $callout_icon_sets[$cur_set] = $cur_icons;
+                            $cur_set = null;
+                        }
+                    }
+                }
+
+                // Иконки активного набора (fallback: первый набор)
+                $active_set_icons = $callout_icon_sets[$current_icon_set]
+                    ?? (reset($callout_icon_sets) ?: []);
+                ?>
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Callout</h3>
+                        <select name="u_fields[callout]" class="u-component-select" id="callout-select">
+                            <?php foreach ($callout_options as $opt): ?>
+                                <option value="<?= $opt ?>"
+                                    <?= $current_callout === $opt ? 'selected' : '' ?>>
+                                    <?= ucfirst(str_replace('-', ' ', $opt)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+
+                            <?php if (!empty($callout_icon_sets)): ?>
+                                <div class="u-icon-select-wrap">
+                                    <label class="u-basic-field-label">Icon Set</label>
+
+                                    <input type="hidden"
+                                           name="u_fields[callout-icon-set]"
+                                           id="callout-icon-set-value"
+                                           value="<?= esc_attr($current_icon_set) ?>">
+
+                                    <div class="u-icon-dropdown"
+                                         id="callout-icon-set-dropdown"
+                                         data-input-name="callout-icon-set">
+
+                                        <button type="button" class="u-icon-trigger" id="callout-icon-set-trigger">
+                                            <span class="u-icon-svg u-icon-svg--set">
+                                                <?= $active_set_icons['info']    ?? '' ?>
+                                                <?= $active_set_icons['success'] ?? '' ?>
+                                                <?= $active_set_icons['warning'] ?? '' ?>
+                                                <?= $active_set_icons['danger']  ?? '' ?>
+                                            </span>
+                                            <span class="u-icon-trigger-name" id="callout-icon-set-label">
+                                                <?= esc_html($current_icon_set) ?>
+                                            </span>
+                                            <span class="u-icon-chevron">▾</span>
+                                        </button>
+
+                                        <div class="u-icon-list" id="callout-icon-set-list" style="display:none">
+                                            <?php foreach ($callout_icon_sets as $set_name => $icons): ?>
+                                                <div class="u-icon-item <?= $current_icon_set === $set_name ? 'is-selected' : '' ?>"
+                                                     data-value="<?= esc_attr($set_name) ?>">
+                                                    <span class="u-icon-svg u-icon-svg--set">
+                                                        <?= $icons['info']    ?>
+                                                        <?= $icons['success'] ?>
+                                                        <?= $icons['warning'] ?>
+                                                        <?= $icons['danger']  ?>
+                                                    </span>
+                                                    <span class="u-icon-item-name"><?= esc_html($set_name) ?></span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <p class="u-desc">
+                                Вариант информационных блоков (callout).<br>
+                                <b>Default</b> — акцентная левая рамка без иконки.<br>
+                                <b>Subtle Tinted</b> — полная рамка, тонированный фон, боковая иконка слева.<br>
+                                <b>Left Accent Bar</b> — 4px левая полоса, тонированный фон, иконка, острые углы.<br>
+                                <b>Solid Filled</b> — насыщенный сплошной фон, белый текст, как баннер-алерт.<br>
+                                <b>Dashed Outline</b> — без фона, пунктирная рамка в цвете акцента.<br>
+                                <b>Icon Badge Card</b> — белая карточка с тенью, иконка.<br>
+                                <b>Minimal Inline</b> — без фона и рамки, тонкая левая линия и акцентная точка.<br>
+                                Icon Set применяется в вариантах Subtle Tinted, Left Accent Bar и Icon Badge Card.
+                            </p>
+                        </div>
+
+                        <div class="u-card-right">
+                            <div class="u-preview">
+                                <img src="<?= plugins_url("assets/media/callout-{$current_callout}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/callout-', dirname(__FILE__)) ?>"
+                                     alt="Callout preview"
+                                     class="u-component-preview-img"
+                                     onerror="this.closest('.u-card-right').style.display='none'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="u-component-card">
                     <div class="u-card-header">
                         <h3>Breadcrumbs</h3>
@@ -665,11 +807,12 @@ function u_color_field(string $name, string $value): void {
 
                 <!-- Manual mode -->
                 <div id="color-mode-manual" class="color-mode-content <?= $manual_mode ? 'active' : '' ?>">
+                    <h4>Brand Colors</h4>
                     <div class="color-table">
                         <div class="color-table-header">
                             <span>Color</span>
-                            <span>Light</span>
-                            <span>Dark</span>
+                            <span data-theme-col="light">Light</span>
+                            <span data-theme-col="dark">Dark</span>
                         </div>
 
                         <?php
@@ -712,10 +855,10 @@ function u_color_field(string $name, string $value): void {
                         ?>
                             <div class="color-table-row">
                                 <span class="color-label"><?= $label ?></span>
-                                <div class="color-input-wrapper">
+                                <div class="color-input-wrapper" data-theme-col="light">
                                     <?php u_color_field("u_fields[{$lk}]", $vl) ?>
                                 </div>
-                                <div class="color-input-wrapper">
+                                <div class="color-input-wrapper" data-theme-col="dark">
                                     <?php u_color_field("u_fields[{$dk}]", $vd) ?>
                                 </div>
                             </div>
@@ -723,24 +866,41 @@ function u_color_field(string $name, string $value): void {
                     </div>
                 </div>
 
-                <!-- System States -->
-                <div class="system-colors-section">
-                    <h4>System States</h4>
-                    <div class="system-colors-grid">
+                <!-- Status Colors -->
+                <div class="system-colors-section" id="status-colors-section">
+                    <h4>Status Colors</h4>
+                    <div class="color-table">
+                        <div class="color-table-header">
+                            <span>Color</span>
+                            <span data-theme-col="light">Light</span>
+                            <span data-theme-col="dark">Dark</span>
+                        </div>
                         <?php
-                        $system_colors = [
-                            'color-success' => ['label' => 'Success', 'default' => '#5db97a'],
-                            'color-warning' => ['label' => 'Warning', 'default' => '#fcd34d'],
-                            'color-error'   => ['label' => 'Error',   'default' => '#dc2f02'],
-                            'color-info'    => ['label' => 'Info',    'default' => '#4fc3f7'],
+                        $system_state_rows = [
+                            'success'     => ['label' => 'Success',      'light_default' => '#5db97a', 'dark_default' => '#4caf68'],
+                            'warning'     => ['label' => 'Warning',      'light_default' => '#fcd34d', 'dark_default' => '#eab308'],
+                            'error'       => ['label' => 'Error',        'light_default' => '#dc2f02', 'dark_default' => '#ff6b4a'],
+                            'info'        => ['label' => 'Info',         'light_default' => '#4fc3f7', 'dark_default' => '#29b6f6'],
+                            'callout-txt' => ['label' => 'Callout Text', 'light_default' => '#1a1a2e', 'dark_default' => '#e8e8f0'],
                         ];
-                        foreach ($system_colors as $key => $cfg): ?>
-                            <div class="system-color-item">
-                                <label><?= $cfg['label'] ?></label>
-                                <?php u_color_field("u_fields[{$key}]", $v[$key] ?? $cfg['default']) ?>
+                        foreach ($system_state_rows as $key => $cfg):
+                            $lk = "color-{$key}-light";
+                            $dk = "color-{$key}-dark";
+                            $vl = $v[$lk] ?? $cfg['light_default'];
+                            $vd = $v[$dk] ?? $cfg['dark_default'];
+                        ?>
+                            <div class="color-table-row">
+                                <span class="color-label"><?= $cfg['label'] ?></span>
+                                <div class="color-input-wrapper" data-theme-col="light">
+                                    <?php u_color_field("u_fields[{$lk}]", $vl) ?>
+                                </div>
+                                <div class="color-input-wrapper" data-theme-col="dark">
+                                    <?php u_color_field("u_fields[{$dk}]", $vd) ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
+                    <p class="u-desc u-mode-hint" style="margin-top:8px"></p>
                 </div>
             </section>
 

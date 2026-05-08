@@ -35,9 +35,24 @@
 @use "art__toc/toc-icon.scss" as toc_icon;
 @use "art__toc/toc-tags.scss" as toc_tags;
 @use "art__lists/lists.scss";
-@use "art__table/tables.scss";
+@use "art__table/default.scss"   as table_default;
+@use "art__table/minimal.scss"   as table_minimal;
+@use "art__table/classic.scss"   as table_classic;
+@use "art__table/cards.scss"     as table_cards;
+@use "art__table/stripes.scss"   as table_stripes;
+@use "art__table/bold.scss"      as table_bold;
+@use "art__table/outlined.scss"  as table_outlined;
+@use "art__table/dashed.scss"    as table_dashed;
+@use "art__table/tinted.scss"    as table_tinted;
+@use "art__table/editorial.scss" as table_editorial;
 @use "art__images/images.scss";
-@use "art__box/box.scss";
+@use "art__callouts/default.scss" as callout_default;
+@use "art__callouts/subtle-tinted.scss" as callout_subtle_tinted;
+@use "art__callouts/left-accent-bar.scss" as callout_left_accent_bar;
+@use "art__callouts/solid-filled.scss" as callout_solid_filled;
+@use "art__callouts/dashed-outline.scss" as callout_dashed_outline;
+@use "art__callouts/icon-badge-card.scss" as callout_icon_badge_card;
+@use "art__callouts/minimal-inline.scss" as callout_minimal_inline;
 @use "art__card/card-grid.scss";
 @use "art__card/table-grid.scss";
 @use "art__card/yesno.scss";
@@ -97,6 +112,38 @@
     @include toc_tags.styles;
 }
 
+// блок стилизация таблиц
+@if conf.$table-style == 'default' {
+    @include table_default.styles;
+}
+@else if conf.$table-style == 'minimal' {
+    @include table_minimal.styles;
+}
+@else if conf.$table-style == 'classic' {
+    @include table_classic.styles;
+}
+@else if conf.$table-style == 'cards' {
+    @include table_cards.styles;
+}
+@else if conf.$table-style == 'stripes' {
+    @include table_stripes.styles;
+}
+@else if conf.$table-style == 'bold' {
+    @include table_bold.styles;
+}
+@else if conf.$table-style == 'outlined' {
+    @include table_outlined.styles;
+}
+@else if conf.$table-style == 'dashed' {
+    @include table_dashed.styles;
+}
+@else if conf.$table-style == 'tinted' {
+    @include table_tinted.styles;
+}
+@else if conf.$table-style == 'editorial' {
+    @include table_editorial.styles;
+}
+
 // блок стилизация карточек статей
 @if conf.$article-card =='default' {
     @include card_default.styles;
@@ -133,6 +180,28 @@
 }
 @else if conf.$details =='arrow' {
     @include details_arrow.styles;
+}
+
+@if conf.$callout =='default' {
+    @include callout_default.styles;
+}
+@else if conf.$callout =='subtle-tinted' {
+    @include callout_subtle_tinted.styles;
+}
+@else if conf.$callout =='left-accent-bar' {
+    @include callout_left_accent_bar.styles;
+}
+@else if conf.$callout =='solid-filled' {
+    @include callout_solid_filled.styles;
+}
+@else if conf.$callout =='dashed-outline' {
+    @include callout_dashed_outline.styles;
+}
+@else if conf.$callout =='icon-badge-card' {
+    @include callout_icon_badge_card.styles;
+}
+@else if conf.$callout =='minimal-inline' {
+    @include callout_minimal_inline.styles;
 }
 
 // блок "ещё почитать" — все варианты компилируются всегда (переключение через CSS-класс)

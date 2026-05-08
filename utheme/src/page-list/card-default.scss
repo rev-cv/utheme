@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -11,13 +11,13 @@
         background: conf.$color-section-light;
         transition: transform 0.2s;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-section-dark;
         }
 
         @if conf.$is-border == 'true' {
             border: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
@@ -48,7 +48,7 @@
                     text-decoration: none;
                     color: conf.$color-text-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: conf.$color-text-dark;
                     }
                 }
@@ -61,7 +61,7 @@
                 flex-grow: 1;
                 margin-bottom: 0;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: rgba(conf.$color-text-dark, 0.7);
                 }
             }
@@ -74,7 +74,7 @@
                 text-align: right;
                 font-size: clamp(.8rem, 2vw, 1rem);
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-accent-dark;
                 }
             }

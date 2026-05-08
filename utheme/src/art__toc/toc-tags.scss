@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -32,7 +32,7 @@ $pad-x: calc(conf.$default-space / 2);
             white-space: nowrap;
             color: $tx-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: $tx-dark;
             }
 
@@ -71,12 +71,12 @@ $pad-x: calc(conf.$default-space / 2);
                 @if conf.$is-border == 'true' {
                     border: 1px solid conf.$color-border-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         border-color: conf.$color-border-dark;
                     }
                 }
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     background-color: $bg-dark;
                     color: $tx-dark;
                 }
@@ -85,7 +85,7 @@ $pad-x: calc(conf.$default-space / 2);
                     text-decoration: none;
                     background-color: sys.adjust($bg-light, $lightness: -8%);
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background-color: sys.adjust($bg-dark, $lightness: 8%);
                     }
                 }

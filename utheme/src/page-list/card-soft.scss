@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -26,7 +26,7 @@
         // }
 
         // Dark mode styles
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: $bg-dark;
             box-shadow: 10px 10px 20px $shadow-dark-dark, -10px -10px 20px $shadow-light-dark;
 

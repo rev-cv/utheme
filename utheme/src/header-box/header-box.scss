@@ -1,5 +1,6 @@
-@use "../conf.scss" as conf;
+﻿@use "../conf.scss" as conf;
 @use 'sass:color' as sys;
+@use "../funcs.scss" as f;
 
 .header-box {
     width: 100%;
@@ -39,7 +40,7 @@
         // mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         // -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background-color: conf.$color-accent-dark;
         }
     }

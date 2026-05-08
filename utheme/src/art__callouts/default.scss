@@ -1,0 +1,79 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    article {
+        .callout {
+            border-top: none;
+            border-right: none;
+            border-bottom: none;
+            border-left: 4px solid transparent;
+            border-radius: 3px f.get-radius-single() f.get-radius-single() 3px;
+            color: conf.$color-callout-txt-light;
+
+            @include f.dark-mode {
+                color: conf.$color-callout-txt-dark;
+            }
+        }
+
+        section .callout:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-callout {
+            border-left-color: conf.$color-info-light;
+            background-color: rgba(conf.$color-info-light, 0.05);
+
+            strong { color: conf.$color-info-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-info-dark;
+                background-color: rgba(conf.$color-info-dark, 0.05);
+
+                strong { color: conf.$color-info-dark; }
+            }
+        }
+
+        .success-callout {
+            border-left-color: conf.$color-success-light;
+            background-color: rgba(conf.$color-success-light, 0.05);
+
+            strong { color: conf.$color-success-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-success-dark;
+                background-color: rgba(conf.$color-success-dark, 0.05);
+
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        .warning-callout {
+            border-left-color: conf.$color-warning-light;
+            background-color: rgba(conf.$color-warning-light, 0.05);
+
+            strong { color: conf.$color-warning-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-warning-dark;
+                background-color: rgba(conf.$color-warning-dark, 0.05);
+
+                strong { color: conf.$color-warning-dark; }
+            }
+        }
+
+        .danger-callout {
+            border-left-color: conf.$color-error-light;
+            background-color: rgba(conf.$color-error-light, 0.05);
+
+            strong { color: conf.$color-error-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-error-dark;
+                background-color: rgba(conf.$color-error-dark, 0.05);
+
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+}

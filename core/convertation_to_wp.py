@@ -103,36 +103,49 @@ def _handle_details(tag):
     
     return f'<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_blocks_content}</details>\n<!-- /wp:details -->'
 
+_CALLOUT_CLASS_MAP = {
+    # canonical names (pass-through)
+    'info-callout':     'info-callout',
+    'success-callout':  'success-callout',
+    'warning-callout':  'warning-callout',
+    'danger-callout':   'danger-callout',
+    # legacy / alias → info-callout
+    'info-box':   'info-callout',
+    'fun-fact':   'info-callout',
+    'center-box': 'info-callout',
+    'banner-box': 'info-callout',
+    'task-box':   'info-callout',
+    # legacy → typed callouts
+    'callout':    'danger-callout',
+    'error-box':  'danger-callout',
+    'warning-box': 'warning-callout',
+    'success-box': 'success-callout',
+}
+
+def _make_callout_block(tag, callout_type):
+    inner_blocks = []
+    for child in tag.children:
+        if isinstance(child, NavigableString) and not child.strip():
+            continue
+        if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
+            inner_blocks.append(BLOCK_HANDLERS[child.name](child))
+    inner_content = '\n'.join(inner_blocks)
+    return (
+        f'<!-- wp:group {{"tagName":"section","className":"callout {callout_type}",'
+        f'"layout":{{"type":"constrained"}}}} -->\n'
+        f'<section class="wp-block-group callout {callout_type}">'
+        f'<div class="wp-block-group__inner-container">{inner_content}</div>'
+        f'</section>\n<!-- /wp:group -->'
+    )
+
 def _handle_div(tag):
-    if 'info-box' in tag.get('class', []) or 'fun-fact' in tag.get('class', []):
-        """Обработка .info-box."""
-        inner_blocks = []
-        for child in tag.children:
-            if isinstance(child, NavigableString) and not child.strip():
-                continue
+    classes = tag.get('class', [])
 
-            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
-                handler = BLOCK_HANDLERS[child.name]
-                inner_blocks.append(handler(child))
-        
-        inner_content = '\n'.join(inner_blocks)
-        return f'<!-- wp:group {{"tagName":"section","className":"info-box","layout":{{"type":"constrained"}}}} -->\n<section class="wp-block-group info-box"><div class="wp-block-group__inner-container">{inner_content}</div></section>\n<!-- /wp:group -->'
+    for cls in classes:
+        if cls in _CALLOUT_CLASS_MAP:
+            return _make_callout_block(tag, _CALLOUT_CLASS_MAP[cls])
 
-    elif "callout" in tag.get('class', []):
-        """Обработка .error-box."""
-        inner_blocks = []
-        for child in tag.children:
-            if isinstance(child, NavigableString) and not child.strip():
-                continue
-
-            if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
-                handler = BLOCK_HANDLERS[child.name]
-                inner_blocks.append(handler(child))
-        
-        inner_content = '\n'.join(inner_blocks)
-        return f'<!-- wp:group {{"tagName":"section","className":"error-box","layout":{{"type":"constrained"}}}} -->\n<section class="wp-block-group error-box"><div class="wp-block-group__inner-container">{inner_content}</div></section>\n<!-- /wp:group -->'
-
-    elif 'card-grid' in tag.get('class', []):
+    if 'card-grid' in classes:
         """Обработка карточки внутри grid"""
         grid_items = []
         for card_div in tag.find_all('div', recursive=False):
@@ -319,9 +332,11 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
 
     
     # все DIV распаковываются и удаляются за исключением тех, что в этом списке
-    forbidden_div = ['info-box', 'fun-fact', 'callout', 'card-grid', 'at-a-glance',
-    'dos-donts', 'odds-example', 'key-takeaways', 'worked-example',
-    'faq-item', 'key-takeaway', 'glossary-term', 'pre-bet-checklist']
+    forbidden_div = [
+        *_CALLOUT_CLASS_MAP.keys(),
+        'card-grid', 'at-a-glance', 'dos-donts', 'odds-example', 'key-takeaways',
+        'worked-example', 'faq-item', 'key-takeaway', 'glossary-term', 'pre-bet-checklist',
+    ]
 
     # удаляем оглавления (nav с data-content="toc") до любой обработки
     for toc in container.find_all('nav', attrs={'data-content': 'toc'}):

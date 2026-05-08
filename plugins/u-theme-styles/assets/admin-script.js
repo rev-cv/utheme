@@ -127,9 +127,14 @@ jQuery(document).ready(function ($) {
 
     // ─── Смена картинки компонента при изменении селекта ────────────────────
     $(document).on('change', '.u-component-select', function () {
-        var $preview = $(this).closest('.u-component-card').find('.u-component-preview-img');
+        var $card    = $(this).closest('.u-component-card');
+        var $right   = $card.find('.u-card-right');
+        var $preview = $card.find('.u-component-preview-img');
         var baseUrl  = $preview.data('base-url');
-        if (baseUrl) $preview.attr('src', baseUrl + $(this).val() + '.webp');
+        if (baseUrl) {
+            $right.show();
+            $preview.show().attr('src', baseUrl + $(this).val() + '.webp');
+        }
     });
 
     // ─── Font Vibe: смена картинки + описания ───────────────────────────────
@@ -215,11 +220,39 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // ─── Theme Mode: обновление активной кнопки сегментированного контрола ──
+    // ─── Theme Mode: блокировка неактивных колонок ───────────────────────────
+    // Применяется ко ВСЕМ [data-theme-col] на странице:
+    // и к Brand Colors таблице, и к Status Colors таблице.
+    var modeHints = {
+        'dark-only':  'Dark Only: колонка Light перекрывается MODE-блоком и не влияет на результат.',
+        'light-only': 'Light Only: колонка Dark перекрывается MODE-блоком и не влияет на результат.',
+        'both':       '',
+    };
+
+    function updateThemeModeColumns(mode) {
+        $('[data-theme-col]').removeClass('u-theme-col-inactive u-theme-col-active');
+        if (mode === 'dark-only') {
+            $('[data-theme-col="light"]').addClass('u-theme-col-inactive');
+            $('[data-theme-col="dark"]').addClass('u-theme-col-active');
+        } else if (mode === 'light-only') {
+            $('[data-theme-col="dark"]').addClass('u-theme-col-inactive');
+            $('[data-theme-col="light"]').addClass('u-theme-col-active');
+        }
+        $('.u-mode-hint').text(modeHints[mode] || '');
+    }
+
     $(document).on('change', 'input[name="u_theme_mode"]', function () {
         $('.u-mode-btn').removeClass('is-active');
         $(this).closest('.u-mode-btn').addClass('is-active');
+        updateThemeModeColumns($(this).val());
+        markDirty($(this));
     });
+
+    // Инициализация при загрузке страницы
+    var initialMode = (typeof uThemeData !== 'undefined' && uThemeData.themeMode)
+        ? uThemeData.themeMode
+        : ($('input[name="u_theme_mode"]:checked').val() || 'both');
+    updateThemeModeColumns(initialMode);
 
     // ─── Typography presets ──────────────────────────────────────────────────
     var uTypoPresets = {

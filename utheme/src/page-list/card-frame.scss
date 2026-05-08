@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -14,13 +14,13 @@
         transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
         padding-bottom: 1em;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-section-dark;
         }
 
         @if conf.$is-border == 'true' {
             border: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
@@ -88,7 +88,7 @@
             -webkit-line-clamp: 5;
             text-overflow: ellipsis;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: rgba(conf.$color-text-dark, 0.7);
             }
         }

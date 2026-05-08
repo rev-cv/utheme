@@ -5,13 +5,15 @@
 @use "sass:list";
 
 @mixin mode($map) {
-    @each $prop, $values in $map {
-        #{$prop}: list.nth($values, 1); // первое значение (light)
+    @if conf.$theme-mode != 'dark-only' {
+        @each $prop, $values in $map {
+            #{$prop}: list.nth($values, 1);
+        }
     }
 
-    @media (prefers-color-scheme: dark) {
+    @include dark-mode {
         @each $prop, $values in $map {
-            #{$prop}: list.nth($values, 2); // второе значение (dark)
+            #{$prop}: list.nth($values, 2);
         }
     }
 }
@@ -51,6 +53,18 @@
     }
 
     @return map.get($current-vibe-map, "default");
+}
+
+// Оборачивает @content в @media dark, выводит напрямую (dark-only) или подавляет (light-only).
+// Использовать вместо прямых @media (prefers-color-scheme: dark) в callouts и компонентах.
+@mixin dark-mode {
+    @if conf.$theme-mode == 'dark-only' {
+        @content;
+    } @else if conf.$theme-mode == 'light-only' {
+        // suppress
+    } @else {
+        @media (prefers-color-scheme: dark) { @content; }
+    }
 }
 
 // Для контекстов, где нужно строго одно значение: calc(), смешанный shorthand,

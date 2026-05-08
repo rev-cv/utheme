@@ -1,4 +1,4 @@
-@use "../conf.scss" as conf;
+﻿@use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 @use 'sass:color' as sys;
 
@@ -62,7 +62,7 @@ $stt-text-dark: conf.$color-bg-dark;
         -webkit-mask-position: center;
         mask-position: center;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background-color: $stt-text-dark;
         }
     }
@@ -73,7 +73,7 @@ $stt-text-dark: conf.$color-bg-dark;
         justify-content: center;
     }
 
-    @media (prefers-color-scheme: dark) {
+    @include f.dark-mode {
         background-color: $stt-bg-dark;
         color: $stt-text-dark;
 

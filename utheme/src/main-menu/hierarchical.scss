@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -29,7 +29,7 @@
 
         @if conf.$is-border == 'true' {
             border-bottom: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-bottom-color: conf.$color-border-dark;
             }
         }
@@ -83,7 +83,7 @@
 
                 &:hover { color: conf.$color-accent-light; }
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     &:hover { color: conf.$color-accent-dark; }
                 }
             }
@@ -159,7 +159,7 @@
                         transform-origin: left;
                         transition: transform 0.25s ease;
 
-                        @media (prefers-color-scheme: dark) {
+                        @include f.dark-mode {
                             background: conf.$color-accent-dark;
                         }
                     }
@@ -198,7 +198,7 @@
 
                     @if conf.$is-border == 'true' {
                         border: 1px solid conf.$color-border-light;
-                        @media (prefers-color-scheme: dark) { border-color: conf.$color-border-dark; }
+                        @include f.dark-mode { border-color: conf.$color-border-dark; }
                     }
 
                     // Пункт второго уровня
@@ -246,7 +246,7 @@
 
                                 .item-chevron { opacity: 1; transform: translateX(2px); }
 
-                                @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                                @include f.dark-mode { color: conf.$color-accent-dark; }
                             }
                         }
 
@@ -275,7 +275,7 @@
 
                             @if conf.$is-border == 'true' {
                                 border: 1px solid conf.$color-border-light;
-                                @media (prefers-color-scheme: dark) { border-color: conf.$color-border-dark; }
+                                @include f.dark-mode { border-color: conf.$color-border-dark; }
                             }
 
                             > .menu-item > a {
@@ -302,7 +302,7 @@
                                         ),
                                     ));
 
-                                    @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                                    @include f.dark-mode { color: conf.$color-accent-dark; }
                                 }
                             }
                         }
@@ -340,7 +340,7 @@
                         ),
                     ));
 
-                    @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                    @include f.dark-mode { color: conf.$color-accent-dark; }
 
                     &::after { transform: scaleX(1); }
                     .item-chevron { transform: rotate(180deg); opacity: 1; }
@@ -426,7 +426,7 @@
 
             @if conf.$is-border == 'true' {
                 border-bottom: 1px solid conf.$color-border-light;
-                @media (prefers-color-scheme: dark) { border-bottom-color: conf.$color-border-dark; }
+                @include f.dark-mode { border-bottom-color: conf.$color-border-dark; }
             }
 
             .panel-site-name {
@@ -469,7 +469,7 @@
             scrollbar-width: thin;
             scrollbar-color: conf.$color-border-light transparent;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 scrollbar-color: conf.$color-border-dark transparent;
             }
         }
@@ -512,7 +512,7 @@
 
                     &:hover { color: conf.$color-accent-light; }
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         &:hover { color: conf.$color-accent-dark; }
                     }
                 }
@@ -550,7 +550,7 @@
                             ),
                         ));
 
-                        @media (prefers-color-scheme: dark) { color: conf.$color-accent-dark; }
+                        @include f.dark-mode { color: conf.$color-accent-dark; }
                     }
                 }
             }
@@ -597,7 +597,7 @@
                     border-left: 2px solid conf.$color-border-light;
                     margin-left: 36px * conf.$density-factor;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         border-left-color: conf.$color-border-dark;
                     }
 

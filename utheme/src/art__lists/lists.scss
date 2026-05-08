@@ -1,4 +1,4 @@
-@use "../conf.scss" as conf;
+﻿@use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
 /* ------------------------------------------------------ */
@@ -22,7 +22,7 @@ aside .wp-block-list {
         font-size: clamp(.8rem, 3vw, 1rem) !important;
         color: conf.$color-text-light;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: conf.$color-text-dark;
         }
 
@@ -42,7 +42,7 @@ aside .wp-block-list {
             font-weight: 600;
             color: conf.$color-accent-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-accent-dark;
             }
         }

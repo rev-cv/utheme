@@ -90,6 +90,10 @@
 .u-icon-svg { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 18px; height: 18px; }
 .u-icon-svg svg { width: 18px; height: 18px; fill: currentColor; display: block; }
 
+/* Icon-set: 4 иконки в ряд (для набора callout-иконок) */
+.u-icon-svg--set { width: auto; gap: 5px; }
+.u-icon-svg--set svg { width: 15px; height: 15px; }
+
 /* ── Descriptions ────────────────────────────────────────────────────────── */
 .u-desc { font-size: 12px; color: #777; line-height: 1.5; margin: 0; }
 
@@ -148,6 +152,24 @@ input:checked + .slider:before { transform: translateX(24px); }
 .system-colors-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
 .system-color-item { background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px; }
 .system-color-item label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 13px; }
+
+/* Theme mode column awareness */
+[data-theme-col].u-theme-col-inactive {
+    opacity: 0.3;
+    pointer-events: none;
+}
+.color-table-header [data-theme-col].u-theme-col-inactive {
+    text-decoration: line-through;
+    opacity: 0.4;
+}
+.color-table-header [data-theme-col].u-theme-col-active {
+    color: #2271b1;
+    font-weight: 700;
+}
+.color-table-header [data-theme-col].u-theme-col-active::after {
+    content: ' ✓';
+    font-size: 11px;
+}
 
 /* Range inputs */
 input[type="range"] { width: 200px; vertical-align: middle; }

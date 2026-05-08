@@ -1,4 +1,4 @@
-@use "../conf.scss" as conf;
+﻿@use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 @use 'sass:color' as sys;
 
@@ -58,7 +58,7 @@
         margin-top: 3em;
         margin-bottom: 3em;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: white;
         }
     }

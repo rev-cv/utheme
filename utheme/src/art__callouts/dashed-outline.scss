@@ -1,0 +1,70 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    article {
+        .callout {
+            padding: calc(conf.$default-space * 0.75) conf.$default-space;
+            background: transparent;
+            border: 1.5px dashed transparent;
+            border-radius: f.get-radius();
+            color: conf.$color-callout-txt-light;
+
+            @include f.dark-mode {
+                color: conf.$color-callout-txt-dark;
+            }
+        }
+
+        section .callout:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-callout {
+            border-color: conf.$color-info-light;
+
+            strong { color: conf.$color-info-light; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-info-dark;
+
+                strong { color: conf.$color-info-dark; }
+            }
+        }
+
+        .success-callout {
+            border-color: conf.$color-success-light;
+
+            strong { color: conf.$color-success-light; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-success-dark;
+
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        .warning-callout {
+            border-color: conf.$color-warning-light;
+
+            strong { color: conf.$color-warning-light; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-warning-dark;
+
+                strong { color: conf.$color-warning-dark; }
+            }
+        }
+
+        .danger-callout {
+            border-color: conf.$color-error-light;
+
+            strong { color: conf.$color-error-light; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-error-dark;
+
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+}

@@ -10,6 +10,7 @@ Usage:
   modlinks.py rm  <slug>              Strip <a> tags linking to <slug>, keeping link text
 """
 
+import re
 import sys
 from pathlib import Path
 from urllib.parse import urlparse
@@ -40,6 +41,20 @@ def _replace_slug_in_href(href: str, old: str, new: str) -> str:
     return new
 
 
+def _restore_faq_href_quotes(content: str) -> str:
+    """Restore single-quoted hrefs inside FAQ shortcode items.
+
+    BeautifulSoup serializes href='...' as href="...", which breaks the outer
+    desc="..." attribute in [id=...] shortcode items.
+    """
+    lines = []
+    for line in content.splitlines(keepends=True):
+        if '[id=' in line:
+            line = re.sub(r'href="([^"]*)"', r"href='\1'", line)
+        lines.append(line)
+    return ''.join(lines)
+
+
 def _process_file(html_file: Path, mode: str, old_slug: str, new_slug: str = '') -> bool:
     content = html_file.read_text(encoding='utf-8')
     soup = BeautifulSoup(content, 'html.parser')
@@ -60,7 +75,7 @@ def _process_file(html_file: Path, mode: str, old_slug: str, new_slug: str = '')
             changed = True
 
     if changed:
-        html_file.write_text(str(soup), encoding='utf-8')
+        html_file.write_text(_restore_faq_href_quotes(str(soup)), encoding='utf-8')
     return changed
 
 

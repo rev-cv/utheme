@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -14,12 +14,12 @@
 
         @if conf.$is-border == 'true' {
             border: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background-color: conf.$color-section-dark;
         }
 
@@ -78,7 +78,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-text-dark;
                     background: linear-gradient(to top, rgba(conf.$color-section-dark, 85%) 85%, transparent);
                 }
@@ -104,7 +104,7 @@
                 // 0.9rem (размер) * 1.5 (интервал) * 5 (строк)
                 max-height: 6.75rem;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     background: rgba(conf.$color-section-dark, 85%);
                     color: rgba(conf.$color-text-dark, 0.8);
                 }

@@ -1,4 +1,4 @@
-// Используемые CSS-переменные (для контекста, они определены в :root)
+﻿// Используемые CSS-переменные (для контекста, они определены в :root)
 // --shadow-sm
 // --header-bg
 // --text-secondary
@@ -46,7 +46,7 @@
         overflow: hidden;
         background: rgba(conf.$color-section-light, 0.9);
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: rgba(conf.$color-section-dark, 0.85);
         }
 
@@ -102,7 +102,7 @@
 
             @if conf.$is-border == 'true' {
                 border: 1px solid conf.$color-border-light;
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     border-color: conf.$color-border-dark;
                 }
             }
@@ -152,7 +152,7 @@
                 color: conf.$color-text-light;
                 text-transform: uppercase;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-text-dark;
                 }
             }
@@ -194,7 +194,7 @@
 
             background: conf.$color-accent-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: conf.$color-accent-dark;
             }
         }
@@ -228,7 +228,7 @@
 
                 color: rgba(conf.$color-text-light, 0.8);
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: rgba(conf.$color-text-dark, 0.8);
                 }
 

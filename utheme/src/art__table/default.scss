@@ -1,0 +1,95 @@
+﻿@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$-border-light: rgba(0, 0, 0, 0.08);
+$-border-dark:  rgba(255, 255, 255, 0.1);
+
+@mixin styles {
+    .wp-block-table {
+        width: 100% !important;
+        max-width: 100vw;
+        display: grid;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 2rem;
+        user-select: none;
+
+        &::-webkit-scrollbar { height: 6px; }
+        &::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: conf.$color-accent-light;
+            border-radius: 10px;
+            &:hover { background: sys.adjust(conf.$color-accent-light, $lightness: -10%); }
+            @include f.dark-mode {
+                background: conf.$color-accent-dark;
+                &:hover { background: sys.adjust(conf.$color-accent-dark, $lightness: -10%); }
+            }
+        }
+
+        table {
+            margin: 0;
+            width: 100% !important;
+            min-width: 100% !important;
+            table-layout: auto !important;
+            border-collapse: collapse;
+            font-size: clamp(16px, 2vw, 18px);
+            background: transparent;
+            border-radius: 5px;
+            box-shadow: 0 4px 24px $-border-light;
+
+            @include f.dark-mode {
+                box-shadow: 0 4px 24px $-border-dark;
+            }
+
+            // Reset WP block editor borders first
+            thead, tr, th, td {
+                border: none !important;
+                white-space: nowrap !important;
+                word-break: normal !important;
+                overflow-wrap: normal !important;
+                hyphens: none !important;
+            }
+
+            th, td { padding: clamp(.5rem, 2vw, 1rem) !important; }
+
+            thead {
+                background: conf.$color-accent-light;
+                @include f.dark-mode { background: conf.$color-accent-dark; }
+            }
+
+            th {
+                text-align: left;
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.05em;
+                color: conf.$color-bg-light;
+                @include f.dark-mode { color: conf.$color-bg-dark; }
+            }
+
+            td {
+                color: conf.$color-text-light;
+                border-bottom: 1px solid $-border-light !important;
+                @include f.dark-mode {
+                    color: conf.$color-text-dark;
+                    border-bottom-color: $-border-dark !important;
+                }
+            }
+
+            tbody tr {
+                transition: background 100ms ease-in-out;
+                &:hover {
+                    background: sys.mix(conf.$color-bg-light, #000, 95%);
+                    @include f.dark-mode {
+                        background: sys.mix(conf.$color-bg-dark, #fff, 90%);
+                    }
+                }
+                &:last-child td { border-bottom: none !important; }
+            }
+        }
+    }
+}
