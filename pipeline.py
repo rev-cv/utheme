@@ -101,7 +101,7 @@ def run():
     if platform.system() == "Windows":
         _activate_plugin("u-theme-styles")
         subprocess.run(["docker", "compose", "up", "-d", "sass"], check=True)
-        _install_and_activate_plugin("all-in-one-wp-migration")
+        _install_and_activate_plugin("wpvivid-backuprestore")
 
     _header("ГОТОВО")
 
@@ -507,7 +507,16 @@ def _install_and_activate_plugin(slug: str):
     )
     if result.returncode != 0:
         output = (result.stdout + result.stderr).strip()
-        print(f"  [!] Не удалось установить плагин '{slug}': {output}")
+        # Плагин уже смонтирован через volume — попробуем просто активировать
+        fallback = subprocess.run(
+            ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+             "wp", "plugin", "activate", slug, "--path=/var/www/html"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        if fallback.returncode == 0:
+            print(f"  Плагин '{slug}' активирован (из volume).")
+        else:
+            print(f"  [!] Не удалось установить плагин '{slug}': {output}")
     else:
         print(f"  Плагин '{slug}' установлен и активирован.")
 

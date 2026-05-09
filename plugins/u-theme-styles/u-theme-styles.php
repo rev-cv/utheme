@@ -35,7 +35,7 @@ class UThemeConfigurator {
         'menu-accent-align' => ['left', 'center', 'right'],
         'footer-menu'    => ['2columns', '4columns'],
         'more-pages'     => ['grid', 'list', 'slider', 'carousel'],
-        'toc-menu'       => ['circle', 'number', 'icon', 'tags'],
+        'toc-menu'       => ['circle', 'number', 'icon', 'tags', 'vertical-rule', 'two-columns', 'underline', 'card-row', 'numbers-right'],
         'stt-icon'       => [
             'chevron-one', 'chevron-two', 'triple-filled-arrow', 'triple-arrow', 
             'double-filled-arrow', 'double-arrow', 'circle-filled-1', 'circle-1', 
@@ -44,7 +44,7 @@ class UThemeConfigurator {
         'details'        => ['plus', 'arrow'],
         'callout'          => ['default', 'subtle-tinted', 'left-accent-bar', 'solid-filled', 'dashed-outline', 'icon-badge-card', 'minimal-inline'],
         'callout-icon-set' => ['circle', 'shield', 'diamond'],
-        'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
+        'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split', 'classic', 'aside', 'overlay', 'blurred', 'type-first', 'editorial', 'clipped'],
         'table-style'    => ['default', 'minimal', 'classic', 'cards', 'stripes', 'bold', 'outlined', 'dashed', 'tinted', 'editorial'],
         'is-img_contain' => ['true', 'false'],
         'is-left-align'  => ['true', 'false'],
@@ -167,7 +167,7 @@ class UThemeConfigurator {
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages',
             'table-style',
             'font-vibe', 'radius-vibe', 'style', 'toc-icon', 'stt-icon',
-            'is-menu-title', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
+            'is-menu-title', 'is-not-section', 'toc-show-title', 'is-img_contain', 'is-left-align', 'is-border',
             'breadcrumbs-separator', 'menu-accent-align',
             'callout', 'callout-icon-set',
             'theme-mode',
@@ -176,7 +176,7 @@ class UThemeConfigurator {
         // Чекбоксы: если не отмечен — браузер не отправляет поле вовсе.
         // Принудительно выставляем 'false' для всех булевых переменных,
         // которые отсутствуют в $_POST['u_fields'].
-        $bool_vars = ['is-menu-title', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border'];
+        $bool_vars = ['is-menu-title', 'is-not-section', 'toc-show-title', 'is-img_contain', 'is-left-align', 'is-border'];
         foreach ($bool_vars as $bvar) {
             if (!isset($fields[$bvar])) {
                 $fields[$bvar] = 'false';
@@ -188,6 +188,14 @@ class UThemeConfigurator {
         foreach ($em_vars as $var) {
             if (isset($fields[$var]) && !str_ends_with($fields[$var], 'em')) {
                 $fields[$var] = $fields[$var] . 'em';
+            }
+        }
+
+        // Параметры с единицей px: слайдер присылает число, пишем с суффиксом.
+        $px_vars = ['max-width'];
+        foreach ($px_vars as $var) {
+            if (isset($fields[$var]) && !str_ends_with($fields[$var], 'px')) {
+                $fields[$var] = $fields[$var] . 'px';
             }
         }
 

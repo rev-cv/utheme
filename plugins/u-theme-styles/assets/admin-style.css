@@ -179,6 +179,12 @@ input[type="range"] { width: 200px; vertical-align: middle; }
 .u-typo-presets-label { font-size: 12px; color: #777; }
 .u-typo-preset { padding: 3px 10px; font-size: 12px; height: auto; line-height: 1.6; }
 
+/* ── Content Width controls ──────────────────────────────────────────────── */
+.u-width-presets { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.u-width-presets-label { font-size: 12px; color: #777; }
+.u-width-preset { padding: 3px 10px; font-size: 12px; height: auto; line-height: 1.6; }
+.u-width-preset.is-active { background: #2271b1; border-color: #2271b1; color: #fff; }
+
 /* Таблицеподобная сетка: label | hd-ctrl | txt-ctrl */
 .u-typo-table {
     display: grid;

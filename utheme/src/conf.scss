@@ -27,9 +27,11 @@ $menu-accent-align: "center"; // left, center, right
 $footer-menu: "2columns"; // 2columns, central
 
 // стилизация оглавления в статье
-$toc-menu: "icon"; // circle, number, icon, tags
+$toc-menu: "icon"; // circle, number, icon, tags, vertical-rule, two-columns, underline, card-row, numbers-right
 // меню должно быть в секции или располагаться открыто?
 $is-not-section: "true"; // true, false
+// показывать заголовок оглавления?
+$toc-show-title: "true"; // true, false
 $toc-icon: "star";
 $toc-icon-select: map.get(ico.$icon-tuple, $toc-icon);
 
@@ -52,7 +54,7 @@ $callout-warning-icon-select: map.get($-callout-set-map, "warning");
 $callout-danger-icon-select:  map.get($-callout-set-map, "danger");
 
 // тип используемой на сайте карточки статей
-$article-card: "float"; // default, frame, slide, windows, float, soft, split
+$article-card: "float"; // default, frame, slide, windows, float, soft, split, classic, aside, overlay, blurred, type-first, editorial, clipped
 
 // вариант стилизации таблиц в статьях
 $table-style: "default"; // default, minimal, classic, cards, stripes, bold, outlined, dashed, tinted, editorial

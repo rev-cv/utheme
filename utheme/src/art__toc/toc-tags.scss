@@ -39,6 +39,8 @@ $pad-x: calc(conf.$default-space / 2);
             &::after {
                 content: ':';
             }
+
+            @if conf.$toc-show-title == 'false' { display: none; }
         }
 
         ol.page-toc-list {

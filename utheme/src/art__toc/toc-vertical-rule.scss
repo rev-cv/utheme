@@ -1,0 +1,100 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$tx-light:  conf.$color-text-light;
+$tx-dark:   conf.$color-text-dark;
+$act-light: conf.$color-accent-light;
+$act-dark:  conf.$color-accent-dark;
+$brd-light: conf.$color-border-light;
+$brd-dark:  conf.$color-border-dark;
+
+$pad-l:     20px;
+$border-w:  2px;
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .4rem;
+        user-select: none;
+        contain: layout style;
+        padding-left: $pad-l;
+        border-left: $border-w solid $brd-light;
+
+        @include f.dark-mode {
+            border-color: $brd-dark;
+        }
+
+        .page-toc-title {
+            margin: 0 0 .8em;
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
+        }
+
+        ol.page-toc-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li.page-toc-level-2 {
+            position: relative;
+
+            // Горизонтальный акцентный штрих, выезжает из левого бордера при hover
+            &::before {
+                content: '';
+                position: absolute;
+                left: -($pad-l + $border-w);
+                top: 50%;
+                transform: translateY(-50%);
+                width: 0;
+                height: 2px;
+                background: $act-light;
+                transition: width 0.2s ease;
+
+                @include f.dark-mode { background: $act-dark; }
+            }
+
+            &:hover::before {
+                width: $pad-l;
+            }
+
+            a {
+                font-size: clamp(.8rem, 3vw, 1rem);
+                display: block;
+                padding: calc(conf.$default-space / 4) 0;
+                color: sys.adjust($tx-light, $lightness: 10%);
+                text-decoration: none;
+                transition: color 150ms ease, transform 150ms ease;
+
+                @include f.dark-mode {
+                    color: sys.adjust($tx-dark, $lightness: -10%);
+                }
+
+                &:hover {
+                    color: $tx-light;
+                    transform: translateX(4px);
+                    text-decoration: none;
+
+                    @include f.dark-mode { color: $tx-dark; }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title { font-size: .75em; }
+        li a { font-size: .7em; }
+    }
+
+    article div.toc {
+        margin-bottom: clamp(.7em, 5vw, 2em) !important;
+        margin-top: clamp(1.4em, 5vw, 3em) !important;
+    }
+}

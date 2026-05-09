@@ -1,0 +1,70 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card--aside {
+        display: block;
+        border-radius: f.get-radius("card");
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+        box-shadow: conf.$shadow-section;
+        @include f.mode((background: (conf.$color-section-light, conf.$color-section-dark)));
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid conf.$color-border-light;
+            @include f.dark-mode { border-color: conf.$color-border-dark; }
+        }
+
+        &:hover {
+            box-shadow: conf.$shadow-section-hover;
+        }
+
+        a {
+            display: grid;
+            grid-template-columns: 42% 1fr;
+            text-decoration: none;
+            color: inherit;
+            min-height: 160px;
+        }
+
+        .aside-img {
+            background-size: cover;
+            background-position: center;
+            background-color: conf.$color-border-light;
+            @include f.dark-mode { background-color: conf.$color-border-dark; }
+            min-height: 100%;
+        }
+
+        .aside-body {
+            padding: conf.$default-space;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .aside-title {
+            @include f.font-hd;
+            margin: 0;
+            font-size: clamp(14px, 3.5vw, 1.1rem);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+        }
+
+        .aside-desc {
+            @include f.font-txt;
+            margin: 0;
+            font-size: 0.8125rem;
+            line-height: 1.55;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: rgba(conf.$color-text-light, 0.65);
+            @include f.dark-mode { color: rgba(conf.$color-text-dark, 0.65); }
+        }
+    }
+}

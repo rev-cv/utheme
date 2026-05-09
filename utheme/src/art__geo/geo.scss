@@ -6,6 +6,15 @@ $sp:    conf.$default-space;
 $sp-sm: calc(#{$sp} * 0.55);
 $sp-xs: calc(#{$sp} * 0.35);
 
+// Grid breakpoints for .tc-brand-list orphan-span rules.
+// h-pad = 2 × clamp(16px,3vw,32px) at its maximum (32px × 2).
+$_h-pad:         64px;
+$_max-content:   conf.$max-width - $_h-pad; // effective max content width
+$_col2-content:  444px * 2;                 // 888px  — min content for 2 desktop cols
+$_col3-content:  444px * 3;                 // 1332px — min content for 3 desktop cols
+$_col2-viewport: 945px;                     // viewport where content ≈ 888px via 3vw clamp
+$_col3-viewport: $_col3-content + $_h-pad;  // 1396px — viewport where 3 cols become possible
+
 /* ─── Brand-list card widget ─────────────────────────────── */
 
 .dynamic-injection-container {
@@ -23,18 +32,29 @@ $sp-xs: calc(#{$sp} * 0.35);
             margin-bottom: 2rem;
         }
 
-        // Last card stretches to fill the orphan empty column.
-        // Breakpoints derived from: content = viewport − 2×clamp(16px,3vw,32px), max-width 1200px.
-        // 3-col never occurs: max content ~1136px < 444px×3.
+        // Stretches orphan last card to fill empty column(s).
+        // Breakpoints derived from: content = viewport − 2×clamp(16px,3vw,32px), capped at $max-width.
         .tc-card:last-child {
             // Mobile 2-col (minmax 200px): content ≥ 400px → viewport ≥ 426px
             @media (min-width: 426px) and (max-width: 540px) {
                 &:nth-child(2n + 1) { grid-column: span 2; }
             }
-            // Desktop 2-col (minmax 444px): content ≥ 888px → viewport ≥ 945px
-            @media (min-width: 945px) {
-                &:nth-child(2n + 1) { grid-column: span 2; }
+
+            @if $_max-content >= $_col3-content {
+                // 3 cols possible at wide viewports — bound 2-col rule and add 3-col rule
+                @media (min-width: #{$_col2-viewport}) and (max-width: #{$_col3-viewport - 1px}) {
+                    &:nth-child(2n + 1) { grid-column: span 2; }
+                }
+                @media (min-width: #{$_col3-viewport}) {
+                    &:nth-child(3n + 1) { grid-column: span 3; }
+                }
+            } @else if $_max-content >= $_col2-content {
+                // 2 cols possible, 3 never
+                @media (min-width: #{$_col2-viewport}) {
+                    &:nth-child(2n + 1) { grid-column: span 2; }
+                }
             }
+            // else: $max-width too narrow for 2 desktop cols — no rule needed
         }
     }
 

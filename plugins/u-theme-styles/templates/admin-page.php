@@ -289,6 +289,51 @@ function u_color_field(string $name, string $value): void {
                                 <p class="u-desc">Множитель пространства между элементами и строками. Меньше — компактнее, больше — воздушнее.</p>
                             </div>
 
+                            <?php
+                            $max_width_raw = $v['max-width'] ?? '1200px';
+                            $max_width_n   = (int) rtrim($max_width_raw, 'px');
+                            $width_presets = [960, 1024, 1140, 1200, 1280, 1440];
+                            ?>
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">
+                                    Content Width
+                                    <output id="max-width-output"><?= esc_html($max_width_raw) ?></output>
+                                </div>
+                                <div class="u-basic-field-control">
+                                    <input type="range" name="u_fields[max-width]" id="max-width-slider"
+                                           min="800" max="1920" step="10"
+                                           value="<?= esc_attr($max_width_n) ?>"
+                                           oninput="document.getElementById('max-width-output').textContent = this.value + 'px'; uSyncWidthPresets(this.value)">
+                                </div>
+                                <div class="u-width-presets">
+                                    <span class="u-width-presets-label">Presets:</span>
+                                    <?php foreach ($width_presets as $preset): ?>
+                                        <button type="button" class="u-width-preset button <?= $max_width_n === $preset ? 'is-active' : '' ?>"
+                                                data-width="<?= $preset ?>">
+                                            <?= $preset ?>px
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                                <p class="u-desc">Максимальная ширина области контента. Определяет, насколько широко растягивается основной блок на больших экранах.</p>
+                            </div>
+                            <script>
+                            function uSyncWidthPresets(val) {
+                                var w = parseInt(val, 10);
+                                document.querySelectorAll('.u-width-preset').forEach(function(b) {
+                                    b.classList.toggle('is-active', parseInt(b.dataset.width, 10) === w);
+                                });
+                            }
+                            document.querySelectorAll('.u-width-preset').forEach(function(btn) {
+                                btn.addEventListener('click', function() {
+                                    var w = this.dataset.width;
+                                    var slider = document.getElementById('max-width-slider');
+                                    slider.value = w;
+                                    document.getElementById('max-width-output').textContent = w + 'px';
+                                    uSyncWidthPresets(w);
+                                });
+                            });
+                            </script>
+
                             <div class="u-basic-field">
                                 <div class="u-basic-field-label">Flags</div>
                                 <div class="u-basic-field-control u-basic-checkboxes">
@@ -400,17 +445,30 @@ function u_color_field(string $name, string $value): void {
                     ],
                     'toc-menu' => [
                         'title'       => 'Table of Contents',
-                        // 'desc'        => 'Оглавление статьи.<br><b>Circle</b> — круглые маркеры.<br><b>Number</b> — нумерованный список. <br><b>Icon</b> — иконки перед пунктами.<br><b>Tags</b> — теги-кнопки в ряд.',
                         'desc'        => '',
-                        'options'     => ['circle', 'number', 'icon', 'tags'],
+                        'options'     => ['circle', 'number', 'icon', 'tags', 'vertical-rule', 'two-columns', 'underline', 'card-row', 'numbers-right'],
                         'switch'      => 'is-not-section',
                         'switch_desc' => 'Отобразить оглавление без секции',
                         'icon_select' => true,
                     ],
                     'article-card' => [
                         'title'   => 'Article Card',
-                        'desc'    => 'Внешний вид карточки статьи в списках и архивах.',
-                        'options' => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
+                        'desc'    => 'Внешний вид карточки статьи в списках и архивах.<br>
+                            <b>Default</b> — базовая карточка с изображением и ссылкой.<br>
+                            <b>Frame</b> — карточка в рамке.<br>
+                            <b>Slide</b> — карточка-слайд.<br>
+                            <b>Windows</b> — плиточный стиль.<br>
+                            <b>Float</b> — заголовок поверх изображения.<br>
+                            <b>Soft</b> — мягкий стиль без жёстких границ.<br>
+                            <b>Split</b> — диагональное разделение с анимацией.<br>
+                            <b>Classic</b> — изображение 16:10 сверху, чистый контент снизу.<br>
+                            <b>Aside</b> — горизонтальный сплит: картинка 42% слева, текст справа.<br>
+                            <b>Overlay</b> — полноразмерное фото, текст поверх с градиентом.<br>
+                            <b>Blurred</b> — размытый фон-декор, чёткий thumbnail в углу.<br>
+                            <b>Type-first</b> — заголовок-герой с inline-миниатюрой.<br>
+                            <b>Editorial</b> — редакционный стиль, верхняя граница, thumbnail.<br>
+                            <b>Clipped</b> — изображение с float, текст обтекает.',
+                        'options' => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split', 'classic', 'aside', 'overlay', 'blurred', 'type-first', 'editorial', 'clipped'],
                     ],
                     'table-style' => [
                         'title'   => 'Table Style',
@@ -471,6 +529,16 @@ function u_color_field(string $name, string $value): void {
                                                value="true"
                                                <?= ($v[$data['switch']] ?? '') === 'true' ? 'checked' : '' ?>>
                                         <span><?= $data['switch_desc'] ?? $data['switch'] ?></span>
+                                    </label>
+                                <?php endif; ?>
+
+                                <?php if ($id === 'toc-menu'): ?>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox"
+                                               name="u_fields[toc-show-title]"
+                                               value="true"
+                                               <?= ($v['toc-show-title'] ?? 'true') === 'true' ? 'checked' : '' ?>>
+                                        <span>Показывать заголовок оглавления</span>
                                     </label>
                                 <?php endif; ?>
 

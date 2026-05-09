@@ -129,6 +129,15 @@ def main():
     else:
         print("\n[3/3] uploads/ not found, skipping.")
 
+    # --- Step 4: remove generated wp-config.php ---
+    wp_config = project_dir / "wp-conf" / "wp-config.php"
+    if wp_config.exists():
+        print("\n[4/4] Removing wp-conf/wp-config.php...")
+        wp_config.unlink()
+        print("  [OK] wp-config.php removed.")
+    else:
+        print("\n[4/4] wp-conf/wp-config.php not found, skipping.")
+
     print("\nDone. Site destroyed.")
 
 

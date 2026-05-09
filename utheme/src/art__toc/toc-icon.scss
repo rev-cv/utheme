@@ -31,6 +31,8 @@ $icon-svg: conf.$toc-icon-select;
             display: block;
             width: fit-content;
             padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
         }
 
         ol.page-toc-list,

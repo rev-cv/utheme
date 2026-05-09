@@ -24,6 +24,13 @@
 @use "page-list/card-float.scss" as card_float;
 @use "page-list/card-soft.scss" as card_soft;
 @use "page-list/card-split.scss" as card_split;
+@use "page-list/card-classic.scss" as card_classic;
+@use "page-list/card-aside.scss" as card_aside;
+@use "page-list/card-overlay.scss" as card_overlay;
+@use "page-list/card-blurred.scss" as card_blurred;
+@use "page-list/card-type-first.scss" as card_type_first;
+@use "page-list/card-editorial.scss" as card_editorial;
+@use "page-list/card-clipped.scss" as card_clipped;
 
 @use "pape-404/page-404.scss";
 @use 'page-sitemap/sitemap.scss';
@@ -34,6 +41,11 @@
 @use "art__toc/toc-circle.scss" as toc_circle;
 @use "art__toc/toc-icon.scss" as toc_icon;
 @use "art__toc/toc-tags.scss" as toc_tags;
+@use "art__toc/toc-vertical-rule.scss" as toc_vertical_rule;
+@use "art__toc/toc-two-columns.scss" as toc_two_columns;
+@use "art__toc/toc-underline.scss" as toc_underline;
+@use "art__toc/toc-card-row.scss" as toc_card_row;
+@use "art__toc/toc-numbers-right.scss" as toc_numbers_right;
 @use "art__lists/lists.scss";
 @use "art__table/default.scss"   as table_default;
 @use "art__table/minimal.scss"   as table_minimal;
@@ -111,6 +123,21 @@
 @else if conf.$toc-menu =='tags' {
     @include toc_tags.styles;
 }
+@else if conf.$toc-menu =='vertical-rule' {
+    @include toc_vertical_rule.styles;
+}
+@else if conf.$toc-menu =='two-columns' {
+    @include toc_two_columns.styles;
+}
+@else if conf.$toc-menu =='underline' {
+    @include toc_underline.styles;
+}
+@else if conf.$toc-menu =='card-row' {
+    @include toc_card_row.styles;
+}
+@else if conf.$toc-menu =='numbers-right' {
+    @include toc_numbers_right.styles;
+}
 
 // блок стилизация таблиц
 @if conf.$table-style == 'default' {
@@ -165,6 +192,27 @@
 }
 @else if conf.$article-card =='split' {
     @include card_split.styles;
+}
+@else if conf.$article-card =='classic' {
+    @include card_classic.styles;
+}
+@else if conf.$article-card =='aside' {
+    @include card_aside.styles;
+}
+@else if conf.$article-card =='overlay' {
+    @include card_overlay.styles;
+}
+@else if conf.$article-card =='blurred' {
+    @include card_blurred.styles;
+}
+@else if conf.$article-card =='type-first' {
+    @include card_type_first.styles;
+}
+@else if conf.$article-card =='editorial' {
+    @include card_editorial.styles;
+}
+@else if conf.$article-card =='clipped' {
+    @include card_clipped.styles;
 }
 
 // блок стилизация футера
