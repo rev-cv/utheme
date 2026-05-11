@@ -22,7 +22,6 @@ $arrow-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
         contain: layout style;
 
         .page-toc-title {
-            margin: 0 0 .8em;
             display: block;
             width: fit-content;
             padding-right: .2em;
@@ -108,8 +107,4 @@ $arrow-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' vi
         li a { font-size: .7em; }
     }
 
-    article div.toc {
-        margin-bottom: clamp(.7em, 5vw, 2em) !important;
-        margin-top: clamp(1.4em, 5vw, 3em) !important;
-    }
 }

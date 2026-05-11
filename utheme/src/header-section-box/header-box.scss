@@ -24,8 +24,11 @@
         max-width: conf.$max-width;
         padding-bottom: .5em;
 
-        @include f.mode((//
-            color: (conf.$color-H1-light, conf.$color-H1-dark),
+        @include f.mode((
+            background:              (conf.$color-H1-light, conf.$color-H1-dark),
+            -webkit-background-clip: (text, text),
+            background-clip:         (text, text),
+            color:                   (transparent, transparent),
         ))
     }
 

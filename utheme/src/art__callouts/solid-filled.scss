@@ -16,10 +16,6 @@
             strong { color: inherit; }
         }
 
-        section .callout:last-child {
-            margin-bottom: 0;
-        }
-
         .info-callout {
             background-color: color.adjust(conf.$color-info-light, $lightness: -25%);
 

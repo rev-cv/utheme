@@ -75,6 +75,17 @@ jQuery(document).ready(function ($) {
 
     // ─── Применить hex-цвет ко всем элементам u-color-field ────────────────
     function setColorField(name, hex) {
+        // Для градиентного поля — ставим solid-режим с авто-цветом
+        var $gradField = $('[name="' + name + '"]').closest('.u-gradient-field');
+        if ($gradField.length) {
+            $gradField.attr('data-mode', 'solid');
+            $gradField.find('.u-gradient-mode-r[value="solid"]').prop('checked', true);
+            $gradField.find('.u-gradient-toggle-btn').removeClass('is-active');
+            $gradField.find('.u-gradient-mode-r[value="solid"]').closest('.u-gradient-toggle-btn').addClass('is-active');
+            $gradField.find('.u-gradient-extra').addClass('is-hidden');
+            applyGradC1($gradField, hex);
+            return;
+        }
         var $field = $('[name="' + name + '"]').closest('.u-color-field');
         if (!$field.length) return;
         $field.find('.u-color-native').val(hex);
@@ -137,27 +148,37 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // ─── Font Vibe: смена картинки + описания ───────────────────────────────
+    // ─── Font Vibe: смена шрифта + загрузка Google Fonts + описание ────────
     $(document).on('change', '#font-vibe-select', function () {
         var val      = $(this).val();
         var $preview = $('#font-vibe-preview');
-        var baseUrl  = $preview.data('base-url');
-        if (baseUrl) $preview.attr('src', baseUrl + val + '.webp');
+
+        if (typeof uFontVibeFamilies !== 'undefined' && uFontVibeFamilies[val]) {
+            var fam = uFontVibeFamilies[val];
+            $preview[0].style.setProperty('--fpb-hd', fam.hd);
+            $preview[0].style.setProperty('--fpb-txt', fam.txt);
+            if (fam.gf) {
+                var id = 'gf-fv-' + val;
+                if (!document.getElementById(id)) {
+                    var link = document.createElement('link');
+                    link.id = id;
+                    link.rel = 'stylesheet';
+                    link.href = fam.gf;
+                    document.head.appendChild(link);
+                }
+            }
+        }
 
         if (typeof uFontVibeDescs !== 'undefined' && uFontVibeDescs[val]) {
             $('#font-vibe-desc').text(uFontVibeDescs[val]);
         }
     });
 
-    // ─── Radius Vibe: смена картинки + описания ─────────────────────────────
+    // ─── Radius Vibe: смена border-radius + описания ────────────────────────
     $(document).on('change', '#radius-vibe-select', function () {
-        var val      = $(this).val();
-        var $preview = $('#radius-vibe-preview');
-        var $placeholder = $preview.next('.u-preview-placeholder');
-        var baseUrl  = $preview.data('base-url');
-        if (baseUrl) {
-            $preview.show().attr('src', baseUrl + val + '.webp');
-            $placeholder.text($(this).find('option:selected').text()).hide();
+        var val = $(this).val();
+        if (typeof uRadiusVibeCss !== 'undefined' && uRadiusVibeCss[val]) {
+            $('#radius-vibe-preview').css('border-radius', uRadiusVibeCss[val]);
         }
         if (typeof uRadiusVibeDescs !== 'undefined' && uRadiusVibeDescs[val] !== undefined) {
             $('#radius-vibe-desc').text(uRadiusVibeDescs[val]);
@@ -273,6 +294,22 @@ jQuery(document).ready(function ($) {
         $('#' + outputId).text(isEm ? fmtEm(value) : value);
     }
 
+    function uSyncFontPreview() {
+        var el = document.getElementById('font-vibe-preview');
+        if (!el) return;
+        el.style.setProperty('--fpb-hd-w',     $('[name="u_fields[hd-weight]"]').val());
+        el.style.setProperty('--fpb-hd-lh',    fmtEm($('[name="u_fields[hd-height]"]').val()));
+        el.style.setProperty('--fpb-hd-ls',    fmtEm($('[name="u_fields[hd-letter-spacing]"]').val()));
+        el.style.setProperty('--fpb-hd-case',  $('[name="u_fields[hd-case]"]').val());
+        el.style.setProperty('--fpb-hd-style', $('[name="u_fields[hd-italic]"]').val());
+        el.style.setProperty('--fpb-txt-w',    $('[name="u_fields[txt-weight]"]').val());
+        el.style.setProperty('--fpb-txt-lh',   fmtEm($('[name="u_fields[txt-height]"]').val()));
+        el.style.setProperty('--fpb-txt-ls',   fmtEm($('[name="u_fields[txt-letter-spacing]"]').val()));
+    }
+
+    $(document).on('input',  '[name="u_fields[hd-weight]"], [name="u_fields[hd-height]"], [name="u_fields[hd-letter-spacing]"], [name="u_fields[txt-weight]"], [name="u_fields[txt-height]"], [name="u_fields[txt-letter-spacing]"]', uSyncFontPreview);
+    $(document).on('change', '[name="u_fields[hd-case]"], [name="u_fields[hd-italic]"]', uSyncFontPreview);
+
     $(document).on('click', '.u-typo-preset', function () {
         var p = uTypoPresets[$(this).data('preset')];
         if (!p) return;
@@ -283,7 +320,91 @@ jQuery(document).ready(function ($) {
         setTypoSlider('txt-height',        'txt-height-output', p['txt-height'], true);
         setTypoSlider('txt-letter-spacing','txt-ls-output',     p['txt-ls'],     true);
         $('[name="u_fields[hd-case]"]').val(p['hd-case']);
+        uSyncFontPreview();
         markDirty($(this));
+    });
+
+    // ─── H1 Gradient fields ──────────────────────────────────────────────────
+    function syncGradientField($field) {
+        var mode  = $field.attr('data-mode') || 'solid';
+        var c1    = $field.find('.u-grad-c1-hex').val() || '#cccccc';
+        var c2    = $field.find('.u-grad-c2-hex').val() || '#ffffff';
+        var angle = $field.find('.u-gradient-angle-r').val() || '135';
+        var value = mode === 'gradient'
+                    ? 'linear-gradient(' + angle + 'deg, ' + c1 + ', ' + c2 + ')'
+                    : c1;
+        $field.find('.u-gradient-value').val(value);
+        $field.find('.u-gradient-strip').css('background',
+            'linear-gradient(' + angle + 'deg, ' + c1 + ', ' + c2 + ')');
+    }
+
+    function applyGradC1($field, raw) {
+        var hex = normalizeHex(raw);
+        if (!hex) return;
+        $field.find('.u-grad-c1-native').val(hex);
+        $field.find('.u-grad-c1-hex').val(hex);
+        $field.find('.u-grad-c1-swatch').css('background-color', hex);
+        syncGradientField($field);
+        markDirty($field);
+    }
+
+    function applyGradC2($field, raw) {
+        var hex = normalizeHex(raw);
+        if (!hex) return;
+        $field.find('.u-grad-c2-native').val(hex);
+        $field.find('.u-grad-c2-hex').val(hex);
+        $field.find('.u-grad-c2-swatch').css('background-color', hex);
+        syncGradientField($field);
+        markDirty($field);
+    }
+
+    // Mode toggle
+    $(document).on('click', '.u-gradient-toggle-btn', function () {
+        var $btn   = $(this);
+        var $field = $btn.closest('.u-gradient-field');
+        var mode   = $btn.find('.u-gradient-mode-r').val();
+        $field.attr('data-mode', mode);
+        $field.find('.u-gradient-extra').toggleClass('is-hidden', mode !== 'gradient');
+        $field.find('.u-gradient-toggle-btn').removeClass('is-active');
+        $btn.addClass('is-active');
+        syncGradientField($field);
+        markDirty($field);
+    });
+
+    // C1 color
+    $(document).on('input change', '.u-grad-c1-native', function () {
+        applyGradC1($(this).closest('.u-gradient-field'), this.value);
+    });
+    $(document).on('blur', '.u-grad-c1-hex', function () {
+        applyGradC1($(this).closest('.u-gradient-field'), this.value);
+    });
+    $(document).on('keydown', '.u-grad-c1-hex', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); applyGradC1($(this).closest('.u-gradient-field'), this.value); }
+    });
+    $(document).on('click', '.u-grad-c1-swatch', function () {
+        $(this).closest('.u-color-field').find('.u-grad-c1-native').trigger('click');
+    });
+
+    // C2 color
+    $(document).on('input change', '.u-grad-c2-native', function () {
+        applyGradC2($(this).closest('.u-gradient-field'), this.value);
+    });
+    $(document).on('blur', '.u-grad-c2-hex', function () {
+        applyGradC2($(this).closest('.u-gradient-field'), this.value);
+    });
+    $(document).on('keydown', '.u-grad-c2-hex', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); applyGradC2($(this).closest('.u-gradient-field'), this.value); }
+    });
+    $(document).on('click', '.u-grad-c2-swatch', function () {
+        $(this).closest('.u-color-field').find('.u-grad-c2-native').trigger('click');
+    });
+
+    // Angle slider
+    $(document).on('input', '.u-gradient-angle-r', function () {
+        var $field = $(this).closest('.u-gradient-field');
+        $(this).siblings('.u-gradient-angle-out').text(this.value + '°');
+        syncGradientField($field);
+        markDirty($field);
     });
 
     // ─── Первичная инициализация ─────────────────────────────────────────────

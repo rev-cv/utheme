@@ -21,7 +21,6 @@ $breadcrumb-separator-dark: $breadcrumb-link-dark;
 .rank-math-breadcrumb {
     font-size: $breadcrumb-font-size;
     line-height: 1.6;
-    margin-bottom: clamp(2em, 5vw, 5em);
 
     p {
         @include f.font-txt;

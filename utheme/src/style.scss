@@ -75,8 +75,7 @@
 @use "art__details/details-arrow.scss" as details_arrow;
 @use "art__blockquote/default.scss";
 
-// @use "header-box/header-box.scss";
-@use "header-section-box/header-box.scss";
+// @use "header-section-box/header-box.scss";
 @use "block-autor/block-autor.scss";
 @use "block-related_articles/related-art.scss";
 @use "block-more_pages/more-pages-grid.scss" as more_pages_grid;
@@ -252,11 +251,18 @@
     @include callout_minimal_inline.styles;
 }
 
-// блок "ещё почитать" — все варианты компилируются всегда (переключение через CSS-класс)
-@include more_pages_grid.styles;
-@include more_pages_list.styles;
-@include more_pages_slider.styles;
-@include more_pages_carousel.styles;
+@if conf.$more-pages == 'grid' {
+    @include more_pages_grid.styles;
+}
+@else if conf.$more-pages == 'list' {
+    @include more_pages_list.styles;
+}
+@else if conf.$more-pages == 'slider' {
+    @include more_pages_slider.styles;
+}
+@else if conf.$more-pages == 'carousel' {
+    @include more_pages_carousel.styles;
+}
 
 
 

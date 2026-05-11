@@ -11,10 +11,8 @@ $space: conf.$default-space;
 article .wp-block-list,
 aside .wp-block-list {
     padding-left: 2em;
-    margin-bottom: 1em;
     margin-left: 0;
     overflow: hidden;
-    margin-top: -1em;
 
     li {
         line-height: 1.7;
@@ -65,13 +63,8 @@ aside .wp-block-list {
 }
 
 
-article h2 + .wp-block-list {
-    margin-top: 0.6em;
-}
-
 aside .wp-block-list {
     padding-left: 1em !important;
-    margin-top: .3em;
 
     li {
         font-size: 0.7em !important;

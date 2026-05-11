@@ -18,6 +18,61 @@ function u_color_field(string $name, string $value): void {
     </div>
     <?php
 }
+
+/**
+ * Вспомогательная функция: пикер для H1 — поддерживает solid-цвет и CSS-градиент.
+ * Сохраняет либо "#hex", либо "linear-gradient(Ndeg, #hex1, #hex2)".
+ */
+function u_h1_gradient_field(string $name, string $value): void {
+    $c1 = '#cccccc'; $c2 = '#ffffff'; $angle = 135; $is_grad = false;
+    if (preg_match('/^linear-gradient\(\s*(\d+)deg\s*,\s*(#[0-9a-fA-F]{3,6})\s*,\s*(#[0-9a-fA-F]{3,6})\s*\)$/', $value, $m)) {
+        $is_grad = true;
+        $angle   = (int) $m[1];
+        $c1      = $m[2];
+        $c2      = $m[3];
+    } elseif (preg_match('/^#[0-9a-fA-F]{3,6}$/', $value)) {
+        $c1 = $value;
+    }
+    $mode          = $is_grad ? 'gradient' : 'solid';
+    $strip_bg      = "linear-gradient({$angle}deg, {$c1}, {$c2})";
+    $safe_name     = esc_attr($name);
+    $safe_val      = esc_attr($value ?: $c1);
+    ?>
+    <div class="u-gradient-field" data-mode="<?= $mode ?>">
+
+        <div class="u-gradient-toggle">
+            <label class="u-gradient-toggle-btn <?= !$is_grad ? 'is-active' : '' ?>">
+                <input type="radio" class="u-gradient-mode-r" value="solid"    <?= !$is_grad ? 'checked' : '' ?>> Solid
+            </label>
+            <label class="u-gradient-toggle-btn <?= $is_grad ? 'is-active' : '' ?>">
+                <input type="radio" class="u-gradient-mode-r" value="gradient" <?= $is_grad  ? 'checked' : '' ?>> Gradient
+            </label>
+        </div>
+
+        <div class="u-color-field">
+            <span class="u-color-swatch u-grad-c1-swatch" style="background-color:<?= esc_attr($c1) ?>"></span>
+            <input type="color" class="u-color-native u-grad-c1-native" value="<?= esc_attr($c1) ?>" tabindex="-1" aria-hidden="true">
+            <input type="text"  class="u-color-hex u-grad-c1-hex"       value="<?= esc_attr($c1) ?>" maxlength="7" placeholder="#000000">
+        </div>
+
+        <div class="u-gradient-extra <?= !$is_grad ? 'is-hidden' : '' ?>">
+            <div class="u-color-field">
+                <span class="u-color-swatch u-grad-c2-swatch" style="background-color:<?= esc_attr($c2) ?>"></span>
+                <input type="color" class="u-color-native u-grad-c2-native" value="<?= esc_attr($c2) ?>" tabindex="-1" aria-hidden="true">
+                <input type="text"  class="u-color-hex u-grad-c2-hex"       value="<?= esc_attr($c2) ?>" maxlength="7" placeholder="#ffffff">
+            </div>
+            <div class="u-gradient-angle-row">
+                <span class="u-gradient-angle-label">Angle</span>
+                <input type="range" class="u-gradient-angle-r" min="0" max="360" value="<?= $angle ?>">
+                <output class="u-gradient-angle-out"><?= $angle ?>°</output>
+            </div>
+            <div class="u-gradient-strip" style="background:<?= esc_attr($strip_bg) ?>"></div>
+        </div>
+
+        <input type="hidden" name="<?= $safe_name ?>" class="u-gradient-value" value="<?= $safe_val ?>">
+    </div>
+    <?php
+}
 ?>
 
 <div class="wrap u-config-wrapper">
@@ -40,35 +95,10 @@ function u_color_field(string $name, string $value): void {
             <!-- ── Basic ──────────────────────────────────────────────────── -->
             <section id="basic" class="tab-pane active">
                 <?php
-                $font_vibes = [
-                    'google'      => ['label' => 'Google',      'desc' => 'Heading: Google Sans · Text: Google Sans'],
-                    'strict'      => ['label' => 'Strict',      'desc' => 'Heading: Inter · Text: Roboto Mono'],
-                    'editorial'   => ['label' => 'Editorial',   'desc' => 'Heading: Playfair Display · Text: Lora'],
-                    'startup'     => ['label' => 'Startup',     'desc' => 'Heading: Inter · Text: Inter'],
-                    'space'       => ['label' => 'Space',       'desc' => 'Heading: Montserrat · Text: Open Sans'],
-                    'syntax'      => ['label' => 'Syntax',      'desc' => 'Heading: JetBrains Mono · Text: Inter'],
-                    'neo-swiss'   => ['label' => 'Neo Swiss',   'desc' => 'Heading: Arimo · Text: Heebo'],
-                    'engineer'    => ['label' => 'Engineer',    'desc' => 'Heading: Barlow Condensed · Text: Source Serif 4'],
-                    'boutique'    => ['label' => 'Boutique',    'desc' => 'Heading: Cormorant Garamond · Text: Montserrat'],
-                    'wisdom'      => ['label' => 'Wisdom',      'desc' => 'Heading: Cinzel · Text: Fauna One'],
-                    'noble'       => ['label' => 'Noble',       'desc' => 'Heading: Fraunces · Text: Manrope'],
-                    'manuscript'  => ['label' => 'Manuscript',  'desc' => 'Heading: DM Serif Display · Text: Source Sans 3'],
-                    'brutal'      => ['label' => 'Brutal',      'desc' => 'Heading: Archivo Black · Text: Archivo'],
-                    'manifesto'   => ['label' => 'Manifesto',   'desc' => 'Heading: Roboto · Text: Oswald'],
-                    'black-metal' => ['label' => 'Black Metal', 'desc' => 'Heading: Jost · Text: Unbounded'],
-                    'raw'         => ['label' => 'Raw',         'desc' => 'Heading: Space Mono · Text: Space Grotesk'],
-                    'velocity'    => ['label' => 'Velocity',    'desc' => 'Heading: Exo 2 · Text: Red Hat Display'],
-                    'courtside'   => ['label' => 'Courtside',   'desc' => 'Heading: Big Shoulders Display · Text: Saira Condensed'],
-                    'district'    => ['label' => 'District',    'desc' => 'Heading: Ruslan Display · Text: Inter'],
-                    'blast'       => ['label' => 'Blast',       'desc' => 'Heading: Rubik Mono One · Text: Inter'],
-                    'industry'    => ['label' => 'Industry',    'desc' => 'Heading: Oswald · Text: Source Sans 3'],
-                    'overdrive'   => ['label' => 'Overdrive',   'desc' => 'Heading: Bebas Neue · Text: Montserrat'],
-                    'organic'     => ['label' => 'Organic',     'desc' => 'Heading: Nunito · Text: Comfortaa'],
-                    'vintage'     => ['label' => 'Vintage',     'desc' => 'Heading: DM Sans · Text: DM Serif Display'],
-                    'interface'   => ['label' => 'Interface',   'desc' => 'Heading: DM Sans · Text: Source Sans 3'],
-                    'antidesign'  => ['label' => 'Anti Design', 'desc' => 'Heading: Arial · Text: Times New Roman'],
-                ];
-                $font_sizes = range(14, 22);
+                $font_registry     = function_exists('u_font_registry') ? u_font_registry() : [];
+                $font_vibes        = array_map(fn($v) => ['label' => $v['label'], 'desc' => $v['desc']], $font_registry);
+                $font_vibe_families = array_map(fn($v) => ['hd' => $v['hd'], 'txt' => $v['txt'], 'gf' => $v['gf']], $font_registry);
+                $font_sizes        = range(14, 22);
                 $current_font_vibe = $v['font-vibe'] ?? 'neo-swiss';
                 ?>
                 <?php
@@ -82,6 +112,15 @@ function u_color_field(string $name, string $value): void {
                     'sticker' => ['label' => 'Sticker', 'desc' => 'Бейдж и стикер. Крупные фиксированные радиусы, шапка скруглена только снизу — сайт выглядит как набор карточек-наклеек.'],
                 ];
                 $current_radius_vibe = $v['radius-vibe'] ?? 'neutral';
+                $radius_vibe_css = [
+                    'sharp'    => '2px',
+                    'neutral'  => '8px',
+                    'dynamic'  => '16px',
+                    'rounded'  => '20px',
+                    'velocity' => '8px 32px 8px 32px',
+                    'chess'    => '0px 20px 0px 20px',
+                    'sticker'  => '28px',
+                ];
                 ?>
 
                 <!-- ── Card 1: Font Size ──────────────────────────────────── -->
@@ -131,6 +170,7 @@ function u_color_field(string $name, string $value): void {
                                     foreach ($font_vibes as $k => $fv) $descs[$k] = $fv['desc'];
                                     echo json_encode($descs, JSON_UNESCAPED_UNICODE);
                                 ?>;
+                                var uFontVibeFamilies = <?= json_encode($font_vibe_families, JSON_UNESCAPED_UNICODE) ?>;
                                 </script>
                             </div>
 
@@ -234,12 +274,28 @@ function u_color_field(string $name, string $value): void {
                         </div>
 
                         <div class="u-card-right">
+                            <?php
+                            $fvf = $font_vibe_families[$current_font_vibe] ?? $font_vibe_families['neo-swiss'];
+                            if (!empty($fvf['gf'])): ?>
+                            <link rel="stylesheet" href="<?= esc_url($fvf['gf']) ?>">
+                            <?php endif; ?>
                             <div class="u-preview u-preview--tall">
-                                <img src="<?= plugins_url("assets/media/font-vibe-{$current_font_vibe}.webp", dirname(__FILE__)) ?>"
-                                     data-base-url="<?= plugins_url('assets/media/font-vibe-', dirname(__FILE__)) ?>"
-                                     alt="Font preview"
-                                     class="u-font-preview-img u-component-preview-img"
-                                     id="font-vibe-preview">
+                                <div class="u-font-preview-box"
+                                     id="font-vibe-preview"
+                                     style="
+                                        --fpb-hd: <?= esc_attr($fvf['hd']) ?>;
+                                        --fpb-txt: <?= esc_attr($fvf['txt']) ?>;
+                                        --fpb-hd-w: <?= esc_attr($hd_weight) ?>;
+                                        --fpb-hd-lh: <?= esc_attr($hd_height) ?>;
+                                        --fpb-hd-ls: <?= esc_attr($hd_ls) ?>;
+                                        --fpb-hd-case: <?= esc_attr($hd_case) ?>;
+                                        --fpb-hd-style: <?= esc_attr($hd_italic) ?>;
+                                        --fpb-txt-w: <?= esc_attr($txt_weight) ?>;
+                                        --fpb-txt-lh: <?= esc_attr($txt_height) ?>;
+                                        --fpb-txt-ls: <?= esc_attr($txt_ls) ?>">
+                                    <div class="u-font-preview-hd">Heading sample</div>
+                                    <div class="u-font-preview-txt">The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -272,6 +328,7 @@ function u_color_field(string $name, string $value): void {
                                     foreach ($radius_vibes as $k => $rv) $rdescs[$k] = $rv['desc'];
                                     echo json_encode($rdescs, JSON_UNESCAPED_UNICODE);
                                 ?>;
+                                var uRadiusVibeCss = <?= json_encode($radius_vibe_css) ?>;
                                 </script>
                             </div>
 
@@ -353,14 +410,7 @@ function u_color_field(string $name, string $value): void {
                                             <span class="u-desc">Все элементы выравниваются по левому краю. По умолчанию — стандартное центрированное выравнивание.</span>
                                         </span>
                                     </label>
-                                    <label class="u-checkbox-label">
-                                        <input type="checkbox" name="u_fields[is-img_contain]" value="true"
-                                            <?= ($v['is-img_contain'] ?? 'false') === 'true' ? 'checked' : '' ?>>
-                                        <span>
-                                            <strong>Contain Images</strong>
-                                            <span class="u-desc">Изображения вписываются в блок целиком (object-fit: contain) без обрезки по краям.</span>
-                                        </span>
-                                    </label>
+
                                 </div>
                             </div>
 
@@ -368,13 +418,9 @@ function u_color_field(string $name, string $value): void {
 
                         <div class="u-card-right">
                             <div class="u-preview u-preview--tall">
-                                <img src="<?= plugins_url("assets/media/radius-vibe-{$current_radius_vibe}.webp", dirname(__FILE__)) ?>"
-                                     data-base-url="<?= plugins_url('assets/media/radius-vibe-', dirname(__FILE__)) ?>"
-                                     alt="Radius preview"
-                                     class="u-radius-preview-img u-component-preview-img"
+                                <div class="u-radius-preview-box"
                                      id="radius-vibe-preview"
-                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                <span class="u-preview-placeholder" style="display:none"><?= esc_html($radius_vibes[$current_radius_vibe]['label'] ?? $current_radius_vibe) ?></span>
+                                     style="border-radius: <?= esc_attr($radius_vibe_css[$current_radius_vibe] ?? '8px') ?>"></div>
                             </div>
                         </div>
                     </div>
@@ -622,6 +668,14 @@ function u_color_field(string $name, string $value): void {
                                             </div>
                                         </div>
                                     </div>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox" name="u_fields[stt-ghost]" value="true"
+                                            <?= ($v['stt-ghost'] ?? 'false') === 'true' ? 'checked' : '' ?>>
+                                        <span>
+                                            <strong>Ghost Mode</strong>
+                                            <span class="u-desc">Прозрачная кнопка — иконка инвертирует цвета контента под ней.</span>
+                                        </span>
+                                    </label>
                                 <?php endif; ?>
 
                                 <p class="u-desc"><?= $data['desc'] ?? '' ?></p>
@@ -639,6 +693,59 @@ function u_color_field(string $name, string $value): void {
                         </div>
                     </div>
                 <?php endforeach; ?>
+
+                <!-- ── Image Style ───────────────────────────────────── -->
+                <?php
+                $image_style_options = ['original', 'marginalia', 'slide-up', 'whisper', 'corner-badge', 'brutalist-strip'];
+                $current_image_style = $v['image-style'] ?? 'original';
+                $image_style_descs = [
+                    'original'       => 'Базовый вариант: картинка 16:9, подпись по центру (или слева при Left Align).',
+                    'marginalia'     => 'Подпись живёт в левом поле — как сноска в книге. На мобильном уходит под картинку.',
+                    'slide-up'       => 'Подпись скрыта и всплывает снизу при наведении. На touch-устройствах — по тапу.',
+                    'whisper'        => 'Крошечная моно-подпись со стрелкой — почти незаметна, не ломает чтение.',
+                    'corner-badge'   => 'В углу маленький [i] — при наведении плавно разворачивается в полную подпись.',
+                    'brutalist-strip' => 'Жёсткая чёрная рамка вокруг картинки, подпись всегда в чёрной полосе снизу.',
+                ];
+                ?>
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Image Style</h3>
+                        <select name="u_fields[image-style]" class="u-component-select" id="image-style-select">
+                            <?php foreach ($image_style_options as $opt): ?>
+                                <option value="<?= $opt ?>"
+                                    <?= $current_image_style === $opt ? 'selected' : '' ?>>
+                                    <?= ucfirst(str_replace('-', ' ', $opt)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+                            <p class="u-desc" id="image-style-desc">
+                                <?= $image_style_descs[$current_image_style] ?? '' ?>
+                            </p>
+                            <script>
+                            var uImageStyleDescs = <?= json_encode($image_style_descs, JSON_UNESCAPED_UNICODE) ?>;
+                            document.getElementById('image-style-select').addEventListener('change', function () {
+                                var desc = uImageStyleDescs[this.value] || '';
+                                document.getElementById('image-style-desc').textContent = desc;
+                                var img = document.getElementById('image-style-preview');
+                                if (img) img.src = img.dataset.baseUrl + this.value + '.webp';
+                            });
+                            </script>
+                        </div>
+                        <div class="u-card-right">
+                            <div class="u-preview">
+                                <img id="image-style-preview"
+                                     src="<?= plugins_url("assets/media/image-style-{$current_image_style}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/image-style-', dirname(__FILE__)) ?>"
+                                     alt="Image style preview"
+                                     class="u-component-preview-img"
+                                     onerror="this.closest('.u-card-right').style.display='none'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- ── Callout ─────────────────────────────────────────── -->
                 <?php
@@ -921,13 +1028,21 @@ function u_color_field(string $name, string $value): void {
                             $vl = $v[$lk] ?? $default_light[$lk] ?? '#ffffff';
                             $vd = $v[$dk] ?? $default_dark[$dk]  ?? '#000000';
                         ?>
-                            <div class="color-table-row">
+                            <div class="color-table-row <?= $key === 'H1' ? 'u-h1-row' : '' ?>">
                                 <span class="color-label"><?= $label ?></span>
                                 <div class="color-input-wrapper" data-theme-col="light">
-                                    <?php u_color_field("u_fields[{$lk}]", $vl) ?>
+                                    <?php if ($key === 'H1'): ?>
+                                        <?php u_h1_gradient_field("u_fields[{$lk}]", $vl) ?>
+                                    <?php else: ?>
+                                        <?php u_color_field("u_fields[{$lk}]", $vl) ?>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="color-input-wrapper" data-theme-col="dark">
-                                    <?php u_color_field("u_fields[{$dk}]", $vd) ?>
+                                    <?php if ($key === 'H1'): ?>
+                                        <?php u_h1_gradient_field("u_fields[{$dk}]", $vd) ?>
+                                    <?php else: ?>
+                                        <?php u_color_field("u_fields[{$dk}]", $vd) ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>

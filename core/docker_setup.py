@@ -174,11 +174,15 @@ def _start_container(container: str) -> None:
     print("  Запуск контейнера WordPress...")
     _ensure_network(WEB_NETWORK)
 
-    # HOST_PORT=0 → ядро ОС атомарно назначает свободный порт, гонка исключена
+    # Если контейнер уже запущен — берём его реальный порт (конфликта нет, он уже его держит).
+    # Если не запущен или не существует — HOST_PORT=0: ядро ОС атомарно назначает свободный порт.
+    r = subprocess.run(["docker", "port", container, "80"], capture_output=True, text=True)
+    host_port = r.stdout.strip().split(":")[-1].strip() if r.returncode == 0 and r.stdout.strip() else "0"
+
     result = subprocess.run(
         COMPOSE + ["up", "-d", WP_SERVICE],
         capture_output=True, text=True,
-        env={**os.environ, "HOST_PORT": "0"},
+        env={**os.environ, "HOST_PORT": host_port},
     )
     if result.returncode != 0:
         print(f"  [!] Docker error:\n{result.stderr}")

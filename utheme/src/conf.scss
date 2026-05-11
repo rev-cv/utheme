@@ -37,6 +37,7 @@ $toc-icon-select: map.get(ico.$icon-tuple, $toc-icon);
 
 $stt-icon: "chevron-one";
 $stt-icon-select: map.get(arr.$arrow-tuple, $stt-icon);
+$stt-ghost: "false"; // true = прозрачная кнопка, иконка инвертирует цвета под ней
 
 // стилизация блока details
 $details: "arrow"; // arrow, plus
@@ -56,14 +57,14 @@ $callout-danger-icon-select:  map.get($-callout-set-map, "danger");
 // тип используемой на сайте карточки статей
 $article-card: "float"; // default, frame, slide, windows, float, soft, split, classic, aside, overlay, blurred, type-first, editorial, clipped
 
+// стиль отображения картинок в статьях
+$image-style: "original"; // original, marginalia, slide-up, whisper, corner-badge, brutalist-strip
+
 // вариант стилизации таблиц в статьях
 $table-style: "default"; // default, minimal, classic, cards, stripes, bold, outlined, dashed, tinted, editorial
 
 // вариант компонента "ещё почитать" под основным контентом
 $more-pages: "grid"; // grid, list, slider
-
-// картинки вписываются или занимают всю ширину страницы?
-$is-img_contain: "false"; // true, false
 
 // выравнивание элементо по левому краю ? Иначе - центральное выравнивание
 $is-left-align: "true"; // true, false

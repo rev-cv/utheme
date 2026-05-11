@@ -18,6 +18,7 @@ $includes = array(
     'shortcode-about-autor.php',
     'shortcode-breadcrumbs.php',
     "shortcode-inline.php",
+    'font-registry.php',
     'mod-google-font.php',
     'mod-seo.php',
     'mod-expert-checked.php',

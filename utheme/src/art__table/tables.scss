@@ -20,7 +20,7 @@ $zebra-bg-dark: rgba(255, 255, 255, 0.02);
     display: grid; // Grid лучше справляется с изоляцией overflow, чем block
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 2rem; // Чтобы тень не обрезалась снизу
+    padding-bottom: 0.5rem;
     user-select: none;
 
     &::-webkit-scrollbar {

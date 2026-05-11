@@ -4,7 +4,7 @@
 article {
     blockquote {
         position: relative;
-        margin: 2rem 0;
+        margin: 0;
         padding: conf.$default-space;
         // Делаем левый отступ чуть больше для визуального веса
         padding-left: calc(conf.$default-space + 0.5rem);

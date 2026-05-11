@@ -45,8 +45,8 @@ class UThemeConfigurator {
         'callout'          => ['default', 'subtle-tinted', 'left-accent-bar', 'solid-filled', 'dashed-outline', 'icon-badge-card', 'minimal-inline'],
         'callout-icon-set' => ['circle', 'shield', 'diamond'],
         'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split', 'classic', 'aside', 'overlay', 'blurred', 'type-first', 'editorial', 'clipped'],
+        'image-style'    => ['original', 'marginalia', 'slide-up', 'whisper', 'corner-badge', 'brutalist-strip'],
         'table-style'    => ['default', 'minimal', 'classic', 'cards', 'stripes', 'bold', 'outlined', 'dashed', 'tinted', 'editorial'],
-        'is-img_contain' => ['true', 'false'],
         'is-left-align'  => ['true', 'false'],
         'is-border'      => ['true', 'false'],
         'font-vibe'      => [
@@ -165,18 +165,19 @@ class UThemeConfigurator {
         // Status Colors — записываем напрямую (они не в brand_color_vars).
         $string_vars = [
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages',
-            'table-style',
+            'table-style', 'image-style',
             'font-vibe', 'radius-vibe', 'style', 'toc-icon', 'stt-icon',
-            'is-menu-title', 'is-not-section', 'toc-show-title', 'is-img_contain', 'is-left-align', 'is-border',
+            'is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border',
             'breadcrumbs-separator', 'menu-accent-align',
             'callout', 'callout-icon-set',
             'theme-mode',
+            'stt-ghost',
         ];
 
         // Чекбоксы: если не отмечен — браузер не отправляет поле вовсе.
         // Принудительно выставляем 'false' для всех булевых переменных,
         // которые отсутствуют в $_POST['u_fields'].
-        $bool_vars = ['is-menu-title', 'is-not-section', 'toc-show-title', 'is-img_contain', 'is-left-align', 'is-border'];
+        $bool_vars = ['is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border', 'stt-ghost'];
         foreach ($bool_vars as $bvar) {
             if (!isset($fields[$bvar])) {
                 $fields[$bvar] = 'false';
@@ -262,8 +263,8 @@ class UThemeConfigurator {
 
         $content     = file_get_contents($this->scss_file);
         $string_vars = [
-            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'table-style',
-            'font-vibe', 'style', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
+            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'table-style', 'image-style',
+            'font-vibe', 'style', 'is-not-section', 'is-left-align', 'is-border',
             'font-size', 'stt-icon', 'menu-accent-align',
             'callout', 'callout-icon-set',
         ];

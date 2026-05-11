@@ -29,7 +29,7 @@ aside,
     h4,
     h5,
     h6 {
-        margin: 0.6em auto 0.8em;
+        margin: 0.6em 0 0 0;
         line-height: 1.4;
     }
 
@@ -45,26 +45,25 @@ aside,
             text-align: center;
         }
 
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        @include f.mode(( //
-            background-color: (conf.$color-H1-light, conf.$color-H1-dark),
-            // text-shadow: (2px 2px 4px rgba(0, 0, 0, 0.2), none) //
+        @include f.mode((
+            background:              (conf.$color-H1-light, conf.$color-H1-dark),
+            -webkit-background-clip: (text, text),
+            background-clip:         (text, text),
+            color:                   (transparent, transparent),
         ));
 
-        strong {
-            @include f.font-hd;
-            font-weight: 700;
-            // color: conf.$color-primary-light;
+        // strong {
+        //     @include f.font-hd;
+        //     font-weight: 700;
+        //     // color: conf.$color-primary-light;
 
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            @include f.mode(( //
-                    background-color: (conf.$color-H1-light, conf.$color-H1-dark),
-                ));
-        }
+        //     @include f.mode(( //
+        //             background: (conf.$color-H1-light, conf.$color-H1-dark),
+        //         ));
+        //     -webkit-background-clip: text;
+        //     background-clip: text;
+        //     color: transparent;
+        // }
 
         em {
             font-size: 0.45em;
@@ -144,10 +143,6 @@ aside,
     h6 {
         @include f.font-txt;
         @include f.mode((color: (conf.$color-primary-light, conf.$color-primary-dark)));
-    }
-
-    hr+ :is(h3, h4, h5, h6, h1, h2) {
-        margin-top: 1.2rem;
     }
 
     .page-toc-title {

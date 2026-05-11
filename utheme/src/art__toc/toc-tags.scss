@@ -23,7 +23,6 @@ $pad-x: calc(conf.$default-space / 2);
         contain: layout style;
 
         .page-toc-title {
-            margin: 0;
             padding: $pad-y $pad-x $pad-y 0;
             flex-shrink: 0;
             align-self: center;
@@ -105,9 +104,6 @@ $pad-x: calc(conf.$default-space / 2);
         }
     }
 
-    article div.toc {
-        margin-bottom: clamp(.7em, 5vw, 2em) !important;
-        margin-top: clamp(1.4em, 5vw, 3em) !important;
-    }
+
 
 }

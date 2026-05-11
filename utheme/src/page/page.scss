@@ -46,12 +46,15 @@ body {
     margin: 0 auto;
 }
 
+.dynamic-injection-container,
 article,
 aside {
+    display: flex;
+    flex-direction: column;
+    gap: $space;
 
     p {
         font-size: clamp(14px, 3vw, 1rem);
-        margin-bottom: $space;
 
         strong {
             font-weight: 700;
@@ -114,7 +117,7 @@ main {
     padding: clamp(1rem, 3vw, 2rem);
     max-width: conf.$max-width;
     border-radius: 0;
-
+    margin-bottom: 0 !important;
     width: 100%;
 
     article {

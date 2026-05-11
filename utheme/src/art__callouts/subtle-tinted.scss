@@ -46,10 +46,6 @@ $icon-size: 1.25rem;
             }
         }
 
-        section .callout:last-child {
-            margin-bottom: 0;
-        }
-
         @media (max-width: 480px) {
             .callout {
                 flex-direction: column;

@@ -172,7 +172,9 @@ foreach (glob('/tmp/staging/images/*') as \$file) {
     }
     // Force slug to include extension so it never collides with a page slug
     wp_update_post(['ID' => \$id, 'post_name' => str_replace('.', '-', \$fname)]);
-    \$results[] = \$fname . chr(9) . \$id . chr(9) . wp_get_attachment_url(\$id);
+    \$_abs = wp_get_attachment_url(\$id);
+    \$_rel = str_replace(get_site_url(), '', \$_abs);
+    \$results[] = \$fname . chr(9) . \$id . chr(9) . \$_rel;
 }
 ob_end_clean();
 echo implode(chr(10), \$results) . chr(10);
@@ -203,6 +205,11 @@ for page_file in /tmp/staging/pages/*.wp; do
     done
 done
 echo "Placeholders resolved."
+
+# Регенерация метаданных (размеры, thumbnails) для всех загруженных медиафайлов.
+# Без этого Gutenberg-редактор не может получить width/height через REST API и показывает битые картинки.
+echo "Regenerating attachment metadata..."
+wp media regenerate --yes 2>/dev/null && echo "Metadata regenerated." || echo "  WARN: wp media regenerate failed (non-fatal)."
 
 # Заменяем плейсхолдеры внутренних ссылок %%PAGEURL:slug%% → реальный URL
 echo "Resolving internal link placeholders in .wp files..."

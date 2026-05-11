@@ -39,7 +39,12 @@
             margin: 0;
             flex: 1 1 200px;
 
-            @include f.mode((color: (conf.$color-H1-light, conf.$color-H1-dark)));
+            @include f.mode((
+                background:              (conf.$color-H1-light, conf.$color-H1-dark),
+                -webkit-background-clip: (text, text),
+                background-clip:         (text, text),
+                color:                   (transparent, transparent),
+            ));
         }
 
         .timer {
@@ -317,7 +322,12 @@
                 font-size: clamp(1.1rem, 3vw, 1.5rem);
                 margin: 0;
 
-                @include f.mode((color: (conf.$color-H1-light, conf.$color-H1-dark)));
+                @include f.mode((
+                    background:              (conf.$color-H1-light, conf.$color-H1-dark),
+                    -webkit-background-clip: (text, text),
+                    background-clip:         (text, text),
+                    color:                   (transparent, transparent),
+                ));
             }
         }
 
@@ -336,7 +346,12 @@
                 @include f.font-hd;
                 margin: 1.5rem 0 .5rem;
 
-                @include f.mode((color: (conf.$color-H1-light, conf.$color-H1-dark)));
+                @include f.mode((
+                    background:              (conf.$color-H1-light, conf.$color-H1-dark),
+                    -webkit-background-clip: (text, text),
+                    background-clip:         (text, text),
+                    color:                   (transparent, transparent),
+                ));
             }
         }
     }

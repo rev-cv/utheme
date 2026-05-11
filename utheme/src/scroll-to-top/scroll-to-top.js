@@ -9,8 +9,6 @@ document.addEventListener('DOMContentLoaded', function () {
         h2[id] {
             scroll-margin-top: 100px;
         }
-        
-        /* Резервируем место для lazy-изображений ТОЛЬКО на десктопах ( > 850px) */
         @media (min-width: 851px) {
             article img[loading="lazy"]:not([width]):not([height]) {
                 min-height: 551px;

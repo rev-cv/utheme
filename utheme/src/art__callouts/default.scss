@@ -16,10 +16,6 @@
             }
         }
 
-        section .callout:last-child {
-            margin-bottom: 0;
-        }
-
         .info-callout {
             border-left-color: conf.$color-info-light;
             background-color: rgba(conf.$color-info-light, 0.05);

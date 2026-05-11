@@ -25,8 +25,8 @@ _CONFIG = {
         "default", "frame", "slide", "windows",
         "float", "soft", "split"
     ],
-    "is-img_contain": [
-        "true", "false"
+    "image-style": [
+        "original", "marginalia", "slide-up", "whisper", "corner-badge", "brutalist-strip"
     ],
     "is-left-align": [
         "true", "false"

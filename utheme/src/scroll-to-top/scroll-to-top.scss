@@ -5,7 +5,7 @@
 // --- Scroll-to-Top Button Variables ---
 $stt-size: 45px;
 $stt-position-offset: 20px;
-$stt-z-index: 99;
+$stt-z-index: 1000;
 $stt-transition: opacity 0.3s, background-color 0.3s, transform 0.2s ease;
 $scroll-margin-top: 100px;
 $stt-icon-size: 22px;
@@ -28,23 +28,11 @@ $stt-text-dark: conf.$color-bg-dark;
     z-index: $stt-z-index;
     border: none;
     outline: none;
-    background-color: $stt-bg-light;
-    color: $stt-text-light;
     cursor: pointer;
     border-radius: f.get-radius();
-    box-shadow: conf.$shadow-section;
     width: $stt-size;
     height: $stt-size;
     transition: $stt-transition;
-
-    &:hover {
-        background-color: $stt-bg-hover-light;
-        transform: translateY(-2px);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
 
     &::before {
         content: '';
@@ -52,7 +40,6 @@ $stt-text-dark: conf.$color-bg-dark;
         width: $stt-icon-size;
         height: $stt-icon-size;
         flex-shrink: 0;
-        background-color: $stt-text-light;
         -webkit-mask-image: conf.$stt-icon-select;
         mask-image: conf.$stt-icon-select;
         -webkit-mask-size: contain;
@@ -62,24 +49,53 @@ $stt-text-dark: conf.$color-bg-dark;
         -webkit-mask-position: center;
         mask-position: center;
 
-        @include f.dark-mode {
-            background-color: $stt-text-dark;
+        @if conf.$stt-ghost == "true" {
+            background-color: white;
+        } @else {
+            background-color: $stt-text-light;
+
+            @include f.dark-mode {
+                background-color: $stt-text-dark;
+            }
         }
+    }
+
+    @if conf.$stt-ghost == "true" {
+        background-color: transparent;
+        mix-blend-mode: difference;
+
+        &:hover {
+            background-color: transparent;
+            transform: translateY(-2px);
+        }
+    } @else {
+        background-color: $stt-bg-light;
+        color: $stt-text-light;
+        box-shadow: conf.$shadow-section;
+
+        &:hover {
+            background-color: $stt-bg-hover-light;
+            transform: translateY(-2px);
+        }
+
+        @include f.dark-mode {
+            background-color: $stt-bg-dark;
+            color: $stt-text-dark;
+
+            &:hover {
+                background-color: $stt-bg-hover-dark;
+            }
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
     }
 
     &.show {
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    @include f.dark-mode {
-        background-color: $stt-bg-dark;
-        color: $stt-text-dark;
-
-        &:hover {
-            background-color: $stt-bg-hover-dark;
-        }
     }
 }
 
