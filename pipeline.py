@@ -7,6 +7,7 @@
 #     "bs4",
 #     "transliterate",
 #     "jinja2",
+#     "markdown-it-py",
 # ]
 # ///
 import json
@@ -109,7 +110,7 @@ def run():
 # ─── Шаг 5: конвертация HTML → WP-блоки ─────────────────────────────────────
 
 def _convert_html_to_wp(pages: list[dict], out_dir: Path):
-    from core import convertation_to_wp as conv
+    from core import convertation_html_to_wp as conv
     from core import extract_meta_from_html as extraction
 
     # структурные страницы (content=None) не имеют HTML-источника

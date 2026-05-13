@@ -12,7 +12,7 @@ $-border-dark:  rgba(255, 255, 255, 0.1);
         display: grid;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        margin-bottom: 2rem;
+        // margin-bottom: 2rem;
         user-select: none;
 
         &::-webkit-scrollbar { height: 6px; }

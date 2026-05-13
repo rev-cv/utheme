@@ -263,7 +263,7 @@ class UThemeConfigurator {
 
         $content     = file_get_contents($this->scss_file);
         $string_vars = [
-            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'table-style', 'image-style',
+            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages', 'table-style', 'image-style',
             'font-vibe', 'style', 'is-not-section', 'is-left-align', 'is-border',
             'font-size', 'stt-icon', 'menu-accent-align',
             'callout', 'callout-icon-set',

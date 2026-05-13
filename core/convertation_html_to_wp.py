@@ -315,20 +315,24 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
     if not container:
         return ""
 
-    # внешние ссылки → новая вкладка; внутренние → плейсхолдер %%PAGEURL:slug%%
+    # внешние ссылки → новая вкладка; внутренние → шорткод $$LINK slug | text$$
     for a_tag in container.find_all('a', href=True):
         href = a_tag['href']
         if href.startswith(('http://', 'https://', 'mailto:', 'tel:', '#', '//', 'javascript:')):
             a_tag['target'] = '_blank'
             a_tag['rel'] = 'noopener'
         else:
-            # извлекаем slug — последний непустой сегмент пути
             from urllib.parse import urlparse
-            path = urlparse(href).path.rstrip('/')
-            slug = path.split('/')[-1] if path else ''
-            if slug:
-                a_tag['href'] = f'%%PAGEURL:{slug}%%'
-            # не добавляем target="_blank" для внутренних ссылок
+            path = urlparse(href).path.strip('/')
+            if not path:
+                continue
+            slug = Path(path.split('/')[-1]).stem
+            if not slug:
+                continue
+            link_text = a_tag.get_text(strip=True)
+            if not link_text:
+                continue
+            a_tag.replace_with(f'$$LINK {slug} | {link_text}$$')
 
     
     # все DIV распаковываются и удаляются за исключением тех, что в этом списке
@@ -384,7 +388,7 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
     Конвертирует содержимое в WP-блоки, сохраняет файл .wp рядом с исходным
     и добавляет содержимое блоков в поле 'wp_block' каждого объекта.
     """
-    print('\nЗапуск конвертации HTML в WP блоки\n')
+    print('\nЗапуск конвертации в WP блоки\n')
     
     updated_list = []
 
@@ -404,11 +408,13 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
 
         try:
             content = source_file.read_text(encoding='utf-8')
-            
-            # нужно ли в файл добавлять шорткод выводящий данные статьи?
-            # если название папки начинается с CL, то добавлять шорткод во время конвертации
             add_meta = source_file.parent.name.startswith("CL")
-            wp_content = convert_html_to_blocks(content, add_post_meta=add_meta)
+
+            if source_file.suffix == '.md':
+                from core.convertation_md_to_wp import convert_md_to_blocks
+                wp_content = convert_md_to_blocks(content, add_post_meta=add_meta)
+            else:
+                wp_content = convert_html_to_blocks(content, add_post_meta=add_meta)
             
             if wp_content:
                 new_item["wp_block"] = wp_content

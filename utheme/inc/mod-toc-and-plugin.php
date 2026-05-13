@@ -113,27 +113,25 @@ function my_theme_dynamic_content_injection($content)
         ],
     ]);
 
+    $shortcode_html = '';
+    if (!in_array(get_the_ID(), $excluded_ids) && shortcode_exists('geo_info')) {
+        $shortcode_html = do_shortcode($shortcode);
+    }
+
+    $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $toc_html . '</div>';
+
+    if (preg_match('/<p>\s*\[toc_position\]\s*<\/p>/i', $modified_content)) {
+        return preg_replace('/<p>\s*\[toc_position\]\s*<\/p>/i', $insertion, $modified_content, 1);
+    }
+    if (str_contains($modified_content, '[toc_position]')) {
+        return str_replace('[toc_position]', $insertion, $modified_content);
+    }
+
     if ($first_insertion_pos !== null) {
-        $shortcode_html = '';
-        // Добавляем шорткод только если страница не исключена
-        if (in_array(get_the_ID(), $excluded_ids)) {
-            // для исключенных страниц шорткод не нужен
-        } else {
-            // Проверяем наличие шорткода (плагин Sports Predictions)
-            if (shortcode_exists('geo_info')) {
-                $shortcode_html = do_shortcode($shortcode);
-            }
-        }
-
-        // Оборачиваем и шорткод (если он есть), и TOC в один контейнер.
-        // Это делает вставку единым, цельным блоком, что более предсказуемо для верстки и предотвращает "разъезжание" элементов.
-        $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $toc_html . '</div>';
-        // $insertion = '' . $shortcode_html . $toc_html . '';
-
         $modified_content = substr_replace($modified_content, $insertion, $first_insertion_pos, 0);
     }
 
     return $modified_content;
 }
 
-// add_filter('the_content', 'my_theme_dynamic_content_injection');
+add_filter('the_content', 'my_theme_dynamic_content_injection');
