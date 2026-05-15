@@ -68,7 +68,7 @@ $_col3-viewport: $_col3-content + $_h-pad;  // 1396px — viewport where 3 cols 
         align-items: center;
         column-gap: $sp-sm;
         row-gap: 0;
-        padding: $sp-sm $sp;
+        padding: $sp-sm;
 
         position: relative;
         background: conf.$color-section-light;
@@ -393,6 +393,61 @@ $_col3-viewport: $_col3-content + $_h-pad;  // 1396px — viewport where 3 cols 
             text-align: center;
         }
     }
+}
+
+/* ─── Skeleton loader (CLS prevention) ──────────────────── */
+
+.dynamic-injection-container .tc-card-skeleton {
+    height: 114px;
+    background: conf.$color-section-light;
+    border-radius: f.get-radius("card");
+    overflow: hidden;
+    position: relative;
+
+    @if conf.$is-border == 'true' {
+        border: 1px solid conf.$color-border-light;
+
+        @include f.dark-mode {
+            border-color: conf.$color-border-dark;
+        }
+    }
+
+    @include f.dark-mode {
+        background: conf.$color-section-dark;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            90deg,
+            transparent 25%,
+            color.change(conf.$color-text-light, $alpha: .05) 50%,
+            transparent 75%
+        );
+        background-size: 200% 100%;
+        animation: tc-skeleton-sweep 1.5s ease-in-out infinite;
+
+        @include f.dark-mode {
+            background: linear-gradient(
+                90deg,
+                transparent 25%,
+                color.change(conf.$color-text-dark, $alpha: .07) 50%,
+                transparent 75%
+            );
+            background-size: 200% 100%;
+        }
+    }
+
+    @media (max-width: 540px) {
+        height: 200px;
+    }
+}
+
+@keyframes tc-skeleton-sweep {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* ─── Floating sticky banner ─────────────────────────────── */

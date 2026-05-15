@@ -41,7 +41,7 @@ class UThemeConfigurator {
             'double-filled-arrow', 'double-arrow', 'circle-filled-1', 'circle-1', 
             'circle-2', 'arrow-warm', 'arrow-short', 'arrow-big', 'arrow-pin'],
         'is-not-section' => ['true', 'false'],
-        'details'        => ['plus', 'arrow'],
+        'details'        => ['plus', 'arrow', 'hairline', 'left-rule', 'bottom-rule', 'dashed', 'hanging-marker', 'pill-summary', 'inset-note'],
         'callout'          => ['default', 'subtle-tinted', 'left-accent-bar', 'solid-filled', 'dashed-outline', 'icon-badge-card', 'minimal-inline'],
         'callout-icon-set' => ['circle', 'shield', 'diamond'],
         'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split', 'classic', 'aside', 'overlay', 'blurred', 'type-first', 'editorial', 'clipped'],
@@ -172,12 +172,13 @@ class UThemeConfigurator {
             'callout', 'callout-icon-set',
             'theme-mode',
             'stt-ghost',
+            'paper-effect', 'toc-collapsible',
         ];
 
         // Чекбоксы: если не отмечен — браузер не отправляет поле вовсе.
         // Принудительно выставляем 'false' для всех булевых переменных,
         // которые отсутствуют в $_POST['u_fields'].
-        $bool_vars = ['is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border', 'stt-ghost'];
+        $bool_vars = ['is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border', 'stt-ghost', 'paper-effect', 'toc-collapsible'];
         foreach ($bool_vars as $bvar) {
             if (!isset($fields[$bvar])) {
                 $fields[$bvar] = 'false';
@@ -220,7 +221,7 @@ class UThemeConfigurator {
             // Lookahead (?![\w-]): $color-text не совпадёт с $color-text-light
             // preg_replace_callback: значение подставляется напрямую, без риска
             // интерпретации $1, \\ как backreferences строки замены
-            $pattern = '/(\$' . preg_quote($key, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $pattern = '/(\$' . preg_quote($key, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content  = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $formatted . $m[4], $content);
         }
 

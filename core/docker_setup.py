@@ -18,7 +18,7 @@ WEB_NETWORK  = "web_network"
 
 # ─── Публичный API ───────────────────────────────────────────────────────────
 
-def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> None:
+def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> dict | None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
 
     _clean_wp_config_volume(wp_conf_dir)
@@ -29,15 +29,12 @@ def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> None:
     _copy_staging(staging_dir, container)
     _copy_provision_sh(wp_conf_dir, container)
     _run_provision_sh(container)
-    _process_credentials(container)
+    credentials = _process_credentials(container)
     _cleanup_tmp(container, staging_dir.name)
     _extract_wp_config(container, wp_conf_dir)
 
-    # print("  Рандомизация темы...")
-    # from .randomize_theme import randomize_theme
-    # randomize_theme()
-
     print("\n  Деплой завершён.")
+    return credentials
 
 
 # ─── Шаги ────────────────────────────────────────────────────────────────────
@@ -278,12 +275,12 @@ def _run_provision_sh(container: str) -> None:
     print("  provision.sh выполнен.")
 
 
-def _process_credentials(container: str) -> None:
-    """Читает temp_wp.json из uploads/, пишет в .env и *_access.txt."""
+def _process_credentials(container: str) -> dict | None:
+    """Читает temp_wp.json из uploads/, пишет в .env и *_access.txt. Возвращает данные."""
     json_path = Path("uploads") / "temp_wp.json"
     if not json_path.exists():
         print("  temp_wp.json не найден, пропуск.")
-        return
+        return None
 
     import json
     data = json.loads(json_path.read_text(encoding="utf-8"))
@@ -321,6 +318,14 @@ def _process_credentials(container: str) -> None:
          "rm", "-f", "/var/www/html/wp-content/uploads/temp_wp.json"],
         capture_output=True,
     )
+
+    return {
+        "site_url":    os.getenv("SITE_URL", ""),
+        "admin_user":  admin_user,
+        "admin_pass":  admin_pass,
+        "admin_email": admin_email,
+        "app_pass":    app_pass,
+    }
 
 
 def _cleanup_tmp(container: str, staging_name: str) -> None:

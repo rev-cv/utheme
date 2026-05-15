@@ -410,6 +410,14 @@ function u_h1_gradient_field(string $name, string $value): void {
                                             <span class="u-desc">Все элементы выравниваются по левому краю. По умолчанию — стандартное центрированное выравнивание.</span>
                                         </span>
                                     </label>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox" name="u_fields[paper-effect]" value="true"
+                                            <?= ($v['paper-effect'] ?? 'false') === 'true' ? 'checked' : '' ?>>
+                                        <span>
+                                            <strong>Paper Effect</strong>
+                                            <span class="u-desc">Статья на отдельной подложке: body получает лёгкий тон primary-цвета, main — чистый фон с тенью.</span>
+                                        </span>
+                                    </label>
 
                                 </div>
                             </div>
@@ -585,6 +593,13 @@ function u_h1_gradient_field(string $name, string $value): void {
                                                value="true"
                                                <?= ($v['toc-show-title'] ?? 'true') === 'true' ? 'checked' : '' ?>>
                                         <span>Показывать заголовок оглавления</span>
+                                    </label>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox"
+                                               name="u_fields[toc-collapsible]"
+                                               value="true"
+                                               <?= ($v['toc-collapsible'] ?? 'false') === 'true' ? 'checked' : '' ?>>
+                                        <span>Разворачивающееся оглавление <span class="u-desc">(не работает с типом Tags и при скрытом заголовке)</span></span>
                                     </label>
                                 <?php endif; ?>
 
@@ -867,6 +882,62 @@ function u_h1_gradient_field(string $name, string $value): void {
                                 <img src="<?= plugins_url("assets/media/callout-{$current_callout}.webp", dirname(__FILE__)) ?>"
                                      data-base-url="<?= plugins_url('assets/media/callout-', dirname(__FILE__)) ?>"
                                      alt="Callout preview"
+                                     class="u-component-preview-img"
+                                     onerror="this.closest('.u-card-right').style.display='none'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Details ────────────────────────────────────────── -->
+                <?php
+                $details_options = ['arrow', 'plus', 'hairline', 'left-rule', 'bottom-rule', 'dashed', 'hanging-marker', 'pill-summary', 'inset-note'];
+                $current_details = $v['details'] ?? 'arrow';
+                $details_descs = [
+                    'arrow'          => 'Стрелка-шеврон справа. Блок на фоне секции, раскрытый заголовок отделяется линией.',
+                    'plus'           => 'Плюс слева трансформируется в ×. Блок на фоне секции — компактный FAQ-стиль.',
+                    'hairline'       => 'Тонкая рамка по периметру, шеврон слева. Минималистичный «безопасный» вариант без фона.',
+                    'left-rule'      => 'Только левая линейка, маркер +/–. Лёгкий вариант для FAQ внутри статьи.',
+                    'bottom-rule'    => 'Линия снизу + крест-плюс справа. Несколько подряд выглядят как аккордеон без рамок.',
+                    'dashed'         => 'Пунктирная рамка, треугольная стрелка. Намёк на «дополнительно — разверни если интересно».',
+                    'hanging-marker' => 'Без рамок: маркер › висит в левом поле, текст идёт в ритме абзацев.',
+                    'pill-summary'   => 'Заголовок как «таблетка», содержимое за тонкой левой линией.',
+                    'inset-note'     => 'Врезка: подложка секции + левый акцент в цвет акцента. Для блоков-примечаний.',
+                ];
+                ?>
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Details / Accordion</h3>
+                        <select name="u_fields[details]" class="u-component-select" id="details-select">
+                            <?php foreach ($details_options as $opt): ?>
+                                <option value="<?= $opt ?>"
+                                    <?= $current_details === $opt ? 'selected' : '' ?>>
+                                    <?= ucfirst(str_replace('-', ' ', $opt)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+                            <p class="u-desc" id="details-desc">
+                                <?= $details_descs[$current_details] ?? '' ?>
+                            </p>
+                            <script>
+                            var uDetailsDescs = <?= json_encode($details_descs, JSON_UNESCAPED_UNICODE) ?>;
+                            document.getElementById('details-select').addEventListener('change', function () {
+                                var desc = uDetailsDescs[this.value] || '';
+                                document.getElementById('details-desc').textContent = desc;
+                                var img = document.getElementById('details-preview');
+                                if (img) img.src = img.dataset.baseUrl + this.value + '.webp';
+                            });
+                            </script>
+                        </div>
+                        <div class="u-card-right">
+                            <div class="u-preview">
+                                <img id="details-preview"
+                                     src="<?= plugins_url("assets/media/details-{$current_details}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/details-', dirname(__FILE__)) ?>"
+                                     alt="Details preview"
                                      class="u-component-preview-img"
                                      onerror="this.closest('.u-card-right').style.display='none'">
                             </div>

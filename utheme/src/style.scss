@@ -71,8 +71,15 @@
 @use "art__meta/meta.scss";
 @use "art__description/descr.scss";
 @use "art__breadcrumbs/breadcrumbs.scss";
-@use "art__details/details-plus.scss" as details_plus;
-@use "art__details/details-arrow.scss" as details_arrow;
+@use "art__details/details-plus.scss"           as details_plus;
+@use "art__details/details-arrow.scss"          as details_arrow;
+@use "art__details/details-hairline.scss"       as details_hairline;
+@use "art__details/details-left-rule.scss"      as details_left_rule;
+@use "art__details/details-bottom-rule.scss"    as details_bottom_rule;
+@use "art__details/details-dashed.scss"         as details_dashed;
+@use "art__details/details-hanging-marker.scss" as details_hanging_marker;
+@use "art__details/details-pill-summary.scss"   as details_pill_summary;
+@use "art__details/details-inset-note.scss"     as details_inset_note;
 @use "art__blockquote/default.scss";
 
 // @use "header-section-box/header-box.scss";
@@ -222,11 +229,24 @@
     @include footer_4columns.styles;
 }
 
-@if conf.$details =='plus' {
+@if conf.$details == 'plus' {
     @include details_plus.styles;
-}
-@else if conf.$details =='arrow' {
+} @else if conf.$details == 'arrow' {
     @include details_arrow.styles;
+} @else if conf.$details == 'hairline' {
+    @include details_hairline.styles;
+} @else if conf.$details == 'left-rule' {
+    @include details_left_rule.styles;
+} @else if conf.$details == 'bottom-rule' {
+    @include details_bottom_rule.styles;
+} @else if conf.$details == 'dashed' {
+    @include details_dashed.styles;
+} @else if conf.$details == 'hanging-marker' {
+    @include details_hanging_marker.styles;
+} @else if conf.$details == 'pill-summary' {
+    @include details_pill_summary.styles;
+} @else if conf.$details == 'inset-note' {
+    @include details_inset_note.styles;
 }
 
 @if conf.$callout =='default' {
@@ -264,6 +284,80 @@
     @include more_pages_carousel.styles;
 }
 
+// Collapsible TOC
+@if conf.$toc-collapsible == 'true' and conf.$toc-show-title != 'false' and conf.$toc-menu != 'tags' {
+    article .toc,
+    aside .toc {
+        > details {
+            display: block;
+            width: 100%;
 
+            > ol.page-toc-list {
+                margin-top: conf.$default-space;
+            }
+        }
 
+        summary.page-toc-title {
+            list-style: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .4em;
+            width: 100%;
 
+            &::-webkit-details-marker { display: none; }
+
+            &::before {
+                content: '';
+                display: block;
+                width: 1.1em;
+                height: 1.1em;
+                flex-shrink: 0;
+                background-color: conf.$color-accent-light;
+                -webkit-mask-image: conf.$toc-collapsible-arrow;
+                mask-image: conf.$toc-collapsible-arrow;
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+                transform: rotate(90deg);
+                transition: transform 300ms ease;
+
+                @include funcs.dark-mode {
+                    background-color: conf.$color-accent-dark;
+                }
+            }
+        }
+
+        details[open] summary.page-toc-title::before {
+            transform: rotate(180deg);
+        }
+
+        details[open] ol.page-toc-list {
+            animation: toc-unfold 200ms ease;
+        }
+    }
+
+    @keyframes toc-unfold {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+}
+
+// Paper-effect: убираем тени у элементов внутри статьи
+@if conf.$paper-effect == 'true' {
+    article, aside {
+        section,
+        .wp-block-details,
+        .wp-block-table,
+        .yesno-box,
+        .callout,
+        .pick,
+        .tc-card {
+            box-shadow: none;
+            &:hover { box-shadow: none; }
+        }
+    }
+}

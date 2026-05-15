@@ -46,6 +46,18 @@ function my_theme_get_config($key = null, $default = null)
             if (preg_match('/\$breadcrumbs-separator:\s*["\']([^"\']*)["\']/', $content, $m)) {
                 $config['breadcrumbs-separator'] = $m[1];
             }
+            if (preg_match('/\$toc-menu:\s*["\']?([a-zA-Z0-9_-]+)["\']?/', $content, $m)) {
+                $config['toc-menu'] = $m[1];
+            }
+            if (preg_match('/\$toc-show-title:\s*["\']?(true|false)["\']?/', $content, $m)) {
+                $config['toc-show-title'] = ($m[1] === 'true');
+            }
+            if (preg_match('/\$toc-collapsible:\s*["\']?(true|false)["\']?/', $content, $m)) {
+                $config['toc-collapsible'] = ($m[1] === 'true');
+            }
+            if (preg_match('/\$paper-effect:\s*["\']?(true|false)["\']?/', $content, $m)) {
+                $config['paper-effect'] = ($m[1] === 'true');
+            }
         }
     }
 

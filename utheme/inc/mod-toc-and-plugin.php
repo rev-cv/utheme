@@ -19,12 +19,24 @@ function build_toc_html(string $content): string
         $toc_items .= '<li class="page-toc-level-2"><a href="#' . $slug . '" title="move to this section">' . esc_html($text_content) . '</a></li>';
     }
 
-    $toc_tag = my_theme_get_config('is-not-section', false) ? 'div' : 'section';
+    $toc_tag      = my_theme_get_config('is-not-section', false) ? 'div' : 'section';
+    $collapsible  = my_theme_get_config('toc-collapsible', false);
+    $show_title   = my_theme_get_config('toc-show-title', true);
+    $toc_menu     = my_theme_get_config('toc-menu', 'icon');
 
-    return '<' . $toc_tag . ' class="toc">'
-        . '<div class="page-toc-title">' . $toc_title . '</div>'
-        . '<ol class="page-toc-list">' . $toc_items . '</ol>'
-        . '</' . $toc_tag . '>';
+    $can_collapse = $collapsible && $show_title && $toc_menu !== 'tags';
+    $list_html    = '<ol class="page-toc-list">' . $toc_items . '</ol>';
+
+    if ($can_collapse) {
+        $inner = '<details>'
+               . '<summary class="page-toc-title">' . $toc_title . '</summary>'
+               . $list_html
+               . '</details>';
+    } else {
+        $inner = '<div class="page-toc-title">' . $toc_title . '</div>' . $list_html;
+    }
+
+    return '<' . $toc_tag . ' class="toc">' . $inner . '</' . $toc_tag . '>';
 }
 
 function my_theme_dynamic_content_injection($content)
@@ -116,6 +128,29 @@ function my_theme_dynamic_content_injection($content)
     $shortcode_html = '';
     if (!in_array(get_the_ID(), $excluded_ids) && shortcode_exists('geo_info')) {
         $shortcode_html = do_shortcode($shortcode);
+
+        // После do_shortcode() плагин выполнился и заполнил $this->geo_data.
+        // Читаем точное число карточек через рефлексию (не трогая плагин),
+        // затем заменяем спиннер скелетонами для предотвращения CLS.
+        if ($shortcode_html && class_exists('TC_Sports_Predictions_Pro')) {
+            $count = 6;
+            try {
+                $ref = new \ReflectionProperty('TC_Sports_Predictions_Pro', 'geo_data');
+                $ref->setAccessible(true);
+                $geo = $ref->getValue(TC_Sports_Predictions_Pro::instance());
+                if (is_array($geo) && isset($geo['items'])) {
+                    $count = max(1, min(count($geo['items']), 20));
+                }
+            } catch (\ReflectionException $e) { /* fallback to default */ }
+
+            $skeletons = str_repeat('<div class="tc-card-skeleton" aria-hidden="true"></div>', $count);
+            $shortcode_html = preg_replace(
+                '/<div\s+class="tc-loading">[\s\S]*?<\/p>\s*<\/div>/s',
+                $skeletons,
+                $shortcode_html,
+                1
+            );
+        }
     }
 
     $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $toc_html . '</div>';

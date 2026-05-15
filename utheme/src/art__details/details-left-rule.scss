@@ -1,0 +1,62 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$det-border-light: rgba(0, 0, 0, 0.14);
+$det-border-dark:  rgba(255, 255, 255, 0.14);
+$det-mute-light:   rgba(0, 0, 0, 0.40);
+$det-mute-dark:    rgba(255, 255, 255, 0.40);
+$det-text-main:    conf.$color-text-light;
+$det-text-dark:    conf.$color-text-dark;
+$det-accent:       conf.$color-accent-light;
+$det-accent-dark:  conf.$color-accent-dark;
+$det-transition:   180ms ease;
+
+@mixin styles {
+    .wp-block-details {
+        border-left: 2px solid $det-border-light;
+        padding: 2px 0 2px 1rem;
+        user-select: none;
+        transition: border-color $det-transition;
+
+        @include f.dark-mode { border-left-color: $det-border-dark; }
+
+        &[open] {
+            border-left-color: $det-mute-light;
+            @include f.dark-mode { border-left-color: $det-mute-dark; }
+        }
+
+        > summary {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-weight: 500;
+            color: $det-text-main;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+
+            @include f.dark-mode { color: $det-text-dark; }
+            &::-webkit-details-marker { display: none; }
+
+            &::before {
+                content: "+";
+                font-family: ui-monospace, monospace;
+                font-size: .85em;
+                color: $det-mute-light;
+                width: 14px;
+                text-align: center;
+                flex-shrink: 0;
+                transition: color $det-transition;
+
+                @include f.dark-mode { color: $det-mute-dark; }
+            }
+        }
+
+        &[open] > summary::before { content: "–"; }
+
+        &[open] > *:nth-child(2) { margin-top: 8px; }
+
+        > *:not(summary) { margin: 0; }
+    }
+}

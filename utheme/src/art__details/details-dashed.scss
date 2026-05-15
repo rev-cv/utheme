@@ -1,0 +1,65 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$det-border-light: rgba(0, 0, 0, 0.18);
+$det-border-dark:  rgba(255, 255, 255, 0.18);
+$det-mute-light:   rgba(0, 0, 0, 0.40);
+$det-mute-dark:    rgba(255, 255, 255, 0.40);
+$det-text-main:    conf.$color-text-light;
+$det-text-dark:    conf.$color-text-dark;
+$det-accent:       conf.$color-accent-light;
+$det-accent-dark:  conf.$color-accent-dark;
+$det-transition:   180ms ease;
+
+@mixin styles {
+    .wp-block-details {
+        border: 1px dashed $det-border-light;
+        border-radius: f.get-radius();
+        user-select: none;
+
+        @include f.dark-mode { border-color: $det-border-dark; }
+
+        > summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: .75rem 1rem;
+            font-weight: 500;
+            color: $det-mute-light;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+            transition: color $det-transition;
+
+            @include f.dark-mode { color: $det-mute-dark; }
+            &::-webkit-details-marker { display: none; }
+
+            &::before {
+                content: "▸";
+                font-size: .7em;
+                flex-shrink: 0;
+                transition: transform $det-transition;
+            }
+        }
+
+        &[open] > summary {
+            color: $det-text-main;
+            @include f.dark-mode { color: $det-text-dark; }
+
+            &::before { transform: rotate(90deg); }
+        }
+
+        > *:not(summary) {
+            margin: 0 1rem;
+        }
+
+        > *:last-child { margin-bottom: .875rem; }
+
+        > summary:focus-visible {
+            outline: 2px solid $det-accent;
+            outline-offset: 2px;
+            border-radius: 3px;
+            @include f.dark-mode { outline-color: $det-accent-dark; }
+        }
+    }
+}

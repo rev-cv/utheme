@@ -368,17 +368,6 @@ echo "Default plugins removed."
 
 APP_PASS=$(wp user application-password create $ADMIN_USER "autoposter" --porcelain)
 
-echo ""
-echo "========================================================="
-echo "  CREDENTIALS (copy now!)"
-echo "  URL:      $SITE_URL"
-echo "  Login:    $ADMIN_USER"
-echo "  Password: $ADMIN_PASS"
-echo "  Email:    $ADMIN_EMAIL"
-echo "  App Pass: $APP_PASS"
-echo "========================================================="
-echo ""
-
 mkdir -p wp-content/uploads
 printf '{\n  "admin_user": "%s",\n  "admin_pass": "%s",\n  "admin_email": "%s",\n  "app_pass": "%s"\n}\n' \
     "$ADMIN_USER" "$ADMIN_PASS" "$ADMIN_EMAIL" "$APP_PASS" \

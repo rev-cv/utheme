@@ -1,0 +1,91 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$det-bg-light:     conf.$color-bg-light;
+$det-bg-soft:      conf.$color-section-light;
+$det-bg-dark:      conf.$color-bg-dark;
+$det-bg-soft-dark: conf.$color-section-dark;
+$det-border-light: rgba(0, 0, 0, 0.14);
+$det-border-dark:  rgba(255, 255, 255, 0.14);
+$det-mute-light:   rgba(0, 0, 0, 0.38);
+$det-mute-dark:    rgba(255, 255, 255, 0.38);
+$det-text-main:    conf.$color-text-light;
+$det-text-dark:    conf.$color-text-dark;
+$det-accent:       conf.$color-accent-light;
+$det-accent-dark:  conf.$color-accent-dark;
+$det-transition:   150ms ease;
+
+@mixin styles {
+    .wp-block-details {
+        user-select: none;
+
+        > summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px 5px 10px;
+            border: 1px solid $det-border-light;
+            border-radius: 999px;
+            font-size: .9em;
+            font-weight: 500;
+            color: $det-text-main;
+            background: $det-bg-light;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+            transition: background $det-transition, border-color $det-transition;
+
+            @include f.dark-mode {
+                border-color: $det-border-dark;
+                background: $det-bg-dark;
+                color: $det-text-dark;
+            }
+
+            &::-webkit-details-marker { display: none; }
+
+            &:hover {
+                background: $det-bg-soft;
+                @include f.dark-mode { background: $det-bg-soft-dark; }
+            }
+
+            // dot indicator
+            &::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: $det-mute-light;
+                flex-shrink: 0;
+                transition: background $det-transition;
+
+                @include f.dark-mode { background: $det-mute-dark; }
+            }
+        }
+
+        &[open] > summary {
+            background: $det-bg-soft;
+            border-color: $det-mute-light;
+
+            @include f.dark-mode {
+                background: $det-bg-soft-dark;
+                border-color: $det-mute-dark;
+            }
+
+            &::before {
+                background: $det-text-main;
+                @include f.dark-mode { background: $det-text-dark; }
+            }
+        }
+
+        &[open] > *:nth-child(2) { margin-top: .875rem; }
+
+        // content indented with left rule
+        > *:not(summary) {
+            padding-left: .875rem;
+            border-left: 1px solid $det-border-light;
+            margin: 0 0 0 .5rem;
+
+            @include f.dark-mode { border-left-color: $det-border-dark; }
+        }
+    }
+}

@@ -34,16 +34,27 @@ $is-not-section: "true"; // true, false
 $toc-show-title: "true"; // true, false
 $toc-icon: "star";
 $toc-icon-select: map.get(ico.$icon-tuple, $toc-icon);
+// оглавление сворачивается при клике?
+// не работает при toc-show-title: false и при toc-menu: tags
+$toc-collapsible: "true"; // true, false
+$toc-collapsible-arrow: map.get(arr.$arrow-tuple, "chevron-one");
+// Три условия блокируют включение (и в PHP, и в SCSS синхронно):
+// toc-menu: "tags" — теги не сворачиваются
+// toc-show-title: "false" — нет заголовка = нечем кликать
+// toc-collapsible: false — просто выключено
 
 $stt-icon: "chevron-one";
 $stt-icon-select: map.get(arr.$arrow-tuple, $stt-icon);
 $stt-ghost: "false"; // true = прозрачная кнопка, иконка инвертирует цвета под ней
 
 // стилизация блока details
-$details: "arrow"; // arrow, plus
+$details: "arrow"; // arrow, plus, hairline, left-rule, bottom-rule, dashed, hanging-marker, pill-summary, inset-note
 
 // режим темы: both — оба; dark-only — только тёмная; light-only — только светлая
 $theme-mode: "both";
+
+// статья на отдельной подложке (paper-эффект)
+$paper-effect: "true"; // true, false
 
 // вариант компонента callout (информационных блоков)
 $callout: "default"; // default, subtle-tinted, left-accent-bar, solid-filled, dashed-outline, icon-badge-card, minimal-inline

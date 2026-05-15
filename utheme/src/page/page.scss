@@ -5,6 +5,9 @@
 $bg-light: conf.$color-bg-light;
 $bg-dark: conf.$color-bg-dark;
 
+$body-bg-light: sys.mix($bg-light, conf.$color-primary-light, 95%);
+$body-bg-dark:  sys.mix($bg-dark,  conf.$color-primary-dark,  90%);
+
 $tx-light: conf.$color-text-light;
 $tx-dark: conf.$color-text-dark;
 
@@ -30,14 +33,17 @@ html {
 
 body {
     line-height: 1.7;
-    background-color: $bg-light;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 
-    @include f.dark-mode {
-        background-color: $bg-dark;
+    @if conf.$paper-effect == 'true' {
+        background-color: $body-bg-light;
+        @include f.dark-mode { background-color: $body-bg-dark; }
+    } @else {
+        background-color: $bg-light;
+        @include f.dark-mode { background-color: $bg-dark; }
     }
 }
 
@@ -116,9 +122,20 @@ main {
     margin: 1rem auto;
     padding: clamp(1rem, 3vw, 2rem);
     max-width: conf.$max-width;
-    border-radius: 0;
     margin-bottom: 0 !important;
     width: 100%;
+
+    @if conf.$paper-effect == 'true' {
+        border-radius: f.get-radius("card");
+        background-color: $bg-light;
+        box-shadow: conf.$shadow-section;
+        @include f.dark-mode {
+            background-color: $bg-dark;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        }
+    } @else {
+        border-radius: 0;
+    }
 
     article {
         width: 100%;

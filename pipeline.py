@@ -41,7 +41,7 @@ def run():
     (STAGING_DIR / "pages").mkdir(exist_ok=True)
 
     # ── 1. НОРМАЛИЗАЦИЯ ИМЁН ─────────────────────────────────────────────────
-    _phase(1, 10, "Нормализация имён файлов и папок")
+    _phase(1, 12, "Нормализация имён файлов и папок")
     from core import check_structure
     check_structure.normalize_branding_assets(SPEC_DIR)
     check_structure.bulk_rename_folders(SPEC_DIR)
@@ -49,18 +49,18 @@ def run():
     check_structure.normalize_all_html_in_directory(SPEC_DIR)
 
     # ── 2. ОПРЕДЕЛЕНИЕ СТРУКТУРЫ ПРОЕКТА ────────────────────────────────────
-    _phase(2, 10, "Определение типа структуры")
+    _phase(2, 12, "Определение типа структуры")
     from core.detect_structure import detect_structure
     structure = detect_structure(SPEC_DIR)
     print(f"  Тип:     {structure['structure_type']}")
     print(f"  Страниц: {len(structure['pages'])}")
 
     # ── 3. ПРОВЕРКА ЦЕЛОСТНОСТИ ──────────────────────────────────────────────
-    _phase(3, 10, "Проверка целостности проекта")
+    _phase(3, 12, "Проверка целостности проекта")
     check_structure.check_structure_flexible(ROOT_DIR, structure["required_items"])
 
     # ── 4. ТРАНСФОРМАЦИЯ ИЗОБРАЖЕНИЙ ─────────────────────────────────────────
-    _phase(4, 10, "Сжатие изображений → staging/images/")
+    _phase(4, 12, "Сжатие изображений → staging/images/")
     from core import convertation_images as cimg
     from core import img_find_images
     pics = img_find_images.get_all_images(SPEC_DIR)
@@ -68,41 +68,52 @@ def run():
     _compress_images(pics, STAGING_DIR / "images", max_kb=120)
 
     # ── 5. КОНВЕРТАЦИЯ HTML → WP-БЛОКИ ───────────────────────────────────────
-    _phase(5, 10, "Конвертация HTML → WP-блоки → staging/pages/")
+    _phase(5, 12, "Конвертация HTML → WP-блоки → staging/pages/")
     _convert_html_to_wp(structure["pages"], STAGING_DIR / "pages")
 
     # ── 6. ПРОВЕРКА ВНЕШНИХ ССЫЛОК ───────────────────────────────────────────
-    _phase(6, 10, "Проверка внешних ссылок")
+    _phase(6, 12, "Проверка внешних ссылок")
     from core import check_links
     check_links.check_links_in_articles(structure["pages"])
 
     # ── 7. СБОРКА МАНИФЕСТА ──────────────────────────────────────────────────
-    _phase(7, 10, "Сборка и валидация manifest.json")
+    _phase(7, 12, "Сборка и валидация manifest.json")
     manifest = _build_manifest(structure, pics)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"  Записан: {MANIFEST.relative_to(ROOT_DIR).as_posix()}")
     _validate_manifest(manifest)
 
     # ── 8. ПРОВЕРКА ВНУТРЕННИХ ССЫЛОК ────────────────────────────────────────
-    _phase(8, 10, "Проверка внутренних ссылок")
+    _phase(8, 12, "Проверка внутренних ссылок")
     from core.check_internal_links import check_internal_links
     check_internal_links(manifest, STAGING_DIR)
 
-    # ── 10. ГЕНЕРАЦИЯ BASH-СКРИПТА ───────────────────────────────────────────
-    _phase(9, 10, "Генерация wp-conf/provision.sh")
+    # ── 9. ГЕНЕРАЦИЯ BASH-СКРИПТА ───────────────────────────────────────────
+    _phase(9, 12, "Генерация wp-conf/provision.sh")
     WP_CONF_DIR.mkdir(exist_ok=True)
     from core.generate_sh import generate_sh
     generate_sh(manifest, WP_CONF_DIR / "provision.sh")
 
-    # ── 11. ДЕПЛОЙ ───────────────────────────────────────────────────────────
-    _phase(10, 10, "Деплой: Docker → WP install → медиа → контент")
+    # ── 10. ДЕПЛОЙ ───────────────────────────────────────────────────────────
+    _phase(10, 12, "Деплой: Docker → WP install → медиа → контент")
     from core import docker_setup
-    docker_setup.run(manifest, STAGING_DIR, WP_CONF_DIR)
+    credentials = docker_setup.run(manifest, STAGING_DIR, WP_CONF_DIR)
 
+    # ── 11. УСТАНОВКА ПЛАГИНОВ ───────────────────────────────────────────────
+    _phase(11, 12, "Установка плагинов")
     if platform.system() == "Windows":
         _activate_plugin("u-theme-styles")
+        if (ROOT_DIR / "plugins" / "GEO").exists():
+            _configure_geo_plugin()
+        _install_plugin("wpvivid-backuprestore")
+
+    # ── 12. ФИНАЛЬНАЯ НАСТРОЙКА ──────────────────────────────────────────────
+    _phase(12, 12, "Финальная настройка системы")
+    if platform.system() == "Windows":
         subprocess.run(["docker", "compose", "up", "-d", "sass"], check=True)
-        _install_and_activate_plugin("wpvivid-backuprestore")
+
+    if credentials:
+        _print_credentials(credentials)
 
     _header("ГОТОВО")
 
@@ -498,28 +509,65 @@ def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> 
 
 # ─── Windows-специфичные шаги ────────────────────────────────────────────────
 
-def _install_and_activate_plugin(slug: str):
+def _install_plugin(slug: str):
+    """Установка плагина без активации."""
     container = os.environ.get("CONTAINER_NAME", "wp_site")
     print(f"  Установка плагина '{slug}'...")
     result = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
-         "wp", "plugin", "install", slug, "--activate", "--path=/var/www/html"],
+         "wp", "plugin", "install", slug, "--path=/var/www/html"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if result.returncode != 0:
         output = (result.stdout + result.stderr).strip()
-        # Плагин уже смонтирован через volume — попробуем просто активировать
-        fallback = subprocess.run(
-            ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
-             "wp", "plugin", "activate", slug, "--path=/var/www/html"],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-        )
-        if fallback.returncode == 0:
-            print(f"  Плагин '{slug}' активирован (из volume).")
-        else:
-            print(f"  [!] Не удалось установить плагин '{slug}': {output}")
+        print(f"  [!] Не удалось установить плагин '{slug}': {output}")
     else:
-        print(f"  Плагин '{slug}' установлен и активирован.")
+        print(f"  Плагин '{slug}' установлен (не активирован).")
+
+
+def _configure_geo_plugin():
+    """Снимает флаг 'Disable Plugin Styles': принудительно пишет tc_disable_styles=0 в БД."""
+    container = os.environ.get("CONTAINER_NAME", "wp_site")
+    print("  Настройка GEO: включение стилей плагина...")
+    # wp option update пропускает запись если считает значение «неизменным».
+    # wp eval вызывает update_option() напрямую и всегда создаёт/обновляет строку в БД.
+    # tc_disable_styles = 1 → плагин НЕ грузит свой CSS → стили темы управляют виджетом.
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "eval", "update_option('tc_disable_styles', 1);", "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        print(f"  [!] Не удалось настроить GEO: {(result.stdout + result.stderr).strip()}")
+        return
+
+    # Верификация: читаем значение обратно
+    verify = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "option", "get", "tc_disable_styles", "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    val = verify.stdout.strip()
+    if val == "1":
+        print("  GEO: стили плагина отключены, управляет тема (tc_disable_styles = 1).")
+    else:
+        print(f"  [!] GEO: неожиданное значение tc_disable_styles = {val!r}")
+
+
+def _print_credentials(creds: dict):
+    url  = creds.get("site_url",    os.environ.get("SITE_URL", "—"))
+    user = creds.get("admin_user",  "—")
+    pwd  = creds.get("admin_pass",  "—")
+    mail = creds.get("admin_email", "—")
+    app  = creds.get("app_pass",    "—")
+    print(f"\n{'=' * 60}")
+    print("  CREDENTIALS")
+    print(f"  URL:      {url}")
+    print(f"  Login:    {user}")
+    print(f"  Password: {pwd}")
+    print(f"  Email:    {mail}")
+    print(f"  App Pass: {app}")
+    print(f"{'=' * 60}")
 
 
 def _activate_plugin(slug: str):
