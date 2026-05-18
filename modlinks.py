@@ -7,6 +7,7 @@
 
 Usage:
   modlinks.py rep <slug> <new-slug>   Replace all internal links to <slug> with <new-slug>
+  modlinks.py rep <slug> /            Replace all internal links to <slug> with root '/'
   modlinks.py rm  <slug>              Strip <a> tags linking to <slug>, keeping link text
 """
 
