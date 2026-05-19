@@ -1,23 +1,82 @@
-# Языковые массивы для технических страниц сайта.
-# Портированы из core/setup_site.sh.
+# Словарь поддерживаемых языков темы.
+# Ключ  — любой принимаемый SITE_LANG (2-буквенный код, код страны или полный WP locale).
+# Значение — (wp_locale, lang_key), где:
+#   wp_locale — код для WordPress (wp language core install)
+#   lang_key  — ключ в словарях PAGE_TITLES / PAGE_DESCRIPTIONS / EDITORIAL и т.д.
 
-LANG_MAP = {
-    "EN": "en_US", "RU": "ru_RU", "FR": "fr_FR", "DE": "de_DE",
-    "PL": "pl_PL", "CZ": "cs_CZ", "CS": "cs_CZ", "PT": "pt_PT",
-    "IT": "it_IT", "NL": "nl_NL", "ES": "es_ES", "SK": "sk_SK",
-    "ET": "et_EE", "LV": "lv_LV", "RO": "ro_RO", "SV": "sv_SE",
-    "LT": "lt_LT", "BG": "bg_BG", "SL": "sl_SI", "HU": "hu_HU",
-    "FI": "fi_FI", "DA": "da_DK", "GR": "el",
-    "HR": "hr_HR", "NO": "nb_NO", "LB": "lb_LU",
-    "GA": "ga",   "TR": "tr_TR",
-}
-
-# Country code → WP locale: позволяет использовать коды стран вместо кодов языков
-# EE (Эстония) → et_EE, SE (Швеция) → sv_SE, AT (Австрия) → de_AT
-COUNTRY_ALIASES = {
-    "EE": "et_EE",
-    "SE": "sv_SE",
-    "AT": "de_AT",
+LOCALE_MAP: dict[str, tuple[str, str]] = {
+    # ── 2-буквенные коды (uppercase) ────────────────────────────────────────
+    "EN": ("en_US", "EN"),
+    "RU": ("ru_RU", "RU"),
+    "FR": ("fr_FR", "FR"),
+    "DE": ("de_DE", "DE"),
+    "PL": ("pl_PL", "PL"),
+    "CZ": ("cs_CZ", "CZ"),
+    "CS": ("cs_CZ", "CS"),
+    "PT": ("pt_PT", "PT"),
+    "IT": ("it_IT", "IT"),
+    "NL": ("nl_NL", "NL"),
+    "ES": ("es_ES", "ES"),
+    "SK": ("sk_SK", "SK"),
+    "ET": ("et_EE", "ET"),
+    "LV": ("lv_LV", "LV"),
+    "RO": ("ro_RO", "RO"),
+    "SV": ("sv_SE", "SV"),
+    "LT": ("lt_LT", "LT"),
+    "BG": ("bg_BG", "BG"),
+    "SL": ("sl_SI", "SL"),
+    "HU": ("hu_HU", "HU"),
+    "FI": ("fi_FI", "FI"),
+    "DA": ("da_DK", "DA"),
+    "GR": ("el",    "GR"),
+    "HR": ("hr_HR", "HR"),
+    "NO": ("nb_NO", "NO"),
+    "LB": ("lb_LU", "LB"),
+    "GA": ("ga",    "GA"),
+    "TR": ("tr_TR", "TR"),
+    # ── Коды стран (aliases) ─────────────────────────────────────────────────
+    "EE": ("et_EE", "ET"),   # Эстония → эстонский
+    "SE": ("sv_SE", "SV"),   # Швеция  → шведский
+    "AT": ("de_AT", "DE"),   # Австрия → немецкий
+    # ── Полные WP locale коды ────────────────────────────────────────────────
+    "en_US": ("en_US", "EN"),
+    "en_GB": ("en_GB", "EN"),
+    "en_AU": ("en_AU", "EN"),
+    "en_CA": ("en_CA", "EN"),
+    "ru_RU": ("ru_RU", "RU"),
+    "fr_FR": ("fr_FR", "FR"),
+    "fr_BE": ("fr_BE", "FR"),
+    "fr_CH": ("fr_CH", "FR"),
+    "de_DE": ("de_DE", "DE"),
+    "de_AT": ("de_AT", "DE"),
+    "de_CH": ("de_CH", "DE"),
+    "pl_PL": ("pl_PL", "PL"),
+    "cs_CZ": ("cs_CZ", "CS"),
+    "pt_PT": ("pt_PT", "PT"),
+    "pt_BR": ("pt_BR", "PT"),
+    "it_IT": ("it_IT", "IT"),
+    "nl_NL": ("nl_NL", "NL"),
+    "nl_BE": ("nl_BE", "NL"),
+    "es_ES": ("es_ES", "ES"),
+    "es_MX": ("es_MX", "ES"),
+    "es_AR": ("es_AR", "ES"),
+    "sk_SK": ("sk_SK", "SK"),
+    "et_EE": ("et_EE", "ET"),
+    "lv_LV": ("lv_LV", "LV"),
+    "ro_RO": ("ro_RO", "RO"),
+    "sv_SE": ("sv_SE", "SV"),
+    "lt_LT": ("lt_LT", "LT"),
+    "bg_BG": ("bg_BG", "BG"),
+    "sl_SI": ("sl_SI", "SL"),
+    "hu_HU": ("hu_HU", "HU"),
+    "fi_FI": ("fi_FI", "FI"),
+    "da_DK": ("da_DK", "DA"),
+    "el":    ("el",    "GR"),
+    "hr_HR": ("hr_HR", "HR"),
+    "nb_NO": ("nb_NO", "NO"),
+    "lb_LU": ("lb_LU", "LB"),
+    "ga":    ("ga",    "GA"),
+    "tr_TR": ("tr_TR", "TR"),
 }
 
 # slug → lang_code → title
@@ -324,26 +383,23 @@ def get_page_description(slug: str, lang: str, site_title: str) -> str | None:
     return template.format(site_title=site_title)
 
 
-def get_lang_code(lang: str) -> str:
-    """Нормализует SITE_LANG к 2-буквенному uppercase-ключу для словарей.
-    Принимает 'FR', 'fr_BE' → 'FR', а также коды стран: 'EE' → 'ET', 'SE' → 'SV', 'AT' → 'DE'."""
-    if "_" in lang:
-        return lang[:2].upper()
-    upper = lang.upper()
-    if upper in COUNTRY_ALIASES:
-        return COUNTRY_ALIASES[upper][:2].upper()
-    return upper
+def resolve_locale(raw: str) -> tuple[str, str]:
+    """Валидирует SITE_LANG и возвращает (wp_locale, lang_key).
 
-
-def get_wp_locale(lang: str) -> str:
-    """Возвращает WP locale slug.
-    Принимает 'FR' (→ fr_FR), 'fr_BE' (→ fr_BE напрямую), 'EE' (→ et_EE через COUNTRY_ALIASES)."""
-    if "_" in lang:
-        return lang
-    upper = lang.upper()
-    if upper in COUNTRY_ALIASES:
-        return COUNTRY_ALIASES[upper]
-    return LANG_MAP.get(upper, "en_US")
+    Принимает 2-буквенные коды ("EN", "FR"), коды стран ("EE", "AT")
+    и полные WP locale ("en_US", "fr_FR", "el", "ga").
+    Если язык не найден — бросает ValueError со списком допустимых значений.
+    """
+    raw = raw.strip()
+    entry = LOCALE_MAP.get(raw) or LOCALE_MAP.get(raw.upper())
+    if not entry:
+        short_codes = sorted(k for k in LOCALE_MAP if len(k) <= 2)
+        raise ValueError(
+            f"Язык '{raw}' не поддерживается темой.\n"
+            f"  2-буквенные коды: {', '.join(short_codes)}\n"
+            f"  Или укажите полный WP locale (например: en_GB, fr_BE, pt_BR)."
+        )
+    return entry
 
 
 def get_editorial_name(lang: str, site_title: str) -> str:

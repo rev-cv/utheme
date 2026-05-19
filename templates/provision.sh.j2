@@ -36,8 +36,12 @@ wp core install \
     --admin_email="$ADMIN_EMAIL" \
     --skip-email
 
-wp language core install $WP_LANG --activate
+if [ "$WP_LANG" != "en_US" ]; then
+    wp language core install $WP_LANG --activate || echo "  Warning: language pack '$WP_LANG' not available, using en_US."
+fi
 echo "Language set to $WP_LANG."
+wp option update utheme_html_lang "$WP_LANG"
+wp option update utheme_html_lang_enabled "1"
 
 # Ensure all DB URLs use HTTPS only for real domains, not local Docker
 if echo "$SITE_URL" | grep -qE '^http://(localhost|127\.0\.0\.1)(:|/|$)'; then
@@ -159,6 +163,17 @@ ob_start();
 require_once ABSPATH . 'wp-admin/includes/media.php';
 require_once ABSPATH . 'wp-admin/includes/file.php';
 require_once ABSPATH . 'wp-admin/includes/image.php';
+add_filter('upload_mimes', function(\$mimes) {
+    \$mimes['svg'] = 'image/svg+xml';
+    return \$mimes;
+});
+add_filter('wp_check_filetype_and_ext', function(\$data, \$file, \$filename, \$mimes) {
+    if (strtolower(pathinfo(\$filename, PATHINFO_EXTENSION)) === 'svg') {
+        \$data['ext']  = 'svg';
+        \$data['type'] = 'image/svg+xml';
+    }
+    return \$data;
+}, 10, 4);
 \$results = [];
 foreach (glob('/tmp/staging/images/*') as \$file) {
     if (!is_file(\$file)) continue;
@@ -209,7 +224,8 @@ echo "Placeholders resolved."
 # Регенерация метаданных (размеры, thumbnails) для всех загруженных медиафайлов.
 # Без этого Gutenberg-редактор не может получить width/height через REST API и показывает битые картинки.
 echo "Regenerating attachment metadata..."
-wp media regenerate --yes 2>/dev/null && echo "Metadata regenerated." || echo "  WARN: wp media regenerate failed (non-fatal)."
+wp media regenerate --yes 2>/dev/null || true
+echo "Metadata regenerated."
 
 # Заменяем плейсхолдеры внутренних ссылок %%PAGEURL:slug%% → реальный URL
 echo "Resolving internal link placeholders in .wp files..."
@@ -242,7 +258,7 @@ cat > /tmp/create_pages.php << PHPEOF
 \$admin_id  = $ADMIN_ID;
 \$media_ids = json_decode(file_get_contents('/tmp/media_ids.json'), true) ?: [];
 \$page_ids  = [];
-ob_implicit_flush(true);
+file_put_contents('/tmp/wp_page_ids.txt', '');
 
 \$pages = [
 {% for page in pages %}
@@ -258,12 +274,12 @@ ob_implicit_flush(true);
         'thumb'        => '{{ page.images[0] if page.images else "" }}',
         'seo_headline' => '{{ page.seo_title | b64 if page.seo_title else "" }}',
         'seo_desc'     => '{{ page.seo_descr | b64 if page.seo_descr else "" }}',
+        'schema_html'  => '{{ page.schema_html | b64 if page.schema_html is defined and page.schema_html else "" }}',
     ],
 {% endfor %}
 ];
 
 foreach (\$pages as \$p) {
-    ob_start();
     \$parent_id = \$p['parent_slug'] !== '' ? (\$page_ids[\$p['parent_slug']] ?? 0) : 0;
     \$args = [
         'post_type'     => 'page',
@@ -277,6 +293,10 @@ foreach (\$pages as \$p) {
     ];
     if (\$p['date'] !== '') \$args['post_date'] = \$p['date'];
     \$id = wp_insert_post(\$args);
+    if (is_wp_error(\$id)) {
+        file_put_contents('/tmp/wp_page_ids.txt', \$p['slug'] . "\tERROR:" . \$id->get_error_message() . "\n", FILE_APPEND);
+        continue;
+    }
     \$page_ids[\$p['slug']] = \$id;
     if (!empty(\$p['cats']))       wp_set_object_terms(\$id, \$p['cats'], 'category', false);
     if (\$p['thumb'] !== '' && isset(\$media_ids[\$p['thumb']])) update_post_meta(\$id, '_thumbnail_id', \$media_ids[\$p['thumb']]);
@@ -284,17 +304,23 @@ foreach (\$pages as \$p) {
     update_post_meta(\$id, '_custom_seo_title', \$seo_t);
     if (\$p['seo_headline'] !== '') update_post_meta(\$id, '_custom_seo_headline', base64_decode(\$p['seo_headline']));
     if (\$p['seo_desc']     !== '') update_post_meta(\$id, '_custom_seo_desc',     base64_decode(\$p['seo_desc']));
-    ob_end_clean();
-    echo \$p['slug'] . "\t" . \$id . "\n";
-    fflush(STDOUT);
+    if (\$p['schema_html']  !== '') update_post_meta(\$id, '_schema_html',         base64_decode(\$p['schema_html']));
+    file_put_contents('/tmp/wp_page_ids.txt', \$p['slug'] . "\t" . \$id . "\n", FILE_APPEND);
 }
 PHPEOF
 
+php -l /tmp/create_pages.php 2>&1 | grep -v "No syntax errors" | head -5
+wp eval 'require("/tmp/create_pages.php");' 2>/tmp/wp_pages_err.log
+[ -s /tmp/wp_pages_err.log ] && { echo "  [!] Errors from create_pages.php:"; cat /tmp/wp_pages_err.log; }
 while IFS=$'\t' read -r _slug _pid; do
-    PAGE_IDS[$_slug]=$_pid
-    echo "  Created '$_slug' (ID: $_pid)"
-done < <(wp eval-file /tmp/create_pages.php 2>/dev/null)
-rm -f /tmp/create_pages.php /tmp/media_ids.json
+    if [[ "$_pid" == ERROR:* ]]; then
+        echo "  [!] Failed to create '$_slug': $_pid"
+    else
+        PAGE_IDS[$_slug]=$_pid
+        echo "  Created '$_slug' (ID: $_pid)"
+    fi
+done < /tmp/wp_page_ids.txt
+rm -f /tmp/create_pages.php /tmp/media_ids.json /tmp/wp_page_ids.txt
 
 # Homepage and privacy page
 if [ -n "${PAGE_IDS[index]}" ]; then
@@ -332,10 +358,10 @@ wp eval "
 \$locs['header-menu'] = \$menu_id;
 set_theme_mod('nav_menu_locations', \$locs);
 {% for node in menus.main %}
-\$parent_item_{{ node.slug | replace('-', '_') }} = wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish'{% if node.menu_title %}, 'menu-item-title' => base64_decode('{{ node.menu_title | b64 }}'){% endif %}]);
+\$parent_item_{{ node.slug | replace('-', '_') }} = wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]:-0}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish'{% if node.menu_title %}, 'menu-item-title' => base64_decode('{{ node.menu_title | b64 }}'){% endif %}]);
 {% if node.children is defined and node.children %}
 {% for child in node.children %}
-wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ child.slug }}]}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish', 'menu-item-parent-id' => \$parent_item_{{ node.slug | replace('-', '_') }}{% if child.menu_title is defined and child.menu_title %}, 'menu-item-title' => base64_decode('{{ child.menu_title | b64 }}'){% endif %}]);
+wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ child.slug }}]:-0}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish', 'menu-item-parent-id' => \$parent_item_{{ node.slug | replace('-', '_') }}{% if child.menu_title is defined and child.menu_title %}, 'menu-item-title' => base64_decode('{{ child.menu_title | b64 }}'){% endif %}]);
 {% endfor %}
 {% endif %}
 {% endfor %}
@@ -350,7 +376,7 @@ wp eval "
 \$locs['footer-menu'] = \$menu_id;
 set_theme_mod('nav_menu_locations', \$locs);
 {% for node in menus.footer %}
-wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish']);
+wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]:-0}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish']);
 {% endfor %}
 "
 echo "FooterMenu created with {{ menus.footer | length }} items."

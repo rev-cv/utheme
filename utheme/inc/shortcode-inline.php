@@ -7,6 +7,7 @@ function replace_placeholders_safely($content) {
 
     $site_name = get_bloginfo('name');
     $current_date = date_i18n('j F Y');
+    $current_year = date('Y');
     $current_date_iso = date('Y-m-d');  // Дата в формате ISO (2026-05-12)
 
     $replacements = [
@@ -15,6 +16,7 @@ function replace_placeholders_safely($content) {
         '$$DOMAIN$$'       => $site_name,
         '$$CURRENT_DATE$$' => $current_date,
         '$$CURRENT_DATE_ISO$$' => $current_date_iso,
+        '$$CY$$'           => $current_year,
     ];
 
     return str_replace(array_keys($replacements), array_values($replacements), $content);
@@ -52,3 +54,8 @@ function handle_custom_link_shorthand($content) {
 }
 
 add_filter('the_content', 'handle_custom_link_shorthand', 10);
+
+add_action('wp_head', function() {
+    $schema = get_post_meta(get_the_ID(), '_schema_html', true);
+    if ($schema) echo "\n" . $schema . "\n";
+}, 5);

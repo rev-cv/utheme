@@ -1,5 +1,4 @@
 import re
-import sys
 from pathlib import Path
 from bs4 import BeautifulSoup
 
@@ -92,8 +91,7 @@ def fetch_meta_data(pages_list: list[dict]) -> list[dict]:
                 else:
                     meta = _meta_from_html(content)
             except Exception as e:
-                print(f"Ошибка чтения {file_path}: {e}")
-                sys.exit(1)
+                raise RuntimeError(f"Ошибка чтения {file_path}: {e}") from e
 
         new_item.update(meta)
         enriched_list.append(new_item)
@@ -137,9 +135,7 @@ def resolve_resource_paths(base_path: Path, pages_list: list[dict]) -> list[dict
         if target_file and target_file.exists():
             new_item["resource"] = target_file
         else:
-            print(f"Файл не найден для '{raw_resource}'")
-            print(f"    ожидался: {target_file})")
-            sys.exit(1)
+            raise RuntimeError(f"Файл не найден для '{raw_resource}', ожидался: {target_file}")
             
         resolved_list.append(new_item)
         

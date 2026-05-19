@@ -1,5 +1,5 @@
 """
-Structure 1 — FLAT5: PILLAR + CL1-CL5 at spec root.
+Structure 1 — CL5_2025: PILLAR + CL1-CL5 at spec root.
 Optionally combined with CLUSTERS ADD/CL1-CL30 for scheduled content.
 """
 from pathlib import Path
@@ -12,12 +12,12 @@ def detect(spec_dir: Path) -> bool:
 
 
 def build(spec_dir: Path) -> dict:
-    pages = _pages_flat5(spec_dir)
+    pages = _pages_cl5_2025(spec_dir)
     has_add = (spec_dir / "CLUSTERS ADD").is_dir()
     if has_add:
         pages += _pages_clusters_add30(spec_dir)
     return {
-        "structure_type": "flat5",
+        "structure_type": "CL5_2025",
         "pages":          pages,
         "menus":          _build_menus(pages),
         "required_items": _required_items(spec_dir, has_add),
@@ -26,7 +26,7 @@ def build(spec_dir: Path) -> dict:
 
 # ─── Page builders ───────────────────────────────────────────────────────────
 
-def _pages_flat5(spec_dir: Path) -> list[dict]:
+def _pages_cl5_2025(spec_dir: Path) -> list[dict]:
     pages = [
         _page("index",    None, spec_dir / "PILLAR"),
         _page("articles", None, None, categories=["Utility Pages"], template="page-list.php"),
@@ -83,7 +83,7 @@ def _build_menus(pages: list[dict]) -> dict:
 
 
 def _required_items(spec_dir: Path, has_add: bool) -> list:
-    _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
+    _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg", ".ico"]
     items = [
         spec_dir / "PILLAR",
         spec_dir / "ADD PAGES",

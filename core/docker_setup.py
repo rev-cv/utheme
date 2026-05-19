@@ -519,3 +519,60 @@ def _remove_volume_from_compose(dest_path: str) -> bool:
              if not (dest_path in l and l.strip().startswith("- "))]
     dc_path.write_text("\n".join(lines), encoding="utf-8")
     return True
+
+
+# ─── Управление плагинами ─────────────────────────────────────────────────────
+
+def install_plugin(slug: str) -> None:
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    print(f"  Установка плагина '{slug}'...")
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "plugin", "install", slug, "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        output = (result.stdout + result.stderr).strip()
+        print(f"  [!] Не удалось установить плагин '{slug}': {output}")
+    else:
+        print(f"  Плагин '{slug}' установлен (не активирован).")
+
+
+def activate_plugin(slug: str) -> None:
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    print(f"  Активация плагина '{slug}'...")
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "plugin", "activate", slug, "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        output = (result.stdout + result.stderr).strip()
+        print(f"  [!] Не удалось активировать плагин: {output}")
+    else:
+        print(f"  Плагин '{slug}' активирован.")
+
+
+def configure_geo_plugin() -> None:
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    print("  Настройка GEO: включение стилей плагина...")
+    # tc_disable_styles = 1 → плагин НЕ грузит свой CSS → стили темы управляют виджетом.
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "eval", "update_option('tc_disable_styles', 1);", "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        print(f"  [!] Не удалось настроить GEO: {(result.stdout + result.stderr).strip()}")
+        return
+
+    verify = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "option", "get", "tc_disable_styles", "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    val = verify.stdout.strip()
+    if val == "1":
+        print("  GEO: стили плагина отключены, управляет тема (tc_disable_styles = 1).")
+    else:
+        print(f"  [!] GEO: неожиданное значение tc_disable_styles = {val!r}")

@@ -1,5 +1,4 @@
 import re
-import sys
 from pathlib import Path
 from bs4 import BeautifulSoup, NavigableString
 
@@ -398,8 +397,7 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
 
         # resource действительно Path и файл существует?
         if not isinstance(source_file, Path) or not source_file.exists():
-            print(f"Ресурс не является валидным путем или файл отсутствует ({source_file})")
-            sys.exit(1)
+            raise RuntimeError(f"Ресурс не является валидным путем или файл отсутствует ({source_file})")
 
         try:
             display_path = source_file.relative_to(Path.cwd())
@@ -424,11 +422,26 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
                 print(f"Файл {display_path} пуст после конвертации")
 
         except Exception as e:
-            print(f"Ошибка в файле {display_path}: {e}")
-            sys.exit(1)
+            raise RuntimeError(f"Ошибка в файле {display_path}: {e}") from e
 
         updated_list.append(new_item)
 
     print('\n' + '='*50)
     return updated_list
-    
+
+
+def convert_pages(pages: list[dict], spec_dir: Path, out_dir: Path) -> None:
+    from core import extract_meta as extraction
+
+    content_pages = [p for p in pages if p.get("content")]
+
+    resource_list = [{"resource": p["content"], **p} for p in content_pages]
+    resource_list = extraction.resolve_resource_paths(spec_dir, resource_list)
+    converted     = conversion_init(resource_list)
+
+    for page, result in zip(content_pages, converted):
+        wp_content = result.get("wp_block", "")
+        out_file   = out_dir / f"{page['slug']}.wp"
+        out_file.write_text(wp_content, encoding="utf-8")
+
+    print(f"  Конвертировано страниц: {len(content_pages)} (структурных пропущено: {len(pages) - len(content_pages)})")

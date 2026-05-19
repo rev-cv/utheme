@@ -35,3 +35,12 @@ foreach ($includes as $file) {
         require_once $filepath;
     }
 }
+
+
+
+add_filter('locale', function($locale) {
+    if (is_admin()) return $locale;
+    if (!get_option('utheme_html_lang_enabled', '1')) return $locale;
+    $custom = get_option('utheme_html_lang', '');
+    return $custom ?: $locale;
+});

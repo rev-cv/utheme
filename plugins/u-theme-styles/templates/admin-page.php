@@ -1177,8 +1177,11 @@ function u_h1_gradient_field(string $name, string $value): void {
                     'mma', 'motorsport', 'padel', 'rugby', 'rugby_league', 'snooker',
                     'squash', 'table_tennis', 'tennis', 'volleyball', 'waterpolo',
                 ];
-                $cur_stream  = get_option('site_stream',  '');
-                $cur_subject = get_option('site_subject', '');
+                $cur_stream           = get_option('site_stream',              '');
+                $cur_subject          = get_option('site_subject',             '');
+                $cur_html_lang        = get_option('utheme_html_lang',         '');
+                $cur_html_lang_enabled = get_option('utheme_html_lang_enabled', '1');
+                $wp_default_lang      = get_bloginfo('language');
                 ?>
                 <div class="u-card">
                     <div class="u-card-body">
@@ -1212,6 +1215,48 @@ function u_h1_gradient_field(string $name, string $value): void {
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="u-card" style="margin-top:16px">
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">HTML Lang (frontend)</div>
+                                <div class="u-basic-field-control">
+                                    <input type="text"
+                                           name="utheme_html_lang"
+                                           value="<?= esc_attr($cur_html_lang) ?>"
+                                           placeholder="<?= esc_attr($wp_default_lang) ?>"
+                                           style="width:140px">
+                                    <p class="description" style="margin-top:4px">
+                                        WP locale для атрибута <code>lang</code> в <code>&lt;html&gt;</code>.
+                                        Примеры: <code>en_GB</code>, <code>fr_BE</code>, <code>pt_BR</code>.
+                                        Пусто — WordPress использует стандартное значение
+                                        (<code><?= esc_html($wp_default_lang) ?></code>).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">Кастомный lang</div>
+                                <div class="u-basic-field-control">
+                                    <label>
+                                        <input type="checkbox"
+                                               name="utheme_html_lang_enabled"
+                                               value="1"
+                                               <?= checked($cur_html_lang_enabled, '1', false) ?>>
+                                        Переопределять locale для фронтенда
+                                    </label>
+                                    <p class="description" style="margin-top:4px">
+                                        Если снять галку — WordPress выводит locale по умолчанию,
+                                        поле выше игнорируется.
+                                    </p>
                                 </div>
                             </div>
 

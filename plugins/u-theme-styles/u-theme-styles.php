@@ -241,6 +241,12 @@ class UThemeConfigurator {
             update_option('site_subject', sanitize_text_field($_POST['site_subject']));
         }
 
+        // HTML lang override
+        if (isset($_POST['utheme_html_lang'])) {
+            update_option('utheme_html_lang', sanitize_text_field($_POST['utheme_html_lang']));
+        }
+        update_option('utheme_html_lang_enabled', isset($_POST['utheme_html_lang_enabled']) ? '1' : '0');
+
         add_settings_error('u_theme', 'saved', 'Настройки сохранены. Docker запустил пересборку!', 'updated');
     }
 

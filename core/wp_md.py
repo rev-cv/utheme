@@ -3,7 +3,7 @@ from pathlib import Path
 
 from markdown_it import MarkdownIt
 
-from core.convertation_html_to_wp import convert_html_to_blocks
+from core.wp_html import convert_html_to_blocks
 
 _md = MarkdownIt(options_update={'html': True})
 

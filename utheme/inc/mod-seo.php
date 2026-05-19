@@ -15,6 +15,15 @@ add_action('init', function () {
             }
         ]);
     }
+    register_post_meta('', '_schema_html', [
+        'show_in_rest'      => true,
+        'single'            => true,
+        'type'              => 'string',
+        'sanitize_callback' => function ($v) { return $v; },
+        'auth_callback'     => function () {
+            return current_user_can('edit_posts');
+        }
+    ]);
 });
 
 /**
@@ -29,6 +38,9 @@ add_action('enqueue_block_editor_assets', function () {
         (function() {
             var el = wp.element.createElement;
             var TextareaControl = wp.components.TextareaControl;
+            var Button = wp.components.Button;
+            var Modal = wp.components.Modal;
+            var useState = wp.element.useState;
             var useSelect = wp.data.useSelect;
             var useDispatch = wp.data.useDispatch;
 
@@ -42,20 +54,26 @@ add_action('enqueue_block_editor_assets', function () {
                     };
                 });
                 var editPost = useDispatch('core/editor').editPost;
-                
-                var pBlock = data.blocks.find(function(b) { 
-                    return b.name === 'core/paragraph' && b.attributes.content; 
+
+                var _s1 = useState(false);
+                var schemaModalOpen = _s1[0];
+                var setSchemaModalOpen = _s1[1];
+
+                var _s2 = useState('');
+                var schemaEditing = _s2[0];
+                var setSchemaEditing = _s2[1];
+
+                var pBlock = data.blocks.find(function(b) {
+                    return b.name === 'core/paragraph' && b.attributes.content;
                 });
                 var pText = pBlock ? pBlock.attributes.content.replace(/<[^>]*>?/gm, '') : '';
 
-                var seoTitle = data.meta['_custom_seo_title'] || '';
-                var seoDesc = data.meta['_custom_seo_desc'] || '';
+                var seoTitle    = data.meta['_custom_seo_title']    || '';
+                var seoDesc     = data.meta['_custom_seo_desc']     || '';
                 var seoHeadline = data.meta['_custom_seo_headline'] || '';
+                var schemaHtml  = data.meta['_schema_html']         || '';
 
-                return el(wp.editPost.PluginDocumentSettingPanel, {
-                    name: 'custom-seo-panel',
-                    title: 'SEO Settings',
-                }, [
+                var children = [
                     el(TextareaControl, {
                         label: 'SEO Title',
                         value: seoTitle,
@@ -75,8 +93,64 @@ add_action('enqueue_block_editor_assets', function () {
                         placeholder: pText.substring(0, 160),
                         onChange: function(val) { editPost({ meta: Object.assign({}, data.meta, { _custom_seo_desc: val }) }); },
                         help: 'Символов: ' + seoDesc.length + ' / 160'
-                    })
-                ]);
+                    }),
+                    el(Button, {
+                        variant: 'secondary',
+                        style: { marginTop: '4px', width: '100%', justifyContent: 'center' },
+                        onClick: function() {
+                            setSchemaEditing(schemaHtml);
+                            setSchemaModalOpen(true);
+                        }
+                    }, 'JSON-LD Schema ↗')
+                ];
+
+                if (schemaModalOpen) {
+                    children.push(
+                        el(Modal, {
+                            title: 'JSON-LD Schema',
+                            onRequestClose: function() { setSchemaModalOpen(false); },
+                            style: { width: '66vw', maxWidth: '1200px', minHeight: '66vh' }
+                        }, [
+                            el('textarea', {
+                                value: schemaEditing,
+                                onChange: function(e) { setSchemaEditing(e.target.value); },
+                                style: {
+                                    width: '100%',
+                                    height: 'calc(66vh - 140px)',
+                                    minHeight: '300px',
+                                    fontFamily: 'monospace',
+                                    fontSize: '12px',
+                                    lineHeight: '1.5',
+                                    boxSizing: 'border-box',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '2px',
+                                    padding: '8px',
+                                    resize: 'none'
+                                }
+                            }),
+                            el('div', {
+                                style: { display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }
+                            }, [
+                                el(Button, {
+                                    variant: 'tertiary',
+                                    onClick: function() { setSchemaModalOpen(false); }
+                                }, 'Отмена'),
+                                el(Button, {
+                                    variant: 'primary',
+                                    onClick: function() {
+                                        editPost({ meta: Object.assign({}, data.meta, { _schema_html: schemaEditing }) });
+                                        setSchemaModalOpen(false);
+                                    }
+                                }, 'Сохранить')
+                            ])
+                        ])
+                    );
+                }
+
+                return el(wp.editPost.PluginDocumentSettingPanel, {
+                    name: 'custom-seo-panel',
+                    title: 'SEO Settings',
+                }, children);
             };
 
             wp.plugins.registerPlugin('custom-seo-panel-inline', { render: SEOPanel });
@@ -91,7 +165,6 @@ add_action('enqueue_block_editor_assets', function () {
 remove_action('wp_head', 'rel_canonical');
 add_action('wp_head', function() {
     if (!is_singular()) return;
-    global $wp_query;
     $link = get_permalink();
     $page = get_query_var('page');
     $paged = get_query_var('paged');

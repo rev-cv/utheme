@@ -1,5 +1,5 @@
 """
-Structure 3 — HUB: filesystem-driven hub + sections structure.
+Structure 3 — FWC_2026: filesystem-driven hub + sections structure.
 
 Layout:
   HUB/PILLAR/index.html        → home page (/)
@@ -32,7 +32,8 @@ def build(spec_dir: Path) -> dict:
     main_nodes:   list[dict] = []
     footer_nodes: list[dict] = []
 
-    hub_html = spec_dir / "HUB" / "PILLAR" / "index.html"
+    hub_dir = spec_dir / "HUB" / "PILLAR"
+    hub_html = hub_dir / "index.html"
     pages += [
         _page("index",   None, hub_html if hub_html.exists() else None),
         _page("news",    None, None, categories=["Utility Pages"], template="page-list.php"),
@@ -64,7 +65,6 @@ def build(spec_dir: Path) -> dict:
             child_html = child_dir / f"{child_slug}.html"
 
             if not child_html.exists():
-                # No HTML → create draft placeholder (e.g. _dynamic.txt present)
                 pages.append(_page(child_slug, slug, None, post_status="draft"))
             else:
                 pages.append(_page(child_slug, slug, child_html))
@@ -92,7 +92,7 @@ def build(spec_dir: Path) -> dict:
     footer_nodes.append(_node("sitemap"))
 
     return {
-        "structure_type": "hub_pillar",
+        "structure_type": "FWC_2026",
         "pages":          pages,
         "menus":          {"main": main_nodes, "footer": footer_nodes},
         "required_items": _required_items(spec_dir),
@@ -100,7 +100,7 @@ def build(spec_dir: Path) -> dict:
 
 
 def _required_items(spec_dir: Path) -> list:
-    _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
+    _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg", ".ico"]
     hub_pillar = spec_dir / "HUB" / "PILLAR"
     add = spec_dir / "ADD PAGES"
     return [
