@@ -56,9 +56,9 @@ def build_manifest(structure: dict, pics: list[dict], spec_dir: Path) -> dict:
 
     for item in resource_list:
         resource_path = Path(item["resource"])
-        schema_file = resource_path.parent / "schema.php"
-        if schema_file.exists():
-            item["schema_html"] = schema_file.read_text(encoding="utf-8").strip()
+        # schema_file = resource_path.parent / "schema.php"
+        # if schema_file.exists():
+        #     item["schema_html"] = schema_file.read_text(encoding="utf-8").strip()
 
         slug = item["slug"]
         item["content"]   = f"{slug}.wp"
