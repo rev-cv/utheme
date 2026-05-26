@@ -17,7 +17,7 @@ def site_config(spec_dir: Path) -> dict:
         "lang":       resolve_locale(os.environ.get("SITE_LANG", "EN"))[1],
         "email":      os.environ.get("ADMIN_EMAIL",  "admin@example.com"),
         "admin_user": os.environ.get("ADMIN_USER",   "admin"),
-        "favicon":    Path(favicon_path).name if favicon_path else None,
+        "favicon":    branding.staging_name(Path(favicon_path)) if favicon_path else None,
         "logo":       Path(logo_path).name    if logo_path    else None,
     }
 

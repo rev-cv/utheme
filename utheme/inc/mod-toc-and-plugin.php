@@ -46,7 +46,7 @@ function my_theme_dynamic_content_injection($content)
     // Регулярка захватывает h2 и контент внутри него
     preg_match_all('/<h2.*?>(.*?)<\/h2>/i', $content, $matches, PREG_OFFSET_CAPTURE);
 
-    if (empty($matches[0]) || in_array(get_the_ID(), [15])) {
+    if (empty($matches[0])) {
         return $content;
     }
 

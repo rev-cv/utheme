@@ -347,7 +347,7 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
 
     # figure не распаковывается — обрабатывается через _handle_figure (сохраняет figcaption)
     # nav распаковывается, чтобы его содержимое (p, ol) попало в основной поток
-    for tag in container.find_all(['div', 'section', 'main', 'nav']):
+    for tag in container.find_all(['div', 'section', 'main', 'nav', 'header']):
         if tag.name == 'div' and any(cls in tag.get('class', []) for cls in forbidden_div):
             continue
         
@@ -375,10 +375,20 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
         if child.name in BLOCK_HANDLERS:
             handler = BLOCK_HANDLERS[child.name]
             blocks.append(handler(child))
-            
+
             if add_post_meta and child.name == 'h1':
                 blocks.append('\n<!-- wp:shortcode -->[post_meta]<!-- /wp:shortcode -->\n')
-        
+
+    # Если H1 не попал в результат (например, был внутри <header>), ищем и вставляем в начало
+    if not any('"level":1' in block for block in blocks):
+        h1_tag = soup.find('h1')
+        if h1_tag:
+            h1_block = _handle_heading(h1_tag)
+            prepend = [h1_block]
+            if add_post_meta:
+                prepend.append('\n<!-- wp:shortcode -->[post_meta]<!-- /wp:shortcode -->\n')
+            blocks = prepend + blocks
+
     return "\n\n".join(blocks)
 
 def conversion_init(pages_list: list[dict]) -> list[dict]:

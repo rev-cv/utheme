@@ -309,33 +309,168 @@ function get_site_translation($key = 'read_more')
             'tr' => 'Deneyiminizi geliştirmek, trafiği analiz etmek ve reklamları kişiselleştirmek için çerezler kullanıyoruz. Lütfen kabul edin veya tercihlerinizi yapılandırın.'
         ],
         'created_by_editorial' => [
-            'es' => 'Creado por la redacción de <a href="' . $aboutUrl . '" title="Sobre nosotros">«' . $siteName . '»</a>',
-            'fr' => 'Créé par la rédaction de <a href="' . $aboutUrl . '" title="À propos de nous">« ' . $siteName . ' »</a>',
-            'de' => 'Erstellt von der Redaktion von <a href="' . $aboutUrl . '" title="Über uns">„' . $siteName . '“</a>',
-            'pl' => 'Opracowane przez redakcję <a href="' . $aboutUrl . '" title="O nas">„' . $siteName . '”</a>',
-            'pt' => 'Criado pela redação de <a href="' . $aboutUrl . '" title="Sobre nós">«' . $siteName . '»</a>',
-            'nl' => 'Gemaakt door de redactie van <a href="' . $aboutUrl . '" title="Over ons">\'' . $siteName . '\'</a>',
-            'sk' => 'Vytvorené redakciou <a href="' . $aboutUrl . '" title="O nás">„' . $siteName . '“</a>',
-            'it' => 'Creato dalla redazione di <a href="' . $aboutUrl . '" title="Chi siamo">«' . $siteName . '»</a>',
-            'et' => 'Koostatud <a href="' . $aboutUrl . '" title="Meist">«' . $siteName . '»</a> toimetuse poolt',
-            'lv' => 'Sagatavojusi <a href="' . $aboutUrl . '" title="Par mums">«' . $siteName . '»</a> redakcija',
-            'ro' => 'Creat de redacția <a href="' . $aboutUrl . '" title="Despre noi">„' . $siteName . '”</a>',
-            'sv' => 'Skapad av redaktionen på <a href="' . $aboutUrl . '" title="Om oss">”' . $siteName . '”</a>',
-            'lt' => 'Parengta <a href="' . $aboutUrl . '" title="Apie mus">„' . $siteName . '“</a> redakcijos',
-            'bg' => 'Създадено от редакцията на <a href="' . $aboutUrl . '" title="За нас">„' . $siteName . '“</a>',
-            'sl' => 'Pripravilo uredništvo <a href="' . $aboutUrl . '" title="O nas">»' . $siteName . '«</a>', 
-            'hu' => 'A(z) <a href="' . $aboutUrl . '" title="Rólunk">„' . $siteName . '”</a> szerkesztősége készítette',
-            'fi' => 'Kirjoittanut <a href="' . $aboutUrl . '" title="Tietoa meistä">”' . $siteName . '”</a> -sivuston toimitus',
-            'en' => 'Created by the <a href="' . $aboutUrl . '" title="About us">"' . $siteName . '"</a> editorial team',
-            'cs' => 'Vytvořeno redakcí <a href="' . $aboutUrl . '" title="O nás">„' . $siteName . '“</a>',
-            'da' => 'Skabt af redaktionen på <a href="' . $aboutUrl . '" title="Om os">”' . $siteName . '”</a>',
-            'ru' => 'Подготовлено редакцией <a href="' . $aboutUrl . '" title="О проекте">«' . $siteName . '»</a>',
-            'el' => 'Δημιουργήθηκε από τη συντακτική ομάδα του <a href="' . $aboutUrl . '" title="Σχετικά με εμάς">«' . $siteName . '»</a>',
-            'hr' => 'Kreirao urednički tim <a href="' . $aboutUrl . '" title="O nama">«' . $siteName . '»</a>',
-            'no' => 'Laget av redaksjonen i <a href="' . $aboutUrl . '" title="Om oss">«' . $siteName . '»</a>',
-            'lb' => 'Erstallt vum Redaktiounsteam vun <a href="' . $aboutUrl . '" title="Iwwer eis">«' . $siteName . '»</a>',
-            'ga' => 'Cruthaithe ag foireann eagarthóireachta <a href="' . $aboutUrl . '" title="Fúinn">«' . $siteName . '»</a>',
-            'tr' => '<a href="' . $aboutUrl . '" title="Hakkımızda">«' . $siteName . '»</a> editöryal ekibi tarafından hazırlandı'
+            'bg' => [
+                'Създадено от редакцията на <a href=”' . $aboutUrl . '” title=”За нас”>„' . $siteName . '”</a>',
+                'Написано от екипа на <a href=”' . $aboutUrl . '” title=”За нас”>„' . $siteName . '”</a>',
+                'Подготвено от редакторите на <a href=”' . $aboutUrl . '” title=”За нас”>„' . $siteName . '”</a>',
+                'Изготвено от редакцията на <a href=”' . $aboutUrl . '” title=”За нас”>„' . $siteName . '”</a>',
+            ],
+            'cs' => [
+                'Vytvořeno redakcí <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+                'Napsáno týmem <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+                'Připraveno redakcí <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+                'Zpracováno redaktory <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+            ],
+            'da' => [
+                'Skabt af redaktionen på <a href=”' . $aboutUrl . '” title=”Om os”>”' . $siteName . '”</a>',
+                'Skrevet af teamet hos <a href=”' . $aboutUrl . '” title=”Om os”>”' . $siteName . '”</a>',
+                'Udarbejdet af redaktionen på <a href=”' . $aboutUrl . '” title=”Om os”>”' . $siteName . '”</a>',
+                'Produceret af redaktørerne på <a href=”' . $aboutUrl . '” title=”Om os”>”' . $siteName . '”</a>',
+            ],
+            'de' => [
+                'Erstellt von der Redaktion von <a href=”' . $aboutUrl . '” title=”Über uns”>„' . $siteName . '”</a>',
+                'Verfasst vom Team von <a href=”' . $aboutUrl . '” title=”Über uns”>„' . $siteName . '”</a>',
+                'Geschrieben von der Redaktion <a href=”' . $aboutUrl . '” title=”Über uns”>„' . $siteName . '”</a>',
+                'Erstellt vom Redaktionsteam <a href=”' . $aboutUrl . '” title=”Über uns”>„' . $siteName . '”</a>',
+            ],
+            'el' => [
+                'Δημιουργήθηκε από τη συντακτική ομάδα του <a href=”' . $aboutUrl . '” title=”Σχετικά με εμάς”>«' . $siteName . '»</a>',
+                'Γράφτηκε από την ομάδα του <a href=”' . $aboutUrl . '” title=”Σχετικά με εμάς”>«' . $siteName . '»</a>',
+                'Προετοιμάστηκε από τους συντάκτες του <a href=”' . $aboutUrl . '” title=”Σχετικά με εμάς”>«' . $siteName . '»</a>',
+                'Παρήχθη από τη σύνταξη του <a href=”' . $aboutUrl . '” title=”Σχετικά με εμάς”>«' . $siteName . '»</a>',
+            ],
+            'en' => [
+                'Created by the <a href=”' . $aboutUrl . '” title=”About us”>”' . $siteName . '”</a> editorial team',
+                'Written by the editors at <a href=”' . $aboutUrl . '” title=”About us”>' . $siteName . '</a>',
+                'Prepared by the <a href=”' . $aboutUrl . '” title=”About us”>' . $siteName . '</a> editorial staff',
+                'Published by the <a href=”' . $aboutUrl . '” title=”About us”>' . $siteName . '</a> team',
+            ],
+            'es' => [
+                'Creado por la redacción de <a href=”' . $aboutUrl . '” title=”Sobre nosotros”>«' . $siteName . '»</a>',
+                'Elaborado por el equipo de <a href=”' . $aboutUrl . '” title=”Sobre nosotros”>«' . $siteName . '»</a>',
+                'Escrito por los editores de <a href=”' . $aboutUrl . '” title=”Sobre nosotros”>«' . $siteName . '»</a>',
+                'Preparado por la redacción de <a href=”' . $aboutUrl . '” title=”Sobre nosotros”>«' . $siteName . '»</a>',
+            ],
+            'et' => [
+                'Koostatud <a href=”' . $aboutUrl . '” title=”Meist”>«' . $siteName . '»</a> toimetuse poolt',
+                'Kirjutatud <a href=”' . $aboutUrl . '” title=”Meist”>«' . $siteName . '»</a> meeskonna poolt',
+                'Loodud <a href=”' . $aboutUrl . '” title=”Meist”>«' . $siteName . '»</a> toimetajate poolt',
+                'Valminud <a href=”' . $aboutUrl . '” title=”Meist”>«' . $siteName . '»</a> toimetus',
+            ],
+            'fi' => [
+                'Kirjoittanut <a href=”' . $aboutUrl . '” title=”Tietoa meistä”>”' . $siteName . '”</a> -sivuston toimitus',
+                'Laadittu <a href=”' . $aboutUrl . '” title=”Tietoa meistä”>”' . $siteName . '”</a> -toimituksen toimesta',
+                'Tuotettu <a href=”' . $aboutUrl . '” title=”Tietoa meistä”>”' . $siteName . '”</a> -tiimin toimesta',
+                'Julkaissut <a href=”' . $aboutUrl . '” title=”Tietoa meistä”>”' . $siteName . '”</a> -toimitus',
+            ],
+            'fr' => [
+                'Créé par la rédaction de <a href=”' . $aboutUrl . '” title=”À propos de nous”>« ' . $siteName . ' »</a>',
+                'Rédigé par l\'équipe de <a href=”' . $aboutUrl . '” title=”À propos de nous”>« ' . $siteName . ' »</a>',
+                'Préparé par les éditeurs de <a href=”' . $aboutUrl . '” title=”À propos de nous”>« ' . $siteName . ' »</a>',
+                'Produit par la rédaction de <a href=”' . $aboutUrl . '” title=”À propos de nous”>« ' . $siteName . ' »</a>',
+            ],
+            'ga' => [
+                'Cruthaithe ag foireann eagarthóireachta <a href=”' . $aboutUrl . '” title=”Fúinn”>«' . $siteName . '»</a>',
+                'Scríofa ag foireann <a href=”' . $aboutUrl . '” title=”Fúinn”>«' . $siteName . '»</a>',
+                'Ullmhaithe ag eagarthóirí <a href=”' . $aboutUrl . '” title=”Fúinn”>«' . $siteName . '»</a>',
+                'Déanta ag foireann <a href=”' . $aboutUrl . '” title=”Fúinn”>«' . $siteName . '»</a>',
+            ],
+            'hr' => [
+                'Kreirao urednički tim <a href=”' . $aboutUrl . '” title=”O nama”>«' . $siteName . '»</a>',
+                'Napisao tim <a href=”' . $aboutUrl . '” title=”O nama”>«' . $siteName . '»</a>',
+                'Pripremio urednički tim <a href=”' . $aboutUrl . '” title=”O nama”>«' . $siteName . '»</a>',
+                'Izradio tim urednika <a href=”' . $aboutUrl . '” title=”O nama”>«' . $siteName . '»</a>',
+            ],
+            'hu' => [
+                'A(z) <a href=”' . $aboutUrl . '” title=”Rólunk”>„' . $siteName . '”</a> szerkesztősége készítette',
+                'A <a href=”' . $aboutUrl . '” title=”Rólunk”>„' . $siteName . '”</a> csapata írta',
+                'A <a href=”' . $aboutUrl . '” title=”Rólunk”>„' . $siteName . '”</a> szerkesztői készítették',
+                'A(z) <a href=”' . $aboutUrl . '” title=”Rólunk”>„' . $siteName . '”</a> szerkesztőség alkotása',
+            ],
+            'it' => [
+                'Creato dalla redazione di <a href=”' . $aboutUrl . '” title=”Chi siamo”>«' . $siteName . '»</a>',
+                'Scritto dal team di <a href=”' . $aboutUrl . '” title=”Chi siamo”>«' . $siteName . '»</a>',
+                'Preparato dagli editori di <a href=”' . $aboutUrl . '” title=”Chi siamo”>«' . $siteName . '»</a>',
+                'Prodotto dalla redazione di <a href=”' . $aboutUrl . '” title=”Chi siamo”>«' . $siteName . '»</a>',
+            ],
+            'lb' => [
+                'Erstallt vum Redaktiounsteam vun <a href=”' . $aboutUrl . '” title=”Iwwer eis”>«' . $siteName . '»</a>',
+                'Geschriwwen vum Team vun <a href=”' . $aboutUrl . '” title=”Iwwer eis”>«' . $siteName . '»</a>',
+                'Virbereet vun der Redaktioun vun <a href=”' . $aboutUrl . '” title=”Iwwer eis”>«' . $siteName . '»</a>',
+                'Produzéiert vum Redaktiounsteam vun <a href=”' . $aboutUrl . '” title=”Iwwer eis”>«' . $siteName . '»</a>',
+            ],
+            'lt' => [
+                'Parengta <a href=”' . $aboutUrl . '” title=”Apie mus”>„' . $siteName . '”</a> redakcijos',
+                'Parašyta <a href=”' . $aboutUrl . '” title=”Apie mus”>„' . $siteName . '”</a> komandos',
+                'Sukurta <a href=”' . $aboutUrl . '” title=”Apie mus”>„' . $siteName . '”</a> redaktorių',
+                'Paruošta <a href=”' . $aboutUrl . '” title=”Apie mus”>„' . $siteName . '”</a> redakcijos',
+            ],
+            'lv' => [
+                'Sagatavojusi <a href=”' . $aboutUrl . '” title=”Par mums”>«' . $siteName . '»</a> redakcija',
+                'Rakstīts <a href=”' . $aboutUrl . '” title=”Par mums”>«' . $siteName . '»</a> komandas',
+                'Veidojusi <a href=”' . $aboutUrl . '” title=”Par mums”>«' . $siteName . '»</a> redakcija',
+                'Sagatavots <a href=”' . $aboutUrl . '” title=”Par mums”>«' . $siteName . '»</a> redaktoriem',
+            ],
+            'nl' => [
+                'Gemaakt door de redactie van <a href=”' . $aboutUrl . '” title=”Over ons”>\'' . $siteName . '\'</a>',
+                'Geschreven door het team van <a href=”' . $aboutUrl . '” title=”Over ons”>\'' . $siteName . '\'</a>',
+                'Samengesteld door de redactie van <a href=”' . $aboutUrl . '” title=”Over ons”>\'' . $siteName . '\'</a>',
+                'Opgesteld door de editors van <a href=”' . $aboutUrl . '” title=”Over ons”>\'' . $siteName . '\'</a>',
+            ],
+            'no' => [
+                'Laget av redaksjonen i <a href=”' . $aboutUrl . '” title=”Om oss”>«' . $siteName . '»</a>',
+                'Skrevet av teamet i <a href=”' . $aboutUrl . '” title=”Om oss”>«' . $siteName . '»</a>',
+                'Utarbeidet av redaksjonen i <a href=”' . $aboutUrl . '” title=”Om oss”>«' . $siteName . '»</a>',
+                'Produsert av redaktørene i <a href=”' . $aboutUrl . '” title=”Om oss”>«' . $siteName . '»</a>',
+            ],
+            'pl' => [
+                'Opracowane przez redakcję <a href=”' . $aboutUrl . '” title=”O nas”>„' . $siteName . '”</a>',
+                'Napisane przez zespół <a href=”' . $aboutUrl . '” title=”O nas”>„' . $siteName . '”</a>',
+                'Przygotowane przez redakcję <a href=”' . $aboutUrl . '” title=”O nas”>„' . $siteName . '”</a>',
+                'Stworzone przez redaktorów <a href=”' . $aboutUrl . '” title=”O nas”>„' . $siteName . '”</a>',
+            ],
+            'pt' => [
+                'Criado pela redação de <a href=”' . $aboutUrl . '” title=”Sobre nós”>«' . $siteName . '»</a>',
+                'Escrito pela equipe de <a href=”' . $aboutUrl . '” title=”Sobre nós”>«' . $siteName . '»</a>',
+                'Preparado pelos editores de <a href=”' . $aboutUrl . '” title=”Sobre nós”>«' . $siteName . '»</a>',
+                'Produzido pela redação de <a href=”' . $aboutUrl . '” title=”Sobre nós”>«' . $siteName . '»</a>',
+            ],
+            'ro' => [
+                'Creat de redacția <a href=”' . $aboutUrl . '” title=”Despre noi”>„' . $siteName . '”</a>',
+                'Scris de echipa <a href=”' . $aboutUrl . '” title=”Despre noi”>„' . $siteName . '”</a>',
+                'Pregătit de editorii <a href=”' . $aboutUrl . '” title=”Despre noi”>„' . $siteName . '”</a>',
+                'Realizat de redacția <a href=”' . $aboutUrl . '” title=”Despre noi”>„' . $siteName . '”</a>',
+            ],
+            'ru' => [
+                'Подготовлено редакцией <a href=”' . $aboutUrl . '” title=”О проекте”>«' . $siteName . '»</a>',
+                'Материал создан командой <a href=”' . $aboutUrl . '” title=”О проекте”>«' . $siteName . '»</a>',
+                'Статья написана редакцией <a href=”' . $aboutUrl . '” title=”О проекте”>«' . $siteName . '»</a>',
+                'Авторы — редакция <a href=”' . $aboutUrl . '” title=”О проекте”>«' . $siteName . '»</a>',
+            ],
+            'sk' => [
+                'Vytvorené redakciou <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+                'Napísané tímom <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+                'Pripravené redakciou <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+                'Spracované redaktormi <a href=”' . $aboutUrl . '” title=”O nás”>„' . $siteName . '”</a>',
+            ],
+            'sl' => [
+                'Pripravilo uredništvo <a href=”' . $aboutUrl . '” title=”O nas”>»' . $siteName . '«</a>',
+                'Napisala ekipa <a href=”' . $aboutUrl . '” title=”O nas”>»' . $siteName . '«</a>',
+                'Ustvarilo uredništvo <a href=”' . $aboutUrl . '” title=”O nas”>»' . $siteName . '«</a>',
+                'Pripravljeno s strani uredništva <a href=”' . $aboutUrl . '” title=”O nas”>»' . $siteName . '«</a>',
+            ],
+            'sv' => [
+                'Skapad av redaktionen på <a href=”' . $aboutUrl . '” title=”Om oss”>”' . $siteName . '”</a>',
+                'Skriven av teamet på <a href=”' . $aboutUrl . '” title=”Om oss”>”' . $siteName . '”</a>',
+                'Framtagen av redaktionen på <a href=”' . $aboutUrl . '” title=”Om oss”>”' . $siteName . '”</a>',
+                'Producerad av redaktörerna på <a href=”' . $aboutUrl . '” title=”Om oss”>”' . $siteName . '”</a>',
+            ],
+            'tr' => [
+                '<a href=”' . $aboutUrl . '” title=”Hakkımızda”>«' . $siteName . '»</a> editöryal ekibi tarafından hazırlandı',
+                '<a href=”' . $aboutUrl . '” title=”Hakkımızda”>«' . $siteName . '»</a> ekibi tarafından yazıldı',
+                '<a href=”' . $aboutUrl . '” title=”Hakkımızda”>«' . $siteName . '»</a> editörleri tarafından hazırlandı',
+                '<a href=”' . $aboutUrl . '” title=”Hakkımızda”>«' . $siteName . '»</a> tarafından yayınlandı',
+            ],
         ],
         'affiliate_disclosure' => [
             'es' => 'Este sitio contiene enlaces de afiliados. Podemos recibir una comisión si realiza una compra a través de ellos, sin costo adicional para usted.',
@@ -891,13 +1026,20 @@ function get_site_translation($key = 'read_more')
     ];
 
     // Проверка: есть ли такая фраза и такой язык?
-    if (isset($data[$key][$lang])) {
-        return $data[$key][$lang];
-    } elseif (isset($data[$key]['en'])) {
-        return $data[$key]['en']; // Если языка нет, отдаем английский
+    $value = $data[$key][$lang] ?? $data[$key]['en'] ?? null;
+
+    if ($value === null) {
+        return 'Translation missing';
     }
 
-    return 'Translation missing';
+    // Если значение — массив вариантов, выбираем по ID поста (детерминировано)
+    if (is_array($value)) {
+        global $post;
+        $idx = ($post && $post->ID) ? ((int) $post->ID % count($value)) : 0;
+        return $value[$idx];
+    }
+
+    return $value;
 }
 
 // Регистрация шорткодов для удобства

@@ -19,6 +19,13 @@ def find_branding_file(spec_dir: Path, stems: list[str]) -> str | None:
     return None
 
 
+def staging_name(src: Path) -> str:
+    """Return the filename that copy_branding_to_build() writes to staging/images/."""
+    if src.suffix.lower() == ".ico":
+        return src.with_suffix(".png").name
+    return src.name
+
+
 def copy_branding_to_build(spec_dir: Path, out_dir: Path) -> None:
     for stems, max_kb, max_height in (
         (_STEMS_FAVICON, 15,  64),
@@ -28,16 +35,20 @@ def copy_branding_to_build(spec_dir: Path, out_dir: Path) -> None:
         if not src:
             continue
         src = Path(src)
-        dst = out_dir / src.name
+        suffix = src.suffix.lower()
+        dst = out_dir / staging_name(src)
         if dst.exists():
             continue
 
-        suffix = src.suffix.lower()
         src_kb = src.stat().st_size / 1024
 
-        if suffix in (".svg", ".ico"):
+        if suffix == ".svg":
             shutil.copy2(src, dst)
             print(f"  Скопирован: {src.name}")
+            continue
+
+        if suffix == ".ico":
+            _convert_ico_to_png(src, dst, max_height)
             continue
 
         height_ok = (not max_height) or (Image.open(src).height <= max_height)
@@ -59,6 +70,27 @@ def copy_branding_to_build(spec_dir: Path, out_dir: Path) -> None:
             w, h = Image.open(dst).size
             info += f" | {w}×{h}px"
         print(f"  Брендинг: {src.name}  ({info})")
+
+
+def _convert_ico_to_png(src: Path, dst: Path, max_height: int | None) -> None:
+    try:
+        img = Image.open(src)
+        if hasattr(img, "ico") and img.ico.sizes:
+            best_size = max(img.ico.sizes, key=lambda s: s[0] * s[1])
+            img = img.ico.getimage(best_size)
+        img = img.convert("RGBA")
+        if max_height and img.height > max_height:
+            ratio = max_height / img.height
+            img = img.resize(
+                (max(1, int(img.width * ratio)), max_height),
+                Image.Resampling.LANCZOS,
+            )
+        img.save(dst, format="PNG", optimize=True)
+        src_kb = src.stat().st_size / 1024
+        dst_kb = dst.stat().st_size / 1024
+        print(f"  Favicon: {src.name} → {dst.name}  ({src_kb:.1f} → {dst_kb:.1f} KB)")
+    except Exception as e:
+        print(f"  [!] Ошибка конвертации ICO {src.name}: {e}")
 
 
 def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> Path | None:
