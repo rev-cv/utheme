@@ -231,7 +231,7 @@ class UThemeConfigurator {
             $content .= $mode_block;
         }
 
-        file_put_contents($this->scss_file, $content);
+        file_put_contents($this->scss_file, $content, LOCK_EX);
 
         // Save site classification options (WP options, not SCSS vars)
         if (isset($_POST['site_stream'])) {
@@ -271,7 +271,7 @@ class UThemeConfigurator {
         $content     = file_get_contents($this->scss_file);
         $string_vars = [
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages', 'table-style', 'image-style',
-            'font-vibe', 'style', 'is-not-section', 'is-left-align', 'is-border',
+            'font-vibe', 'radius-vibe', 'style', 'is-not-section', 'is-left-align', 'is-border',
             'font-size', 'stt-icon', 'menu-accent-align',
             'callout', 'callout-icon-set',
         ];
@@ -280,7 +280,7 @@ class UThemeConfigurator {
         foreach ($this->random_config as $var => $options) {
             $new_val   = $options[array_rand($options)];
             $formatted = in_array($var, $string_vars) ? '"' . $new_val . '"' : $new_val;
-            $pattern   = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $pattern   = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content   = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $formatted . $m[4], $content);
         }
 
@@ -290,11 +290,11 @@ class UThemeConfigurator {
         $new_density = round(0.5 + $density_raw * 0.05, 2);
 
         foreach (['seed-hue' => $new_seed, 'density-factor' => $new_density] as $var => $new_val) {
-            $pattern = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $pattern = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $new_val . $m[4], $content);
         }
 
-        file_put_contents($this->scss_file, $content);
+        file_put_contents($this->scss_file, $content, LOCK_EX);
         add_settings_error('u_theme', 'randomized', 'Тема рандомизирована! Docker запустил пересборку.', 'updated');
     }
 
