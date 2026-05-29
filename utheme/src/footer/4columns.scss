@@ -27,7 +27,7 @@ $footer-border-dark: rgba(conf.$color-text-dark, .1);
         font-size: $footer-text-font-size;
         line-height: 1.6;
         border-top: 1px solid $footer-border-light;
-        margin-top: 0;
+        margin-top: 1em;
 
         .container {
             max-width: conf.$max-width;

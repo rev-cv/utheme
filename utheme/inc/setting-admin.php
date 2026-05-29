@@ -45,9 +45,11 @@ function my_theme_setup()
 
 add_action('after_setup_theme', 'my_theme_setup');
 
-
-
-
+// Убрать WordPress version из <head> и RSS
+remove_action('wp_head', 'wp_generator');
+// Убрать версию из URL ассетов
+add_filter('style_loader_src', fn($src) => remove_query_arg('ver', $src));
+add_filter('script_loader_src', fn($src) => remove_query_arg('ver', $src));
 
 
 

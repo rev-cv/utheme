@@ -21,9 +21,13 @@ WEB_NETWORK  = "web_network"
 def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> dict | None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
 
+    theme_slug = manifest.get("site", {}).get("theme_slug", "utheme")
+    _update_theme_mount(theme_slug)
     _clean_wp_config_volume(wp_conf_dir)
     _ensure_shared_db()
     _create_site_db()
+    if (wp_conf_dir / "robots.txt").exists():
+        _add_volume_to_compose("./wp-conf/robots.txt:/var/www/html/robots.txt")
     _start_container(container)
     _patch_provision_url(wp_conf_dir)
     _copy_staging(staging_dir, container)
@@ -479,6 +483,19 @@ networks:
   shared_db_network:
     external: true
 """
+
+
+def _update_theme_mount(theme_slug: str) -> None:
+    dc_path = Path("docker-compose.yml")
+    content = dc_path.read_text(encoding="utf-8")
+    updated = re.sub(
+        r'(\./utheme:/var/www/html/wp-content/themes/)\S+',
+        rf'\g<1>{theme_slug}',
+        content,
+    )
+    if updated != content:
+        dc_path.write_text(updated, encoding="utf-8", newline="\n")
+        print(f"  Theme mount: ./utheme → /themes/{theme_slug}")
 
 
 def _add_volume_to_compose(volume_line: str) -> bool:

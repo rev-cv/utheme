@@ -95,6 +95,7 @@
 
 @use "cookie-modal/cookie-modal.scss";
 @use "art__geo/geo.scss";
+@use "art__geo/predictions.scss";
 
 // блок вставки разных меню
 @if conf.$main-menu =='island' {

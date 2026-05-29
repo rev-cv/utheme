@@ -17,6 +17,7 @@ function replace_placeholders_safely($content) {
         '$$CURRENT_DATE$$' => $current_date,
         '$$CURRENT_DATE_ISO$$' => $current_date_iso,
         '$$CY$$'           => $current_year,
+        '$$URL_ABOUT_US$$' => get_about_us_url(),
     ];
 
     return str_replace(array_keys($replacements), array_values($replacements), $content);

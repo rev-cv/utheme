@@ -19,6 +19,7 @@ services:
       - ./wp-conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./wp-conf/.htaccess:/var/www/html/.htaccess
       - ./wp-conf/wp-config.php:/var/www/html/wp-config.php
+      - ./wp-conf/robots.txt:/var/www/html/robots.txt
     networks:
       - web_network
       - shared_db_network

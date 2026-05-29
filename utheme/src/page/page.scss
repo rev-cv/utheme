@@ -126,6 +126,7 @@ main {
     width: 100%;
 
     @if conf.$paper-effect == 'true' {
+        margin-top: 1.5rem;
         border-radius: f.get-radius("card");
         background-color: $bg-light;
         box-shadow: conf.$shadow-section;

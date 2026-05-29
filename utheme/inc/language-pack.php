@@ -30,12 +30,28 @@ $HELP_URLS = [
     'tr' => 'https://www.yesilhat.gov.tr/'
 ];
 
+function has_about_us_page(): bool
+{
+    $slug = get_option('utheme_about_us_slug', 'about-us');
+    return (bool) get_page_by_path($slug);
+}
+
+function get_about_us_url(): string
+{
+    $slug = get_option('utheme_about_us_slug', 'about-us');
+    $page = get_page_by_path($slug);
+    if ($page) {
+        return get_permalink($page->ID);
+    }
+    return home_url('/' . $slug . '/');
+}
+
 function get_site_translation($key = 'read_more')
 {
     // Получаем код языка (первые 2 буквы, например 'en', 'ru')
     $lang = substr(get_bloginfo('language'), 0, 2);
     $siteName = get_bloginfo('name');
-    $aboutUrl = home_url('/about-us/');
+    $aboutUrl = get_about_us_url();
 
     $cookie_url = '#';
     if ($key === 'cookie_notice') {
@@ -1101,3 +1117,26 @@ function get_responsible_gaming_block()
 
     return $text_with_link;
 }
+
+
+
+/*
+Этот фильтр WordPress переопределяет локаль сайта на фронтенде.
+
+Что делает:
+- Перехватывает хук locale, который WordPress вызывает при определении языка
+- Пропускает без изменений, если запрос из админки (is_admin())
+- Пропускает, если кастомный язык отключён в настройках темы (utheme_html_lang_enabled)
+- Возвращает значение опции utheme_html_lang (если задано) вместо системной локали WordPress
+
+Зачем нужно: позволяет задать язык сайта через настройки темы независимо 
+от общих настроек WordPress — полезно когда контент генерируется пайплайном 
+с явно указанным SITE_LANG, и этот язык нужно зеркалить в атрибуте <html lang=""> 
+и поведении WP без смены основной локали установки.
+*/
+add_filter('locale', function($locale) {
+    if (is_admin()) return $locale;
+    if (!get_option('utheme_html_lang_enabled', '1')) return $locale;
+    $custom = get_option('utheme_html_lang', '');
+    return $custom ?: $locale;
+});

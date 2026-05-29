@@ -53,6 +53,7 @@ def generate_sh(manifest: dict, out_path: Path) -> None:
         "editorial":       get_editorial_name(lang, site_title),
         "welcome_title":   welcome_title,
         "welcome_content": welcome_content,
+        "has_news_page":   manifest.get("has_news_page", False),
     }
 
     rendered = template.render(ctx)
@@ -62,3 +63,12 @@ def generate_sh(manifest: dict, out_path: Path) -> None:
     except ValueError:
         display = out_path.as_posix()
     print(f"  Записан: {display}")
+
+    robots_tpl = env.get_template("robots.txt.j2")
+    robots_out = out_path.parent / "robots.txt"
+    robots_out.write_text(robots_tpl.render(ctx), encoding="utf-8", newline="\n")
+    try:
+        robots_display = robots_out.relative_to(Path.cwd()).as_posix()
+    except ValueError:
+        robots_display = robots_out.as_posix()
+    print(f"  Записан: {robots_display}")

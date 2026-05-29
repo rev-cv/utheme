@@ -1,8 +1,63 @@
+"""
+Методология поиска и сопоставления картинок
+============================================
+
+Модуль работает в три последовательных шага.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ШАГ 1 — get_detailed_image_data(root_path)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Рекурсивно обходит все *.html в root_path (rglob).
+Для каждого <img> извлекает:
+  • stem файла из атрибута src (т.е. «hero» из «images/hero.webp»)
+  • alt, title, longdesc, figcaption — SEO-поля
+Дубли по stem внутри одного HTML пропускаются (seen_images).
+Результат — плоский список записей вида:
+  { name, html, seo: {alt, title, description, caption}, filename_full }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ШАГ 2 — find_and_select_images(folder, pics)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Строит индекс stem → [список физических файлов] по всей папке folder
+(тоже rglob). Затем для каждой записи из шага 1 выбирает лучший
+физический файл через selection_score:
+
+  +100  расширение .avif
+  + 50  расширение .webp
+  +  5  × (количество общих компонентов пути с HTML-файлом)
+         — реализовано в _path_proximity(); позволяет корректно
+           выбирать между одноимёнными hero.webp из разных
+           подпапок в многосекционных проектах (MINIREVIEW_2026)
+  + 10  файл лежит в папке с именем «images» (case-insensitive)
+
+Приоритеты: формат > близость к HTML > папка images.
+Если файл не найден ни в одном расширении — собирается missing_report
+и после обхода бросается RuntimeError со списком отсутствующих.
+
+ВАЖНО: индексирование идёт по stem без расширения. Значит, если
+в проекте есть hero.webp и hero.jpg — они оба попадут в индекс
+под ключом «hero». selection_score выберёт лучший формат (.webp > .jpg).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ШАГ 3 — _normalize_image_names(pics)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+После выбора файлов проверяет уникальность имён в рамках всего
+проекта. Если один и тот же stem встречается в нескольких HTML
+(что неизбежно для hero, section-1 и т.п. в многосекционных
+проектах), каждому вхождению добавляется уникальный хеш-суффикс:
+  hero → hero-a3f8c21b  (для страницы A)
+  hero → hero-7d04e59a  (для страницы B)
+
+Защищённые имена (logo, favicon, icon) из списка _PROTECTED_NAMES
+переименованию не подлежат — они всегда уникальны по назначению.
+
+Переименование происходит на диске (Path.rename) и синхронно в
+атрибуте src соответствующего HTML (BeautifulSoup).
+"""
+
 import hashlib
-import os
 from collections import Counter, defaultdict
 from pathlib import Path
-
 from bs4 import BeautifulSoup
 
 _PROTECTED_NAMES = {"logo", "favicon", "icon"}
@@ -63,6 +118,17 @@ def get_detailed_image_data(root_path: Path) -> list:
     return results
 
 
+def _path_proximity(img_path: Path, html_path: Path) -> int:
+    """Number of path components shared from the root (absolute paths)."""
+    common = 0
+    for a, b in zip(img_path.parts, html_path.parts):
+        if a == b:
+            common += 1
+        else:
+            break
+    return common
+
+
 def find_and_select_images(folder: Path, pics: list) -> list:
     print('\nВыявление картинок и проверка их наличия на диске.')
 
@@ -80,7 +146,6 @@ def find_and_select_images(folder: Path, pics: list) -> list:
     for item in pics:
         target_name = item['name']
         html_path   = Path(item['html'])
-        html_dir    = html_path.parent
 
         found_paths = project_images_index.get(target_name, [])
 
@@ -88,13 +153,15 @@ def find_and_select_images(folder: Path, pics: list) -> list:
         item["selected_image"] = None
 
         if found_paths:
-            def selection_score(path: Path):
+            def selection_score(path: Path, _html=html_path):
                 score = 0
                 ext = path.suffix.lower()
-                if ext == '.avif':  score += 100
+                if ext == '.avif':   score += 100
                 elif ext == '.webp': score += 50
-                if "IMAGES" in path.parts: score += 20
-                if path.parent == html_dir: score += 1
+                # Prefer images closer in the directory tree to the HTML file
+                score += _path_proximity(path, _html) * 5
+                # Prefer files that sit inside an 'images' sibling/parent folder
+                if path.parent.name.lower() == "images": score += 10
                 return score
 
             item["selected_image"] = max(found_paths, key=selection_score)

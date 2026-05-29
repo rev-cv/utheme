@@ -26,5 +26,6 @@ def detect_structure(spec_dir: Path) -> dict:
         "    • PILLAR + CL1           (s1_cl5_2025)\n"
         "    • PILLAR + CLUSTERS MAIN (s2_cl5_2026)\n"
         "    • HUB + PILLAR           (s3_fwc_2026)\n"
-        "    • index.html + slug/     (s4_fsr_2026)"
+        "    • index.html + slug/     (s4_fsr_2026)\n"
+        "    • hub/ + slug/           (s5_minireview_2026)"
     )

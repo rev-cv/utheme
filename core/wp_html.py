@@ -147,7 +147,7 @@ def _handle_div(tag):
     if 'card-grid' in classes:
         """Обработка карточки внутри grid"""
         grid_items = []
-        for card_div in tag.find_all('div', recursive=False):
+        for card_div in tag.find_all(['div', 'article'], recursive=False):
             card_blocks = []
             for child in card_div.children:
                 if isinstance(child, NavigableString) and not child.strip():
@@ -347,7 +347,7 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
 
     # figure не распаковывается — обрабатывается через _handle_figure (сохраняет figcaption)
     # nav распаковывается, чтобы его содержимое (p, ol) попало в основной поток
-    for tag in container.find_all(['div', 'section', 'main', 'nav', 'header']):
+    for tag in container.find_all(['div', 'section', 'article', 'aside', 'main', 'nav', 'header']):
         if tag.name == 'div' and any(cls in tag.get('class', []) for cls in forbidden_div):
             continue
         

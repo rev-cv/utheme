@@ -18,7 +18,9 @@ SITE_URL="{{ site.url }}"
 SITE_TITLE="{{ site.title | bash_escape }}"
 ADMIN_USER="{{ site.admin_user | bash_escape }}"
 ADMIN_EMAIL="{{ site.email }}"
-THEME_SLUG="{{ site.theme_slug | default('utheme') }}"
+THEME_SLUG="{{ site.theme_slug }}"
+THEME_NAME="{{ site.theme_name | bash_escape }}"
+THEME_AUTHOR="{{ site.theme_author | bash_escape }}"
 WP_LANG="{{ wp_locale }}"
 
 ADMIN_PASS=$(tr -dc 'a-zA-Z0-9!@#$%^&*()_+=-' < /dev/urandom | head -c 30)
@@ -85,8 +87,14 @@ echo "Admin user ready (ID: $ADMIN_ID)."
 # ===========================================================================
 # 3. THEME
 
+sed -i "s/^Theme Name:.*/Theme Name: $THEME_NAME/" /var/www/html/wp-content/themes/$THEME_SLUG/style.css
+sed -i "s/^Author:.*/Author: $THEME_AUTHOR/" /var/www/html/wp-content/themes/$THEME_SLUG/style.css
 wp theme activate $THEME_SLUG
-wp theme list --status=inactive --field=name | while read -r _theme; do wp theme delete "$_theme"; done
+# Theme folder is bind-mounted from host — must not be deleted
+wp theme list --status=inactive --field=name | while read -r _theme; do
+    [ "$_theme" = "$THEME_SLUG" ] && continue
+    wp theme delete "$_theme"
+done
 echo "Theme '$THEME_SLUG' activated."
 
 # ===========================================================================
@@ -135,6 +143,7 @@ echo "Settings applied."
 
 wp eval "
 wp_insert_term('Utility Pages', 'category');
+wp_insert_term('Who We Are', 'category');
 wp_insert_term('page+5', 'category');
 wp_insert_term('page+30', 'category');
 wp_insert_term('news', 'category');
@@ -329,10 +338,17 @@ fi
 if [ -n "${PAGE_IDS[privacy-policy]}" ]; then
     wp eval "update_option('wp_page_for_privacy_policy', ${PAGE_IDS[privacy-policy]});"
 fi
+{% if about_us_slug %}
+if [ -n "${PAGE_IDS[{{ about_us_slug }}]}" ]; then
+    wp eval "update_option('utheme_about_us_slug', '{{ about_us_slug }}');"
+    echo "  About Us page set (slug: {{ about_us_slug }})"
+fi
+{% endif %}
 
 # ===========================================================================
 # 9. WELCOME NEWS POST
 
+{% if has_news_page %}
 WELCOME_POST_ID=$(wp eval "
 ob_start();
 \$id = wp_insert_post([
@@ -347,6 +363,7 @@ ob_end_clean();
 echo \$id;
 " 2>/dev/null)
 echo "  Created welcome post (ID: $WELCOME_POST_ID)"
+{% endif %}
 
 # ===========================================================================
 # 10. MENUS

@@ -153,7 +153,12 @@ function my_theme_dynamic_content_injection($content)
         }
     }
 
-    $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $toc_html . '</div>';
+    $predictions_html = '';
+    if (!in_array(get_the_ID(), $excluded_ids) && shortcode_exists('sports_predictions')) {
+        $predictions_html = do_shortcode('[sports_predictions]');
+    }
+
+    $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $predictions_html . $toc_html . '</div>';
 
     if (preg_match('/<p>\s*\[toc_position\]\s*<\/p>/i', $modified_content)) {
         return preg_replace('/<p>\s*\[toc_position\]\s*<\/p>/i', $insertion, $modified_content, 1);

@@ -15,13 +15,21 @@
 
     body:not(:has(.header-box)) {
         main {
-            margin-top: 5rem !important;
+            @if conf.$paper-effect == 'true' {
+                margin-top: calc(5rem + 1.5rem) !important;
+            } @else {
+                margin-top: 5rem !important;
+            }
         }
     }
 
     body:has(.header-box) {
         .header-box {
-            margin-top: 4rem !important;
+            @if conf.$paper-effect == 'true' {
+                margin-top: calc(4rem + 1.5rem) !important;
+            } @else {
+                margin-top: 4rem !important;
+            }
 
             @media (max-width: 768px) {
                 margin-top: 1.2em !important;

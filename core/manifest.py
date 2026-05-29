@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 from core import branding
 from core.translations import resolve_locale
@@ -8,17 +9,29 @@ REQUIRED_PAGE_FIELDS = ["slug", "title", "publish_at"]
 
 
 def site_config(spec_dir: Path) -> dict:
+    from core.theme_identity import get_theme_identity
     favicon_path = branding.find_branding_file(spec_dir, ["favicon", "icon"])
     logo_path    = branding.find_branding_file(spec_dir, ["logo"])
+    site_url     = os.environ.get("SITE_URL", "http://localhost:8080")
+    theme        = get_theme_identity(site_url)
+    site_domain  = os.environ.get("SITE_DOMAIN", "")
+    if not site_domain:
+        _host = urlparse(site_url).hostname or ""
+        if _host and _host not in ("localhost", "127.0.0.1"):
+            site_domain = _host
     return {
-        "title":      os.environ.get("SITE_TITLE",  "WordPress Site"),
-        "url":        os.environ.get("SITE_URL",     "http://localhost:8080"),
-        "wp_locale":  resolve_locale(os.environ.get("SITE_LANG", "EN"))[0],
-        "lang":       resolve_locale(os.environ.get("SITE_LANG", "EN"))[1],
-        "email":      os.environ.get("ADMIN_EMAIL",  "admin@example.com"),
-        "admin_user": os.environ.get("ADMIN_USER",   "admin"),
-        "favicon":    branding.staging_name(Path(favicon_path)) if favicon_path else None,
-        "logo":       Path(logo_path).name    if logo_path    else None,
+        "title":        os.environ.get("SITE_TITLE",  "WordPress Site"),
+        "url":          site_url,
+        "domain":       site_domain,
+        "wp_locale":    resolve_locale(os.environ.get("SITE_LANG", "EN"))[0],
+        "lang":         resolve_locale(os.environ.get("SITE_LANG", "EN"))[1],
+        "email":        os.environ.get("ADMIN_EMAIL",  "admin@example.com"),
+        "admin_user":   os.environ.get("ADMIN_USER",   "admin"),
+        "favicon":      branding.staging_name(Path(favicon_path)) if favicon_path else None,
+        "logo":         Path(logo_path).name    if logo_path    else None,
+        "theme_slug":   theme["slug"],
+        "theme_name":   theme["name"],
+        "theme_author": theme["author"],
     }
 
 
@@ -96,11 +109,18 @@ def build_manifest(structure: dict, pics: list[dict], spec_dir: Path) -> dict:
             if item["slug"] in schedule_map:
                 item["publish_at"] = schedule_map[item["slug"]].strftime("%Y-%m-%dT%H:%M:%S")
 
+    _news_slugs = {"news", "articles"}
+    has_news_page = structure.get("has_news_page", False) or any(
+        p.get("slug") in _news_slugs for p in all_pages
+    )
+
     return {
         "site":           site_config(spec_dir),
         "structure_type": structure["structure_type"],
         "menus":          structure["menus"],
         "pages":          all_pages,
+        "about_us_slug":  structure.get("about_us_slug"),
+        "has_news_page":  has_news_page,
     }
 
 

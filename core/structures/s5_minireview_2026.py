@@ -1,94 +1,42 @@
 """
-Structure 4 — FSR_2026 — FileSystem Routing 2026
-=================================================
+Structure 5 — MINIREVIEW_2026
+==============================
 
 ОПИСАНИЕ
 --------
-Структура использует файловую систему как источник маршрутов (по аналогии с
-Next.js App Router). Слаги страниц и иерархия берутся напрямую из имён папок.
+Вариант FSR_2026, в котором домашняя страница (hub) живёт в подпапке hub/,
+а не в корне spec/. Все остальные папки маршрутизируются как в FSR_2026.
 
 ОБНАРУЖЕНИЕ (detect)
 --------------------
-Активируется при одновременном соблюдении трёх условий:
-  • В корне spec/ есть index.html или index.md   — домашняя страница
-  • В корне нет папки PILLAR/                    — исключает CL5_2025 / CL5_2026
-  • В корне нет папки HUB/                       — исключает FWC_2026
+Активируется при одновременном соблюдении четырёх условий:
+  • В корне spec/ НЕТ index.html / index.md        — отличает от FSR_2026
+  • В корне spec/ есть папка hub/ с контентным файлом
+  • В корне нет папки PILLAR/                      — исключает CL5_2025/2026
+  • В корне нет папки HUB/ (uppercase)             — исключает FWC_2026
 
-ФОРМАТ ИМЕНИ ПАПКИ
-------------------
-  <slug> [ФЛАГ1][ФЛАГ2]...
-
-Из имени папки вырезаются все блоки в квадратных скобках, остаток обрезается
-по краям — это slug. Допустимые символы slug: a–z, 0–9, дефис, нижнее
-подчёркивание, пробел. Недопустимые символы удаляются с уведомлением в лог.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+СТРУКТУРА ПАПОК
+---------------
+  spec/
+    hub/
+      index.html          ← домашняя страница (slug="index")
+      images/             ← игнорируется (нет index-файла)
+    karty/                ← контейнер (нет index) → дети поднимаются наверх
+      visa/
+        index2.html       ← страница slug="visa", parent=None
+      mastercard/
+        index3.html       ← страница slug="mastercard", parent=None
+    bankovni-prevod/
+      index17.html        ← страница slug="bankovni-prevod", parent=None
+      vyber-na-ucet/
+        index21.html      ← страница slug="vyber-na-ucet", parent="bankovni-prevod"
+    logo.webp             ← обязательно
+    favicon.webp          ← обязательно
 
 ФЛАГИ
 -----
-
-  [M]   — добавить страницу в главное меню, без подменю.
-
-  Полная форма: [<order>M<depth>;<label>]
-    <order>  — целое число, порядковый номер в меню (опционально, перед M)
-    <depth>  — целое число, глубина раскрытия подменю (опционально, после M)
-    <label>  — текст ссылки в меню вместо slug (опционально, после `;`)
-
-    Примеры:
-      [M]              → в меню, label=slug, без подменю, порядок авто
-      [M2]             → в меню, раскрыть 2 уровня подменю
-      [1M]             → в меню на позиции 1
-      [1M3]            → позиция 1, 3 уровня подменю
-      [M;Best Casinos] → без номера, без подменю, label="Best Casinos"
-      [1M3;Casinos UK] → позиция 1, 3 уровня, label="Casinos UK"
-
-  [F]   — добавить страницу в меню футера.
-
-  Полная форма: [<order>F;<label>]
-    <order>  — целое число, порядковый номер в меню (опционально, перед F)
-    <label>  — текст ссылки вместо slug (опционально, после `;`)
-
-    Примеры:
-      [F]            → в футере, label=slug, порядок авто
-      [1F]           → в футере на позиции 1
-      [F;Footer]     → в футере, label="Footer"
-      [1F;Footer]    → позиция 1, label="Footer"
-
-  [U]   — пометить страницу категорией "Utility Pages".
-
-  [DLY]                    — отложенная публикация, случайные дата и время.
-  [DLY=YYYY-MM-DD]         — фиксированная дата, случайное время (7–21 ч).
-  [DLY=YYYY-MM-DDThh.mm.ss]— фиксированные дата и время.
-                             Знак `:` заменяется на `.` (ограничение Windows).
-                             При ошибке разбора — откат к случайной дате + лог.
-
-  Флаги комбинируются в любом порядке:
-    casino-sites [1M2;Casinos][U][DLY=2026-06-01]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-ОБРАБОТКА ПАПОК БЕЗ index-ФАЙЛА (контейнеры)
----------------------------------------------
-Если в папке нет index.html / index.md, она считается маршрутным контейнером:
-
-  • Её дочерние папки продвигаются на уровень выше (контейнер пропускается).
-  • Флаги контейнера наследуются дочерними папками и мержатся с их собственными:
-      — булевы флаги (M, F, U): OR
-      — числовые (order, depth): приоритет у дочерней, если задана
-      — label: приоритет у дочерней, если задана
-      — publish_at: приоритет у дочерней, если задана
-  • Процесс рекурсивен: цепочка пустых контейнеров схлопывается полностью.
-  • Если внутри контейнера нигде не нашлось index-файла — папка игнорируется.
-
-  Пример:
-    check [U]/               — нет index, контейнер с флагом [U]
-      licence-register-checks [M]/  — есть index.html
-    →  страница "licence-register-checks", флаги [U][M], parent=None
-
-ДОМАШНЯЯ СТРАНИЦА
------------------
-  index.html или index.md в корне spec/ — всегда домашняя страница
-  (slug="index", parent=None), вне меню, флаги не применяются.
+Те же, что в FSR_2026: [M], [F], [U], [DLY], со всеми вариациями.
+Применяются к именам папок (кроме hub/).
 """
 
 import re
@@ -102,26 +50,22 @@ from ._shared import _find_content_file, _node, _page
 
 # ── Регулярные выражения ──────────────────────────────────────────────────────
 
-# Флаг M: [<order>M<depth>;<label>] — все части опциональны
 _RE_M = re.compile(r'\[(\d*)M(\d*)(?:;([^\]]*))?\]')
 _RE_F = re.compile(r'\[(\d*)F(?:;([^\]]*))?\]')
 _RE_U = re.compile(r'\[U\]')
 _RE_W = re.compile(r'\[W\]')
 _RE_A = re.compile(r'\[A\]')
 _RE_N = re.compile(r'\[N\]')
-# Флаг DLY: [DLY] или [DLY=значение]
 _RE_DLY = re.compile(r'\[DLY(?:=([^\]]+))?\]')
-# Все флаги вместе — для вырезания из имени папки
 _RE_ANY_FLAG = re.compile(
-    r'\[\d*M\d*(?:;[^\]]*)?\]'   # M
-    r'|\[\d*F(?:;[^\]]*)?\]'       # F
-    r'|\[U\]'                      # U
-    r'|\[W\]'                      # W
-    r'|\[A\]'                      # A
-    r'|\[N\]'                      # N
-    r'|\[DLY(?:=[^\]]*)?\]'        # DLY
+    r'\[\d*M\d*(?:;[^\]]*)?\]'
+    r'|\[\d*F(?:;[^\]]*)?\]'
+    r'|\[U\]'
+    r'|\[W\]'
+    r'|\[A\]'
+    r'|\[N\]'
+    r'|\[DLY(?:=[^\]]*)?\]'
 )
-# Недопустимые символы в slug
 _RE_INVALID = re.compile(r'[^a-z0-9\-_ ]')
 
 
@@ -181,7 +125,6 @@ def _parse_flags(name: str) -> _Flags:
 
 
 def _merge_flags(parent: _Flags, child: _Flags) -> _Flags:
-    """Складывает флаги контейнера-родителя с флагами дочерней папки."""
     return _Flags(
         in_main    = parent.in_main   or child.in_main,
         m_order    = child.m_order    if child.m_order is not None else parent.m_order,
@@ -220,25 +163,32 @@ def _validate_slug(raw: str, folder: Path, errors: list[str]) -> str:
 # ── Публичный API ─────────────────────────────────────────────────────────────
 
 def detect(spec_dir: Path) -> bool:
-    has_index = (spec_dir / "index.html").exists() or (spec_dir / "index.md").exists()
-    no_pillar = not (spec_dir / "PILLAR").is_dir()
-    no_hub    = not (spec_dir / "HUB").is_dir()
-    return has_index and no_pillar and no_hub
+    no_root_index = (
+        not (spec_dir / "index.html").exists()
+        and not (spec_dir / "index.md").exists()
+    )
+    hub_dir       = spec_dir / "hub"
+    has_hub       = hub_dir.is_dir() and _find_content_file(hub_dir) is not None
+    dir_names     = {d.name for d in spec_dir.iterdir() if d.is_dir()}
+    no_pillar     = "PILLAR" not in dir_names
+    no_HUB        = "HUB" not in dir_names   # case-sensitive: hub/ ≠ HUB/
+    return no_root_index and has_hub and no_pillar and no_HUB
 
 
 def build(spec_dir: Path) -> dict:
-    pages:             list[dict]  = []
-    menu_register:     list[tuple] = []  # (slug, _Flags) для страниц с [M]
-    footer_register:   list[tuple] = []  # (slug, _Flags) для страниц с [F]
-    about_us_register: list[str]   = []  # slug страниц с [W]
-    news_page_register: list[str]  = []  # slug страниц с [N]
-    slug_errors:       list[str]   = []
+    pages:              list[dict]  = []
+    menu_register:      list[tuple] = []
+    footer_register:    list[tuple] = []
+    about_us_register:  list[str]   = []
+    news_page_register: list[str]   = []
+    slug_errors:        list[str]   = []
 
-    # Домашняя страница — корневой index, вне меню
-    pages.append(_page("index", None, _find_content_file(spec_dir)))
+    # Домашняя страница — hub/index.html, вне меню
+    hub_dir = spec_dir / "hub"
+    pages.append(_page("index", None, _find_content_file(hub_dir)))
 
-    # Обход вложенных папок
-    for subdir in sorted(d for d in spec_dir.iterdir() if d.is_dir()):
+    # Обход вложенных папок, кроме hub/ (она уже потреблена как homepage)
+    for subdir in sorted(d for d in spec_dir.iterdir() if d.is_dir() and d.name != "hub"):
         _walk(subdir, None, _Flags(), pages, menu_register, footer_register,
               about_us_register, news_page_register, slug_errors)
 
@@ -249,7 +199,7 @@ def build(spec_dir: Path) -> dict:
     footer_nodes.append(_node("sitemap"))
 
     return {
-        "structure_type": "FSR_2026",
+        "structure_type": "MINIREVIEW_2026",
         "pages":          pages,
         "menus":          {"main": main_nodes, "footer": footer_nodes},
         "about_us_slug":  about_us_register[-1] if about_us_register else None,
@@ -303,7 +253,6 @@ def _walk(
             menu_register.append((slug, flags))
         if flags.in_footer:
             footer_register.append((slug, flags))
-        # Дочерние папки — обычный обход без наследования флагов
         for child in subdirs:
             _walk(child, slug, _Flags(), pages, menu_register, footer_register,
                   about_us_register, news_page_register, slug_errors)
@@ -321,12 +270,10 @@ def _walk(
 # ── Построение меню ───────────────────────────────────────────────────────────
 
 def _build_main_menu(menu_register: list[tuple], pages: list[dict]) -> list[dict]:
-    # Индекс иерархии: parent_slug → [child_slug, ...]
     children_of: dict[str | None, list[str]] = {}
     for p in pages:
         children_of.setdefault(p["parent"], []).append(p["slug"])
 
-    # Сортируем: с явным order — по возрастанию, без order — в конец (порядок обнаружения)
     ordered = sorted(menu_register, key=lambda x: (x[1].m_order is None, x[1].m_order or 0))
 
     nodes = []
@@ -383,9 +330,10 @@ def _resolve_publish_at(dly_value: str | None) -> str:
 # ── Обязательные элементы ─────────────────────────────────────────────────────
 
 def _required_items(spec_dir: Path) -> list:
-    _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
+    _exts  = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
+    hub_dir = spec_dir / "hub"
     return [
-        [spec_dir / "index.html", spec_dir / "index.md"],
+        [hub_dir / "index.html", hub_dir / "index.md"],
         [spec_dir / f"logo{e}"    for e in _exts],
         [spec_dir / f"favicon{e}" for e in _exts] + [spec_dir / f"icon{e}" for e in _exts],
     ]

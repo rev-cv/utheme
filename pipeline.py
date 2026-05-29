@@ -59,7 +59,12 @@ def run():
     _phase(3, 12, "Проверка целостности проекта")
     from core import structure_validate
     errors = structure_validate.check_structure_flexible(ROOT_DIR, structure["required_items"])
-    errors += structure.get("slug_errors", [])
+    slug_errors = structure.get("slug_errors", [])
+    if slug_errors:
+        print("    ОШИБКА: Проблемы со slug-именами папок!")
+        for e in slug_errors:
+            print(f"        {e}")
+    errors += slug_errors
     if errors:
         print("Выполнение остановлено.")
         sys.exit(1)
