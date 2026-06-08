@@ -9,20 +9,21 @@
         </div>
 
         <div class="island-trigger">
-            <button id="menu-toggle" aria-label="Toggle Menu">
+            <button id="menu-toggle" aria-label="Toggle Menu" aria-expanded="false" aria-controls="island-dropdown">
                 <span></span>
                 <span class="icon-dots"><span></span><span></span><span></span></span>
             </button>
         </div>
     </div>
 
-    <div class="island-dropdown">
+    <div id="island-dropdown" class="island-dropdown">
         <?php wp_nav_menu([
-            "theme_location" => "header-menu",
-            "container" => "nav",
-            "container_class" => "island-nav",
-            "menu_class" => "island-grid",
-            "walker" => new Island_Walker() // Кастомный класс для картинок 
+            "theme_location"        => "header-menu",
+            "container"             => "nav",
+            "container_class"       => "island-nav",
+            "container_aria_label"  => "Main menu",
+            "menu_class"            => "island-grid",
+            "walker"                => new Island_Walker(),
         ]); ?>
     </div>
 </header>
@@ -32,31 +33,25 @@
         const wrapper = document.getElementById('island-wrapper');
         const btn = document.getElementById('menu-toggle');
 
+        function setOpen(open) {
+            wrapper.classList.toggle('is-open', open);
+            btn.setAttribute('aria-expanded', String(open));
+            btn.querySelector('span').textContent = '';
+        }
+
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-
-            wrapper.classList.toggle('is-open');
-
-            const btnText = btn.querySelector('span');
-            if (wrapper.classList.contains('is-open')) {
-                btnText.textContent = '✖';
-                btnText.textContent = '';
-            } else {
-                btnText.textContent = '';
-            }
+            setOpen(!wrapper.classList.contains('is-open'));
         });
 
         const links = document.querySelectorAll('.island-grid a');
         links.forEach(link => {
-            link.addEventListener('click', () => {
-                wrapper.classList.remove('is-open');
-            });
+            link.addEventListener('click', () => setOpen(false));
         });
 
         document.addEventListener('click', function(e) {
             if (wrapper.classList.contains('is-open') && !wrapper.contains(e.target)) {
-                wrapper.classList.remove('is-open');
-                btn.querySelector('span').textContent = '';
+                setOpen(false);
             }
         });
     });

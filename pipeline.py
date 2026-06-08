@@ -76,7 +76,7 @@ def run():
     from core import compress_images as cimages
     pics = find_images.get_all_images(SPEC_DIR)
     branding.copy_branding_to_build(SPEC_DIR, STAGING_DIR / "images")
-    cimages.compress_images(pics, STAGING_DIR / "images", max_kb=120)
+    cimages.compress_images(pics, STAGING_DIR / "images", max_kb=100)
 
     # ── 5. КОНВЕРТАЦИЯ HTML → WP-БЛОКИ ───────────────────────────────────────
     _phase(5, 12, "Конвертация HTML → WP-блоки → staging/pages/")

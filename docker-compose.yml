@@ -40,6 +40,8 @@ services:
   sass:
     image: node:alpine
     working_dir: /src
+    networks:
+      - web_network
     volumes:
       - ./utheme/src:/src
     profiles:

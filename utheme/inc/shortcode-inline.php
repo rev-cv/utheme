@@ -31,11 +31,15 @@ function handle_custom_link_shorthand($content) {
         return $content;
     }
 
-    $pattern = '/\$\$LINK\s+([^|]+?)\s*\|\s*(.*?)\$\$/';
+    $pattern = '/\$\$LINK\s*([^|]*?)\s*\|\s*(.*?)\$\$/';
 
     return preg_replace_callback($pattern, function($matches) {
         $slug = sanitize_title(trim($matches[1]));
         $link_text = trim($matches[2]);
+
+        if ($slug === '') {
+            return sprintf('<a href="%s">%s</a>', esc_url(home_url('/')), esc_html($link_text));
+        }
 
         $posts = get_posts([
             'name'           => $slug,

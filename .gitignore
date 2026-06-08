@@ -4,7 +4,8 @@ Thumbs.db
 Desktop.ini
 # .vscode/
 .idea/
-CLAUDE.md
+# CLAUDE.md
+
 TASKS.md
 
 # --- Python & Automation ---
@@ -39,3 +40,8 @@ created_pages.json
 *.txt
 utheme/src/*.css
 utheme/src/*.map
+
+example
+CLAUDE.md
+.claude
+review.md

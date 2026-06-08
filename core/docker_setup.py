@@ -440,7 +440,11 @@ def _shared_db_dir() -> Path:
     for parent in current.parents:
         if parent.name == "sites":
             return parent.parent / "wp-maria-db"
-    return current.parent / "wp-maria-db"
+        candidate = parent / "wp-maria-db"
+        if candidate.exists():
+            return candidate
+    # создаём на уровень выше месячной папки (e:\kuren\wp-maria-db)
+    return current.parent.parent / "wp-maria-db"
 
 
 def _read_db_root_password(shared_db_dir: Path) -> str | None:

@@ -6,7 +6,7 @@
  */
 function build_toc_html(string $content): string
 {
-    preg_match_all('/<h2.*?>(.*?)<\/h2>/i', $content, $matches, PREG_OFFSET_CAPTURE);
+    preg_match_all('/<h2.*?>(.*?)<\/h2>/is', $content, $matches, PREG_OFFSET_CAPTURE);
 
     if (empty($matches[0])) return '';
 
@@ -44,7 +44,7 @@ function my_theme_dynamic_content_injection($content)
     if (!is_single() && !is_page()) return $content;
 
     // Регулярка захватывает h2 и контент внутри него
-    preg_match_all('/<h2.*?>(.*?)<\/h2>/i', $content, $matches, PREG_OFFSET_CAPTURE);
+    preg_match_all('/<h2.*?>(.*?)<\/h2>/is', $content, $matches, PREG_OFFSET_CAPTURE);
 
     if (empty($matches[0])) {
         return $content;

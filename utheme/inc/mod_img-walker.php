@@ -10,7 +10,7 @@ class Island_Walker extends Walker_Nav_Menu
         $img_url = get_the_post_thumbnail_url($item->object_id, 'thumbnail');
 
         $output .= '<li class="menu-item-card">';
-        $output .= '<a href="' . $item->url . '">';
+        $output .= '<a href="' . esc_url($item->url) . '">';
         $output .= '<div class="menu-thumb">';
         
         // Используем нормальный тег img. 

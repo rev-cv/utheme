@@ -264,6 +264,25 @@ def _handle_div(tag):
 
     return ""
 
+def _handle_dl(tag):
+    """Converts <dl> definition list to WP paragraph blocks."""
+    blocks = []
+    children = [c for c in tag.children if not (isinstance(c, NavigableString) and not c.strip())]
+    i = 0
+    while i < len(children):
+        child = children[i]
+        if hasattr(child, 'name') and child.name == 'dt':
+            term = child.decode_contents()
+            blocks.append(f'<!-- wp:paragraph -->\n<p><strong>{term}</strong></p>\n<!-- /wp:paragraph -->')
+            i += 1
+            while i < len(children) and hasattr(children[i], 'name') and children[i].name == 'dd':
+                definition = children[i].decode_contents()
+                blocks.append(f'<!-- wp:paragraph -->\n<p>{definition}</p>\n<!-- /wp:paragraph -->')
+                i += 1
+        else:
+            i += 1
+    return '\n'.join(blocks)
+
 def _handle_span(tag):
     """Обработка span (превращение в p для hero-label)."""
     classes = tag.get('class', [])
@@ -301,6 +320,7 @@ BLOCK_HANDLERS = {
     'p': _handle_paragraph, 'img': _handle_image, 'figure': _handle_figure,
     'ul': _handle_list, 'ol': _handle_list,
     'table': _handle_table, 'details': _handle_details, 'div': _handle_div, 'span': _handle_span,
+    'dl': _handle_dl,
 }
 
 # --- Основная логика ---
@@ -309,10 +329,32 @@ def convert_html_to_blocks(html_content, add_post_meta=False):
     """Преобразует строку HTML в WP блоки."""
     html_content = _preprocess_faq_blocks(html_content)
     soup = BeautifulSoup(html_content, 'html.parser')
-    container = soup.find('article') or soup.find('main') or soup.body
-    
+
+    # <main> — приоритет; <article> только если прямой потомок <body> (не карточка внутри контента)
+    main_tag = soup.find('main')
+    if main_tag:
+        container = main_tag
+    elif soup.body:
+        container = soup.body.find('article', recursive=False) or soup.body
+    else:
+        container = soup.body
+
     if not container:
         return ""
+
+    # Bug #2: если контейнер — <main>, вытащить контент из внешнего <header> (без nav)
+    if container.name == 'main' and soup.body:
+        page_header = soup.body.find('header', recursive=False)
+        if page_header:
+            for nav in page_header.find_all('nav'):
+                nav.decompose()
+            header_children = list(page_header.children)
+            insert_pos = 0
+            for child in header_children:
+                if isinstance(child, NavigableString) and not child.strip():
+                    continue
+                container.insert(insert_pos, child.extract())
+                insert_pos += 1
 
     # внешние ссылки → новая вкладка; внутренние → шорткод $$LINK slug | text$$
     for a_tag in container.find_all('a', href=True):

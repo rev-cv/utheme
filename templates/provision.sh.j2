@@ -274,7 +274,7 @@ file_put_contents('/tmp/wp_page_ids.txt', '');
     [
         'slug'         => '{{ page.slug }}',
         'title'        => '{{ page.title | b64 }}',
-        'status'       => '{{ page.post_status if page.post_status else ("publish" if page.publish_at == "now" else "future") }}',
+        'status'       => '{{ "draft" if (not is_new and page.slug == "news") else (page.post_status if page.post_status else ("publish" if page.publish_at == "now" else "future")) }}',
         'date'         => '{{ page.publish_at if (not page.post_status and page.publish_at != "now") else "" }}',
         'content_file' => '{{ ("/tmp/staging/pages/" ~ page.content) if page.content else "" }}',
         'template'     => '{{ page.template }}',
@@ -355,7 +355,7 @@ ob_start();
     'post_type'    => 'post',
     'post_title'   => base64_decode('{{ welcome_title | b64 }}'),
     'post_content' => base64_decode('{{ welcome_content | b64 }}'),
-    'post_status'  => 'publish',
+    'post_status'  => '{{ "publish" if is_new else "draft" }}',
     'post_author'  => $ADMIN_ID,
 ]);
 wp_set_object_terms(\$id, 'news', 'category', false);
@@ -375,11 +375,13 @@ wp eval "
 \$locs['header-menu'] = \$menu_id;
 set_theme_mod('nav_menu_locations', \$locs);
 {% for node in menus.main %}
+{% if is_new or node.slug != "news" %}
 \$parent_item_{{ node.slug | replace('-', '_') }} = wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]:-0}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish'{% if node.menu_title %}, 'menu-item-title' => base64_decode('{{ node.menu_title | b64 }}'){% endif %}]);
 {% if node.children is defined and node.children %}
 {% for child in node.children %}
 wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ child.slug }}]:-0}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish', 'menu-item-parent-id' => \$parent_item_{{ node.slug | replace('-', '_') }}{% if child.menu_title is defined and child.menu_title %}, 'menu-item-title' => base64_decode('{{ child.menu_title | b64 }}'){% endif %}]);
 {% endfor %}
+{% endif %}
 {% endif %}
 {% endfor %}
 "
@@ -393,7 +395,9 @@ wp eval "
 \$locs['footer-menu'] = \$menu_id;
 set_theme_mod('nav_menu_locations', \$locs);
 {% for node in menus.footer %}
+{% if is_new or node.slug != "news" %}
 wp_update_nav_menu_item(\$menu_id, 0, ['menu-item-object-id' => ${PAGE_IDS[{{ node.slug }}]:-0}, 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-status' => 'publish']);
+{% endif %}
 {% endfor %}
 "
 echo "FooterMenu created with {{ menus.footer | length }} items."
