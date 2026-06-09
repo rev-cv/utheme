@@ -7,7 +7,7 @@ _SCSS_FILE = Path(__file__).parent.parent / "utheme" / "src" / "conf.scss"
 _CONFIG = {
     "main-menu": [
         "island", "aside", "boring",
-        "docs", "newspaper", "hierarchical"
+        "docs", "hierarchical"
     ],
     "footer-menu": [
         "2columns", "central"

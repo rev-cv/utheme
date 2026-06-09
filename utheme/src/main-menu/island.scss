@@ -1,12 +1,10 @@
-﻿// Используемые CSS-переменные (для контекста, они определены в :root)
+// Используемые CSS-переменные (для контекста, они определены в :root)
 // --shadow-sm
 // --header-bg
 // --text-secondary
 // --primary-color (изменено на --primary)
 // --secondary-color (изменено на --secondary)
 
-// Переопределение переменных для использования в SCSS вложенности
-// Примечание: В реальном SCSS проекте эти переменные должны быть объявлены в начале файла как $переменная
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 @use 'sass:color' as sys;
@@ -36,8 +34,8 @@
             }
         }
     }
-    
-    #island-wrapper {
+
+    .ut-island {
         user-select: none;
         position: fixed;
         top: 20px;
@@ -49,7 +47,6 @@
         backdrop-filter: blur(10px);
         border-radius: f.get-radius();
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        // border: 1px solid rgba(255, 255, 255, 0.3);
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         overflow: hidden;
         background: rgba(conf.$color-section-light, 0.9);
@@ -67,7 +64,7 @@
             &:hover {
                 border-radius: f.get-radius();
 
-                .island-dropdown {
+                .ut-island__dropdown {
                     max-height: 500px;
                     opacity: 1;
                     padding: 20px;
@@ -76,10 +73,10 @@
         }
 
         /* Открытие по кнопке (все устройства) */
-        &.is-open {
+        &.ut-is-open {
             border-radius: f.get-radius();
 
-            .island-dropdown {
+            .ut-island__dropdown {
                 max-height: 500px;
                 opacity: 1;
                 padding: 20px;
@@ -100,7 +97,7 @@
         }
 
 
-        .island-main {
+        .ut-island__bar {
             display: flex;
             align-items: center;
             justify-content: flex-start;
@@ -125,7 +122,7 @@
             }
         }
 
-        .island-logo {
+        .ut-site-header__logo {
             a {
                 display: flex;
                 justify-content: center;
@@ -139,7 +136,7 @@
             }
         }
 
-        .island-name {
+        .ut-site-header__name {
             @if conf.$is-menu-title == 'false' {
                 display: none;
             }
@@ -148,9 +145,6 @@
                 @include f.font-txt;
                 font-weight: 700;
                 text-decoration: none;
-                // padding-left: clamp(1em, 2vw, 3em);
-                // padding-right: clamp(1em, 2vw, 3em);
-                // padding-right: clamp(1.3em, 3vw, 4em);
                 transform: translateX(-.3em) translateY(2px);
                 font-size: clamp(.6em, 1vw, 1em);
                 letter-spacing: .1em;
@@ -171,16 +165,16 @@
         }
 
         @if conf.$menu-accent-align == 'center' {
-            .island-trigger { margin-left: auto; }
-            .island-name { position: absolute; left: 50%; transform: translateX(-50%); }
+            .ut-island__trigger { margin-left: auto; }
+            .ut-site-header__name { position: absolute; left: 50%; transform: translateX(-50%); }
         } @else if conf.$menu-accent-align == 'right' and conf.$is-menu-title == 'true' {
-            .island-name { margin-left: auto; }
-            .island-trigger { margin-left: 10px; }
+            .ut-site-header__name { margin-left: auto; }
+            .ut-island__trigger { margin-left: 10px; }
         } @else {
-            .island-trigger { margin-left: auto; }
+            .ut-island__trigger { margin-left: auto; }
         }
 
-        .menu-title {
+        .ut-item__label {
             @include f.font-txt;
             font-size: .55rem;
             display: -webkit-box;
@@ -190,7 +184,7 @@
         }
 
         /* Кнопка */
-        #menu-toggle {
+        .ut-toggle {
 
             border: none;
             padding: 8px 18px;
@@ -208,7 +202,7 @@
         }
 
         /* Скрытое меню */
-        .island-dropdown {
+        .ut-island__dropdown {
             max-height: 0;
             opacity: 0;
             transition: all 0.4s ease;
@@ -216,17 +210,14 @@
         }
 
         /* Сетка ссылок-карточек */
-        .island-grid {
+        .ut-island__grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             list-style: none;
-            // direction: rtl;
-            /* Справа налево по вашей просьбе */
 
             li a {
                 direction: ltr;
-                /* Возвращаем текст ссылок в обычный вид */
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -240,7 +231,7 @@
                     color: rgba(conf.$color-text-dark, 0.8);
                 }
 
-                &:hover .menu-thumb {
+                &:hover .ut-item__thumb {
                     transform: scale(1.05);
                 }
             }
@@ -248,12 +239,11 @@
             @media (max-width: 768px) {
                 grid-template-columns: repeat(2, 1fr);
                 direction: ltr;
-                /* На мобилке лучше оставить стандарт, чтобы не путать пользователя */
             }
         }
 
         /* Стили для "обложек" (миниатюр) */
-        .menu-thumb {
+        .ut-item__thumb {
             width: 100%;
             aspect-ratio: 16/9;
             background: #eee;
@@ -266,7 +256,6 @@
 
             @media (max-width: 768px) {
                 aspect-ratio: 1/1;
-                /* Квадратные превью на мобилках экономят место */
             }
 
             img {

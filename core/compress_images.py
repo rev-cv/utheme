@@ -1,5 +1,6 @@
 import io
 import shutil
+import os
 import sys
 import tempfile
 import threading
@@ -11,7 +12,7 @@ from PIL import Image
 
 def compress_images(pics: list[dict], out_dir: Path, max_kb: int) -> None:
     col       = 42
-    n_workers = 4
+    n_workers = os.cpu_count()
 
     valid   = [p for p in pics if p.get("selected_image") and Path(p["selected_image"]).exists()]
     n_slots = min(n_workers, len(valid))

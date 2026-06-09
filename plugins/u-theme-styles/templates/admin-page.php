@@ -488,7 +488,7 @@ function u_h1_gradient_field(string $name, string $value): void {
                     'main-menu' => [
                         'title'       => 'Main Menu',
                         'desc'        => 'Стиль отображения главного меню сайта.',
-                        'options'     => ['island', 'aside', 'boring', 'docs', 'newspaper', 'hierarchical'],
+                        'options'     => ['island', 'aside', 'boring', 'docs', 'hierarchical'],
                         'switch'      => 'is-menu-title',
                         'switch_desc' => 'Показывать название сайта в главном меню',
                     ],

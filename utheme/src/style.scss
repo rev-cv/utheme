@@ -6,7 +6,6 @@
 @use "main-menu/aside.scss" as aside;
 @use "main-menu/boring.scss" as boring;
 @use "main-menu/docs.scss" as docs;
-@use "main-menu/newspaper.scss" as newspaper;
 @use "main-menu/hierarchical.scss" as hierarchical;
 
 @use 'footer/2column.scss' as footer_2columns;
@@ -109,9 +108,6 @@
 }
 @else if conf.$main-menu =='docs' {
     @include docs.styles;
-}
-@else if conf.$main-menu =='newspaper' {
-    @include newspaper.styles;
 }
 @else if conf.$main-menu =='hierarchical' {
     @include hierarchical.styles;

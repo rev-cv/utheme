@@ -30,36 +30,45 @@
 
 Классы в HTML (`.article-card`, `.island-main`, `.footer-column`) одинаковы на всех сайтах. Слабый, но существующий fingerprint.
 
-### Рассмотренные варианты
+### Выбранный подход — префикс `ut-` в исходниках + замена при деплое
 
-**Путь А — добавить префикс в SCSS (рекомендуется)**
+**Шаг 1 — рефактор исходников (одноразовый)**
 
-Единоразовый рефактор: добавить `ut-` перед всеми кастомными классами в SCSS и PHP.
-После этого в pipeline: `ut-` → `a7k-` (рандомный) по всем файлам скопированной темы.
+Добавить `ut-` перед всеми кастомными классами:
 
-- Замена = одна строка кода, нулевой runtime overhead
-- Чёткая граница: `ut-*` — мои классы, всё остальное — WP/плагины
+- `utheme/src/*.scss` — все селекторы: `.ut-island-main`, `.ut-article-card`, …
+- `utheme/components/*.php`, `utheme/inc/*.php`, `utheme/*.php` — атрибуты `class="ut-…"`
+- `core/wp_html.py` — классы, которые pipeline вставляет в `.wp` файлы
 
-*Почему не сделано сейчас:* требует рефактора SCSS/PHP — отложено.
+Граница чёткая: `ut-*` — мои классы, всё остальное (`wp-block-*`, `alignwide`, …) — WP/плагины, не трогать.
 
-**Путь Б — автоматический парсинг CSS**
+**Шаг 2 — генерация css-префикса при деплое**
 
-Парсить скомпилированный `style.css`, извлекать классы, заменять хешами (`article-card → _3xk9b`).
+В `core/theme_identity.py` (уже есть `rng` сидированный доменом):
 
-- Проблема: в SCSS используются WP-классы (`.wp-block-*` и др.) → автоматически не отличить своё от чужого
-- Нужно заменять в SCSS/PHP исходниках, а не в компилированном CSS
-- Во время парсинга HTML → .wp нужно смотреть, используется ли класс в стилях → заменять на лету
-- Вывод: слишком сложно и рискованно без чёткой границы
+```python
+css_prefix = ''.join(rng.choices('abcdefghjkmnpqrstvwxyz', k=3)) + '-'
+# → "kfn-", "bxq-", "mtr-", ...
+```
 
-**PHP output buffer (runtime)**
+Добавить в возвращаемый dict как `"css_prefix"`, прокинуть через `manifest.py → site_config()` в шаблон.
 
-Перехватить HTML перед отдачей, заменить классы по карте.
+**Шаг 3 — замена в скопированной теме (`templates/provision.sh.j2`)**
 
-- Вывод: заметный overhead на каждый запрос, отклонено.
+После `cp -r utheme /themes/{{ slug }}/` — один `find + sed`:
+
+```bash
+find /themes/{{ slug }}/ -type f \( -name "*.css" -o -name "*.php" \) \
+  -exec sed -i 's/\but-/{{ css_prefix }}/g' {} +
+```
+
+Заменяет `ut-` → `kfn-` во всех CSS и PHP файлах скопированной темы. Оригинал (bind-mount) не трогается.
+
+**Итог:** нулевой runtime overhead, каждый сайт имеет уникальные CSS-классы в HTML.
 
 ---
 
-## Лёгкие wins — не реализованы, но просты
+## Лёгкие wins — ✅ реализовано
 
 Две строки в `utheme/functions.php`:
 
@@ -76,7 +85,43 @@ add_filter('script_loader_src', fn($src) => remove_query_arg('ver', $src));
 
 ---
 
-## Следующие шаги (по приоритету)
+## Реализовано — YAML-маппинг классов (Phase 1)
 
-1. **Быстро:** добавить `remove_action('wp_head', 'wp_generator')` и фильтры `?ver=` в `functions.php`
-2. **Потом:** ввести префикс `ut-` в SCSS/PHP как соглашение, после чего Путь А реализуется тривиально
+`core/theme_obfuscate.py` переписан:
+- `_load_variants()` — загружает все `core/keyclass/keyclass-*.yml` при импорте
+- Валидация: нет дублей ключей, нет дублей имён в каждом столбце
+- `make_class_map(site_url)` — `sha256(domain) % N_THEMES` выбирает столбец
+- `apply_class_map_to_file` — longest-first string replace по всем `.php/.css/.scss`
+
+`core/keyclass/keyclass-main-menu.yml` — 21 ключ × 4 темы:
+- Только блоки (BEM) + standalone state-классы
+- Элементы (`ut-panel__head` и т.п.) не нужны — замена `ut-panel` → `amber` покрывает `ut-panel__head` → `amber__head` автоматически
+
+### BEM-рефактор меню (Phase 1, завершён)
+
+Все 5 PHP-компонентов и 5 SCSS-файлов главного меню переведены на BEM:
+- `ut-item-card` → `ut-item` (блок), `ut-item__row`, `ut-item__thumb`, `ut-item__label`, `ut-item--has-sub`
+- `ut-panel-head` → `ut-panel__head`, `ut-panel__body`, `ut-panel__list`, `ut-panel__item`, …
+- `ut-drill-root-list` → `ut-drill__root`, `ut-drill__viewport`, `ut-drill__panel`, …
+- `ut-island-wrapper` → `ut-island` (блок), `ut-island__bar`, `ut-island__dropdown`, …
+- `ut-header-island` → `ut-site-header__island` (boring/hier) / `ut-island__bar` (island)
+- `ut-nav-menu-list` → `ut-nav__list`, `ut-menu-item` → `ut-nav__item`
+
+Ключей в YAML: 81 → 60 → 57 (newspaper) → **21 (BEM)**.
+
+### Phase 2 — обфускация `__elem` (отложено)
+
+Текущая схема заменяет только имя блока: `ut-panel` → `amber`, и это автоматически даёт `ut-panel__head` → `amber__head`.
+
+**`__head`, `__body`, `__list`, `__item` и т.п. остаются видимыми.**
+
+Запланировано на Phase 2 — глобальный проход с заменой BEM-элементов на короткие суффиксы (например, `__head` → `__a`, `__body` → `__b`). Это дополнительный уровень, не блокирует Phase 1.
+
+---
+
+## Следующие шаги
+
+1. Добавить `css_prefix` в `get_theme_identity()` → `manifest.py` → `site_config()`
+2. Добавить `sed`-замену в `templates/provision.sh.j2`
+3. Обфускация content-классов в `core/wp_html.py` (`info-callout`, `card-grid`, `at-a-glance`, …)
+4. [Phase 2] Обфускация `__elem` суффиксов

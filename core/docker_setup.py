@@ -24,6 +24,7 @@ def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> dict | None:
     theme_slug = manifest.get("site", {}).get("theme_slug", "utheme")
     _update_theme_mount(theme_slug)
     _clean_wp_config_volume(wp_conf_dir)
+    _ensure_htaccess(wp_conf_dir)
     _ensure_shared_db()
     _create_site_db()
     if (wp_conf_dir / "robots.txt").exists():
@@ -84,6 +85,19 @@ def _find_free_port() -> None:
 def _clean_wp_config_volume(wp_conf_dir: Path) -> None:
     if not (wp_conf_dir / "wp-config.php").exists():
         _remove_volume_from_compose("/var/www/html/wp-config.php")
+
+
+def _ensure_htaccess(wp_conf_dir: Path) -> None:
+    dest = wp_conf_dir / ".htaccess"
+    if dest.is_dir():
+        import shutil
+        shutil.rmtree(dest)
+    if not dest.exists():
+        template = Path(__file__).parent.parent / "wp-conf" / ".htaccess"
+        if template.is_file():
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            import shutil
+            shutil.copy2(template, dest)
 
 
 def _ensure_shared_db() -> None:

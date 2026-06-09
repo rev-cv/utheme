@@ -1,14 +1,14 @@
-<header id="site-header">
-    <div class="header-island container">
-        <div class="site-logo">
+<header class="ut-site-header">
+    <div class="ut-site-header__island container">
+        <div class="ut-site-header__logo">
             <?php the_custom_logo(); ?>
         </div>
 
-        <div class="site-name">
+        <div class="ut-site-header__name">
             <a href="<?php echo home_url(); ?>"><?php bloginfo("name"); ?></a>
         </div>
 
-        <button class="menu-toggle" aria-label="Open Menu">
+        <button class="ut-toggle" aria-label="Open Menu">
             <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
                 <line x1="3" y1="12" x2="21" y2="12"></line>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -18,25 +18,25 @@
     </div>
 </header>
 
-<div class="menu-overlay"></div>
+<div class="ut-overlay"></div>
 
-<div class="side-panel">
-    <div class="side-panel-header">
-        <button class="drill-back" aria-label="Back" hidden>
+<div class="ut-panel">
+    <div class="ut-panel__head">
+        <button class="ut-drill__back" aria-label="Back" hidden>
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            <span class="drill-title"></span>
+            <span class="ut-drill__title"></span>
         </button>
-        <button class="menu-close" aria-label="Close">&times;</button>
+        <button class="ut-close" aria-label="Close">&times;</button>
     </div>
 
-    <div class="drill-viewport">
+    <div class="ut-drill__viewport">
         <?php wp_nav_menu([
             "theme_location" => "header-menu",
             "container"       => "nav",
-            "container_class" => "side-nav",
-            "menu_class"      => "side-menu-list",
+            "container_class" => "ut-side-nav",
+            "menu_class"      => "ut-drill__root",
             "walker"          => new Aside_Walker(),
             "depth"           => 3,
         ]); ?>
@@ -50,32 +50,30 @@
     var CORNER_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
 
     document.addEventListener('DOMContentLoaded', function () {
-        var toggle       = document.querySelector('.menu-toggle');
-        var close        = document.querySelector('.menu-close');
-        var overlay      = document.querySelector('.menu-overlay');
-        var panel        = document.querySelector('.side-panel');
-        var headerIsland = document.querySelector('.header-island');
+        var toggle       = document.querySelector('.ut-toggle');
+        var close        = document.querySelector('.ut-close');
+        var overlay      = document.querySelector('.ut-overlay');
+        var panel        = document.querySelector('.ut-panel');
+        var headerIsland = document.querySelector('.ut-site-header__island');
         var body         = document.body;
-        var backBtn      = panel.querySelector('.drill-back');
-        var titleEl      = backBtn.querySelector('.drill-title');
-        var viewport     = panel.querySelector('.drill-viewport');
-        var nav          = viewport.querySelector('.side-nav');
+        var backBtn      = panel.querySelector('.ut-drill__back');
+        var titleEl      = backBtn.querySelector('.ut-drill__title');
+        var viewport     = panel.querySelector('.ut-drill__viewport');
+        var nav          = viewport.querySelector('.ut-side-nav');
 
         // ── Открытие / закрытие ───────────────────────────────────────────────
 
         function openMenu() {
             menuIsOpen = true;
-            body.classList.add('menu-open');
+            body.classList.add('ut-menu-open');
             viewport.style.overflowY = 'hidden';
 
-            // Measure natural height (capped at 80vh)
             panel.style.height = 'auto';
             var maxH = Math.round(window.innerHeight * 0.8);
             var target = Math.min(panel.scrollHeight, maxH);
             panel.style.height = '0';
 
-            // Force reflow then animate
-            panel.offsetHeight; // eslint-disable-line no-unused-expressions
+            panel.offsetHeight;
             panel.style.transition = 'height 0.35s ease';
             panel.style.height = target + 'px';
 
@@ -91,15 +89,14 @@
             menuIsOpen = false;
             viewport.style.overflowY = 'hidden';
 
-            // Pin current height, then animate to 0
             panel.style.height = panel.offsetHeight + 'px';
-            panel.offsetHeight; // eslint-disable-line no-unused-expressions
+            panel.offsetHeight;
             panel.style.transition = 'height 0.35s ease';
             panel.style.height = '0';
 
             function onClose() {
                 panel.removeEventListener('transitionend', onClose);
-                body.classList.remove('menu-open');
+                body.classList.remove('ut-menu-open');
                 viewport.style.overflowY = '';
                 resetDrill();
             }
@@ -122,18 +119,17 @@
         var _heightHandler = null;
 
         function init() {
-            var rootList = nav.querySelector('.side-menu-list');
+            var rootList = nav.querySelector('.ut-drill__root');
             if (!rootList) return;
 
             rootList.dataset.drillId = 'root';
 
-            // Уровень 0 → уровень 1
-            rootList.querySelectorAll(':scope > li.has-submenu').forEach(function (li) {
-                var subMenu = li.querySelector('.sub-menu-list');
+            rootList.querySelectorAll(':scope > li.ut-item--has-sub').forEach(function (li) {
+                var subMenu = li.querySelector('.ut-item__sub');
                 if (!subMenu) return;
 
                 var id    = 'dp' + (++counter);
-                var title = (li.querySelector('.menu-title') || {}).textContent || '';
+                var title = (li.querySelector('.ut-item__label') || {}).textContent || '';
                 var url   = (li.querySelector('a') || {}).href || '';
 
                 li.dataset.drillTarget     = id;
@@ -141,9 +137,8 @@
                 subMenu.dataset.drillTitle = title.trim();
                 subMenu.dataset.drillUrl   = url;
 
-                // Уровень 1 → уровень 2
                 subMenu.querySelectorAll(':scope > li').forEach(function (subLi) {
-                    var subSubMenu = subLi.querySelector('.sub-sub-menu-list');
+                    var subSubMenu = subLi.querySelector('.ut-item__sub-sub');
                     if (!subSubMenu) return;
 
                     var subId    = 'dp' + (++counter);
@@ -151,15 +146,14 @@
                     var subTitle = (subAnchor.textContent || '').trim();
                     var subUrl   = subAnchor.href || '';
 
-                    subLi.classList.add('has-submenu');
+                    subLi.classList.add('ut-item--has-sub');
                     subLi.dataset.drillTarget     = subId;
                     subSubMenu.dataset.drillId    = subId;
                     subSubMenu.dataset.drillTitle = subTitle;
                     subSubMenu.dataset.drillUrl   = subUrl;
 
-                    // Инжектируем кнопку-уголок для уровня 1
                     var corner = document.createElement('button');
-                    corner.className = 'drill-corner';
+                    corner.className = 'ut-drill__corner';
                     corner.setAttribute('aria-label', 'Open submenu');
                     corner.innerHTML = CORNER_SVG;
                     subLi.appendChild(corner);
@@ -170,28 +164,28 @@
                 nav.appendChild(subMenu);
             });
 
-            setPanel(rootList, 'drill-panel--active');
-            rootList.classList.add('drill-panel');
+            setPanel(rootList, 'ut-drill__panel--active');
+            rootList.classList.add('ut-drill__panel');
 
             nav.querySelectorAll('[data-drill-id]:not([data-drill-id="root"])').forEach(function (p) {
-                p.classList.add('drill-panel', 'drill-panel--next');
+                p.classList.add('ut-drill__panel', 'ut-drill__panel--next');
             });
 
             stack = [{ el: rootList, title: '', url: '' }];
         }
 
         function setPanel(el, cls) {
-            el.classList.remove('drill-panel--active', 'drill-panel--prev', 'drill-panel--next');
+            el.classList.remove('ut-drill__panel--active', 'ut-drill__panel--prev', 'ut-drill__panel--next');
             if (cls) el.classList.add(cls);
         }
 
         function drillIn(targetId) {
-            panel.classList.remove('is-going-back');
+            panel.classList.remove('ut-is-going-back');
             var targetPanel = nav.querySelector('[data-drill-id="' + targetId + '"]');
             if (!targetPanel) return;
 
-            setPanel(stack[stack.length - 1].el, 'drill-panel--prev');
-            setPanel(targetPanel, 'drill-panel--active');
+            setPanel(stack[stack.length - 1].el, 'ut-drill__panel--prev');
+            setPanel(targetPanel, 'ut-drill__panel--active');
 
             stack.push({
                 el:    targetPanel,
@@ -205,21 +199,21 @@
 
         function drillOut() {
             if (stack.length <= 1) return;
-            panel.classList.add('is-going-back');
+            panel.classList.add('ut-is-going-back');
             var cur = stack.pop();
-            setPanel(cur.el, 'drill-panel--next');
-            setPanel(stack[stack.length - 1].el, 'drill-panel--active');
+            setPanel(cur.el, 'ut-drill__panel--next');
+            setPanel(stack[stack.length - 1].el, 'ut-drill__panel--active');
             updateHeader();
             recalcHeight();
         }
 
         function resetDrill() {
-            panel.classList.remove('is-going-back');
-            nav.querySelectorAll('.drill-panel').forEach(function (p) {
+            panel.classList.remove('ut-is-going-back');
+            nav.querySelectorAll('.ut-drill__panel').forEach(function (p) {
                 setPanel(p, null);
-                p.classList.add('drill-panel--next');
+                p.classList.add('ut-drill__panel--next');
             });
-            if (stack[0]) setPanel(stack[0].el, 'drill-panel--active');
+            if (stack[0]) setPanel(stack[0].el, 'ut-drill__panel--active');
             stack = stack.slice(0, 1);
             updateHeader();
         }
@@ -246,10 +240,10 @@
             }
             _recalcTimer = setTimeout(function () {
                 _recalcTimer = null;
-                var active = nav.querySelector('.drill-panel--active');
+                var active = nav.querySelector('.ut-drill__panel--active');
                 if (!active) return;
                 void active.offsetHeight;
-                var panelHeader = panel.querySelector('.side-panel-header');
+                var panelHeader = panel.querySelector('.ut-panel__head');
                 var headerH = panelHeader ? panelHeader.offsetHeight : 0;
                 var maxH    = Math.round(window.innerHeight * 0.8);
                 var target  = Math.min(headerH + active.scrollHeight, maxH);
@@ -269,9 +263,8 @@
 
         if (backBtn) backBtn.addEventListener('click', drillOut);
 
-        // Клик по уголку — drill-in; клик по основной части карточки — переход
         nav.addEventListener('click', function (e) {
-            var btn = e.target.closest('.submenu-toggle, .drill-corner');
+            var btn = e.target.closest('.ut-item__toggle, .ut-drill__corner');
             if (!btn) return;
             var trigger = btn.closest('[data-drill-target]');
             if (!trigger) return;

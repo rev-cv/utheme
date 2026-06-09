@@ -31,7 +31,7 @@ class UThemeConfigurator {
 
     // Конфиг рандомизации — повторяет randomize_theme.py
     private array $random_config = [
-        'main-menu'        => ['island', 'aside', 'boring', 'docs', 'newspaper', 'hierarchical'],
+        'main-menu'        => ['island', 'aside', 'boring', 'docs', 'hierarchical'],
         'menu-accent-align' => ['left', 'center', 'right'],
         'footer-menu'    => ['2columns', '4columns'],
         'more-pages'     => ['grid', 'list', 'slider', 'carousel'],

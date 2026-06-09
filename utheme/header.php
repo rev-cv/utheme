@@ -17,8 +17,6 @@
             get_template_part('components/main-menu-boring');
         } elseif ($menu_type === 'docs') {
             get_template_part('components/main-menu-docs');
-        } elseif ($menu_type === 'newspaper') {
-            get_template_part('components/main-menu-newspaper');
         } elseif ($menu_type === 'hierarchical') {
             get_template_part('components/main-menu-hierarchical');
         } else {

@@ -1,4 +1,8 @@
 <?php
+remove_action('wp_head', 'wp_generator');
+add_filter('style_loader_src',  fn($src) => remove_query_arg('ver', $src));
+add_filter('script_loader_src', fn($src) => remove_query_arg('ver', $src));
+
 function my_theme_enqueue_styles()
 {
     wp_enqueue_style('my-theme-style', get_stylesheet_uri());
