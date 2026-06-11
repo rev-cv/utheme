@@ -272,15 +272,22 @@ def _walk(
     news_page_register:  list[str],
     slug_errors:         list[str],
 ) -> None:
+    index_file = _find_content_file(folder)
+    subdirs    = sorted(d for d in folder.iterdir() if d.is_dir())
+
+    if not index_file and not subdirs:
+        return
+
+    raw_slug = _extract_slug(folder.name)
+    if not index_file and _RE_INVALID.search(raw_slug):
+        return  # silently skip staging/work folders (NEW, PROMTS, IMAGES, etc.)
+
     raw_flags = _parse_flags(folder.name)
     flags     = _merge_flags(inherited_flags, raw_flags)
-    slug      = _validate_slug(_extract_slug(folder.name), folder, slug_errors)
+    slug      = _validate_slug(raw_slug, folder, slug_errors)
 
     if not slug:
         return
-
-    index_file = _find_content_file(folder)
-    subdirs    = sorted(d for d in folder.iterdir() if d.is_dir())
 
     if index_file:
         categories = ["Utility Pages"] if flags.utility else []
@@ -383,9 +390,11 @@ def _resolve_publish_at(dly_value: str | None) -> str:
 # ── Обязательные элементы ─────────────────────────────────────────────────────
 
 def _required_items(spec_dir: Path) -> list:
-    _exts = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
+    _exts      = [".png", ".webp", ".jpg", ".jpeg", ".svg"]
+    images_dir = spec_dir / "IMAGES"
     return [
         [spec_dir / "index.html", spec_dir / "index.md"],
-        [spec_dir / f"logo{e}"    for e in _exts],
-        [spec_dir / f"favicon{e}" for e in _exts] + [spec_dir / f"icon{e}" for e in _exts],
+        [spec_dir   / f"logo{e}" for e in _exts] + [images_dir / f"logo{e}" for e in _exts],
+        [spec_dir   / f"favicon{e}" for e in _exts] + [spec_dir   / f"icon{e}" for e in _exts]
+        + [images_dir / f"favicon{e}" for e in _exts] + [images_dir / f"icon{e}" for e in _exts],
     ]

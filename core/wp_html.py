@@ -461,7 +461,7 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
             add_meta = source_file.parent.name.startswith("CL")
 
             if source_file.suffix == '.md':
-                from core.convertation_md_to_wp import convert_md_to_blocks
+                from core.wp_md import convert_md_to_blocks
                 wp_content = convert_md_to_blocks(content, add_post_meta=add_meta)
             else:
                 wp_content = convert_html_to_blocks(content, add_post_meta=add_meta)

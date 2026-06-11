@@ -56,11 +56,13 @@
 """
 
 import hashlib
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 from bs4 import BeautifulSoup
 
 _PROTECTED_NAMES = {"logo", "favicon", "icon"}
+_MD_IMG = re.compile(r'!\[([^\]]*)\]\(([^)]+)\)')
 
 
 def get_detailed_image_data(root_path: Path) -> list:
@@ -114,6 +116,51 @@ def get_detailed_image_data(root_path: Path) -> list:
 
         except Exception as e:
             print(f"Ошибка при обработке {html_file}: {e}")
+
+    _re_index_md = re.compile(r'^index\d*\.md$')
+    _fm_re = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
+    for md_file in root_path.rglob("*.md"):
+        if not _re_index_md.match(md_file.name):
+            continue
+        try:
+            content = md_file.read_text(encoding='utf-8')
+            seen_images: set[str] = set()
+
+            # headimg из frontmatter идёт первым → становится images[0] (thumbnail)
+            fm_m = _fm_re.match(content)
+            if fm_m:
+                for line in fm_m.group(1).splitlines():
+                    if ':' in line:
+                        k, _, v = line.partition(':')
+                        if k.strip() == 'headimg':
+                            src = v.strip().strip("\"'")
+                            if src:
+                                image_path = Path(src)
+                                stem = image_path.stem
+                                if stem not in seen_images:
+                                    seen_images.add(stem)
+                                    results.append({
+                                        "name":          stem,
+                                        "html":          md_file,
+                                        "seo":           {"alt": "", "title": "", "description": "", "caption": ""},
+                                        "filename_full": image_path.name,
+                                    })
+
+            for m in _MD_IMG.finditer(content):
+                alt = m.group(1).strip()
+                src = m.group(2).strip()
+                image_path = Path(src)
+                if image_path.stem in seen_images:
+                    continue
+                seen_images.add(image_path.stem)
+                results.append({
+                    "name":          image_path.stem,
+                    "html":          md_file,
+                    "seo":           {"alt": alt, "title": "", "description": "", "caption": ""},
+                    "filename_full": image_path.name,
+                })
+        except Exception as e:
+            print(f"Ошибка при обработке {md_file}: {e}")
 
     return results
 
@@ -242,23 +289,43 @@ def _normalize_image_names(pics: list) -> list:
                         print(f"  Переименован: {c['original']} → {c['new']}")
                 c['item_ref']['name'] = c['new']
 
-            with open(html_path, 'r', encoding='utf-8') as f:
-                soup = BeautifulSoup(f, 'html.parser')
+            if html_path.suffix == '.md':
+                content = html_path.read_text(encoding='utf-8')
+                changed_md = False
 
-            changed_html = False
-            for img in soup.find_all('img'):
-                src = img.get('src')
-                if src:
-                    src_p = Path(src)
+                def _replace_md(m: re.Match) -> str:
+                    nonlocal changed_md
+                    alt, src = m.group(1), m.group(2).strip()
+                    p = Path(src)
                     for c in changes:
-                        if src_p.stem == c['original']:
-                            ext = c['pic_path'].suffix if c['pic_path'] else src_p.suffix
-                            img['src'] = str(src_p.parent / f"{c['new']}{ext}")
-                            changed_html = True
+                        if c['new'] != c['original'] and p.stem == c['original']:
+                            ext = c['pic_path'].suffix if c['pic_path'] else p.suffix
+                            new_src = (p.parent / f"{c['new']}{ext}").as_posix()
+                            changed_md = True
+                            return f'![{alt}]({new_src})'
+                    return m.group(0)
 
-            if changed_html:
-                with open(html_path, 'w', encoding='utf-8') as f:
-                    f.write(str(soup))
+                new_content = _MD_IMG.sub(_replace_md, content)
+                if changed_md:
+                    html_path.write_text(new_content, encoding='utf-8')
+            else:
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    soup = BeautifulSoup(f, 'html.parser')
+
+                changed_html = False
+                for img in soup.find_all('img'):
+                    src = img.get('src')
+                    if src:
+                        src_p = Path(src)
+                        for c in changes:
+                            if src_p.stem == c['original']:
+                                ext = c['pic_path'].suffix if c['pic_path'] else src_p.suffix
+                                img['src'] = str(src_p.parent / f"{c['new']}{ext}")
+                                changed_html = True
+
+                if changed_html:
+                    with open(html_path, 'w', encoding='utf-8') as f:
+                        f.write(str(soup))
 
         except Exception as e:
             print(f"Ошибка при обработке {html_path}: {e}")
