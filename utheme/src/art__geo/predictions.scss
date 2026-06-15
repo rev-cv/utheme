@@ -10,6 +10,8 @@ $sp-xs: calc(#{$sp} * 0.35);
 
 .dynamic-injection-container {
 
+    h2 { display: none; }
+
     /* ── Wrapper ────────────────────────────────────────────── */
     .matches {
         @if conf.$is-not-section == 'false' {

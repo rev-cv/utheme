@@ -19,6 +19,8 @@ $_col3-viewport: $_col3-content + $_h-pad;  // 1396px — viewport where 3 cols 
 
 .dynamic-injection-container {
 
+    h2 { display: none; }
+
     .tc-brand-list {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(444px, 1fr));

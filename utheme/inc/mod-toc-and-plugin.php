@@ -1,6 +1,22 @@
 <?php
 
 /**
+ * Динамическая вставка TOC и рекламных блоков в контент страницы.
+ *
+ * Ручное позиционирование — вставьте любой из тегов прямо в редакторе страницы:
+ *   [toc_position]   — TOC (по умолчанию: перед первым h2)
+ *   [geo_position]   — блок geo_info (по умолчанию: авто, см. ниже)
+ *   [sport_position] — блок sports_predictions (по умолчанию: авто, см. ниже)
+ *
+ * Авто-позиционирование рекламных блоков (если ручной тег не задан):
+ *   — перед первой картинкой, если она стоит до первого h2
+ *   — иначе после h1
+ *
+ * Блоки независимы: можно задать вручную только один из двух рекламных тегов,
+ * второй встанет по авто-логике.
+ */
+
+/**
  * Парсит h2-заголовки из HTML и возвращает готовый HTML блока TOC.
  * Возвращает пустую строку если заголовков нет.
  */
@@ -53,7 +69,7 @@ function my_theme_dynamic_content_injection($content)
     $toc_items = '';
     $modified_content = $content;
     $offset_shift = 0;
-    $first_insertion_pos = null; // Позиция для вставки ТОС и шорткода
+    $first_insertion_pos = null; // Позиция для вставки TOC
 
     foreach ($matches[0] as $index => $match) {
         $full_tag = $match[0];
@@ -107,9 +123,21 @@ function my_theme_dynamic_content_injection($content)
         $toc_items .= '<li class="page-toc-level-2"><a href="#' . $slug . '" title="move to this section">' . $text_content . '</a></li>';
     }
 
-    $toc_html = build_toc_html($content);
+    // — TOC — вставляется перед первым h2 (или в [toc_position]) —
+    $toc_html  = build_toc_html($content);
+    $toc_block = $toc_html ? '<div class="dynamic-injection-container">' . $toc_html . '</div>' : '';
 
-    $shortcode = '[geo_info]';
+    if ($toc_block) {
+        if (preg_match('/<p>\s*\[toc_position\]\s*<\/p>/i', $modified_content)) {
+            $modified_content = preg_replace('/<p>\s*\[toc_position\]\s*<\/p>/i', $toc_block, $modified_content, 1);
+        } elseif (str_contains($modified_content, '[toc_position]')) {
+            $modified_content = str_replace('[toc_position]', $toc_block, $modified_content);
+        } elseif ($first_insertion_pos !== null) {
+            $modified_content = substr_replace($modified_content, $toc_block, $first_insertion_pos, 0);
+        }
+    }
+
+    // — Рекламные блоки — вставляются перед первой картинкой или после h1 —
 
     // исключаются страницы с категорией Utility Pages
     $excluded_ids = get_posts([
@@ -127,7 +155,7 @@ function my_theme_dynamic_content_injection($content)
 
     $shortcode_html = '';
     if (!in_array(get_the_ID(), $excluded_ids) && shortcode_exists('geo_info')) {
-        $shortcode_html = do_shortcode($shortcode);
+        $shortcode_html = do_shortcode('[geo_info]');
 
         // После do_shortcode() плагин выполнился и заполнил $this->geo_data.
         // Читаем точное число карточек через рефлексию (не трогая плагин),
@@ -158,17 +186,67 @@ function my_theme_dynamic_content_injection($content)
         $predictions_html = do_shortcode('[sports_predictions]');
     }
 
-    $insertion = '<div class="dynamic-injection-container">' . $shortcode_html . $predictions_html . $toc_html . '</div>';
+    // Ручное позиционирование: [geo_position] и [sport_position]
+    $geo_placed   = false;
+    $sport_placed = false;
 
-    if (preg_match('/<p>\s*\[toc_position\]\s*<\/p>/i', $modified_content)) {
-        return preg_replace('/<p>\s*\[toc_position\]\s*<\/p>/i', $insertion, $modified_content, 1);
-    }
-    if (str_contains($modified_content, '[toc_position]')) {
-        return str_replace('[toc_position]', $insertion, $modified_content);
+    if ($shortcode_html) {
+        $geo_wrap = '<div class="dynamic-injection-container">' . $shortcode_html . '</div>';
+        if (preg_match('/<p>\s*\[geo_position\]\s*<\/p>/i', $modified_content)) {
+            $modified_content = preg_replace('/<p>\s*\[geo_position\]\s*<\/p>/i', $geo_wrap, $modified_content, 1);
+            $geo_placed = true;
+        } elseif (str_contains($modified_content, '[geo_position]')) {
+            $modified_content = str_replace('[geo_position]', $geo_wrap, $modified_content);
+            $geo_placed = true;
+        }
     }
 
-    if ($first_insertion_pos !== null) {
-        $modified_content = substr_replace($modified_content, $insertion, $first_insertion_pos, 0);
+    if ($predictions_html) {
+        $sport_wrap = '<div class="dynamic-injection-container">' . $predictions_html . '</div>';
+        if (preg_match('/<p>\s*\[sport_position\]\s*<\/p>/i', $modified_content)) {
+            $modified_content = preg_replace('/<p>\s*\[sport_position\]\s*<\/p>/i', $sport_wrap, $modified_content, 1);
+            $sport_placed = true;
+        } elseif (str_contains($modified_content, '[sport_position]')) {
+            $modified_content = str_replace('[sport_position]', $sport_wrap, $modified_content);
+            $sport_placed = true;
+        }
+    }
+
+    // Авто-позиционирование того, что не было размещено вручную
+    $auto_geo   = $geo_placed   ? '' : $shortcode_html;
+    $auto_sport = $sport_placed ? '' : $predictions_html;
+
+    $ads_block = '';
+    if ($auto_geo || $auto_sport) {
+        $ads_block = '<div class="dynamic-injection-container">' . $auto_geo . $auto_sport . '</div>';
+    }
+
+    if ($ads_block) {
+        // Ищем позиции в уже модифицированном контенте (после вставки TOC)
+        preg_match('/<img[\s>]/i', $modified_content, $img_m, PREG_OFFSET_CAPTURE);
+        preg_match('/<h2[\s>]/i', $modified_content, $h2_m,  PREG_OFFSET_CAPTURE);
+
+        $first_img_pos  = $img_m ? $img_m[0][1] : false;
+        $first_h2_pos_m = $h2_m  ? $h2_m[0][1]  : false;
+
+        // Картинка существует и стоит до первого h2
+        $img_before_h2 = $first_img_pos !== false
+            && ($first_h2_pos_m === false || $first_img_pos < $first_h2_pos_m);
+
+        if ($img_before_h2) {
+            // Если img обёрнут в figure — вставляем перед figure, а не внутрь него
+            $before_img        = substr($modified_content, 0, $first_img_pos);
+            $last_figure_open  = strrpos($before_img, '<figure');
+            $last_figure_close = strrpos($before_img, '</figure>');
+            $inside_figure     = $last_figure_open !== false
+                && ($last_figure_close === false || $last_figure_open > $last_figure_close);
+            $insert_pos = $inside_figure ? $last_figure_open : $first_img_pos;
+
+            $modified_content = substr_replace($modified_content, $ads_block, $insert_pos, 0);
+        } elseif (preg_match('/<\/h1>/i', $modified_content, $h1_m, PREG_OFFSET_CAPTURE)) {
+            $after_h1 = $h1_m[0][1] + strlen($h1_m[0][0]);
+            $modified_content = substr_replace($modified_content, $ads_block, $after_h1, 0);
+        }
     }
 
     return $modified_content;
