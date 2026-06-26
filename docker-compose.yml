@@ -10,6 +10,7 @@ services:
       WORDPRESS_DB_USER: ${DB_USER}
       WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
       WORDPRESS_DB_NAME: ${DB_NAME}
+      WORDPRESS_CONFIG_EXTRA: "define('WP_HOME','${SITE_URL}');define('WP_SITEURL','${SITE_URL}');"
     volumes:
       - wp_html:/var/www/html
       - ./utheme:/var/www/html/wp-content/themes/utheme
@@ -18,6 +19,7 @@ services:
       - ./wp-conf/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./wp-conf/.htaccess:/var/www/html/.htaccess
       - ./wp-conf/wp-config.php:/var/www/html/wp-config.php
+      - ./wp-conf/robots.txt:/var/www/html/robots.txt
     networks:
       - web_network
       - shared_db_network
@@ -38,13 +40,15 @@ services:
   sass:
     image: node:alpine
     working_dir: /src
+    networks:
+      - web_network
     volumes:
       - ./utheme/src:/src
     profiles:
       - dev
     command: >
       sh -c "npm install -g sass@1.77.8 &&
-      sass --watch --poll --style=compressed style.scss:style.css"
+      sass --watch --poll --style=compressed --load-path=/src style.scss:style.css"
 
 volumes:
   wp_html:

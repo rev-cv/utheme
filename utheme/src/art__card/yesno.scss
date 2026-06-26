@@ -1,10 +1,10 @@
+@use "sass:color";
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
 .yesno-box {
-    margin: 2rem 0;
+    // margin: 2rem 0;
     overflow: hidden;
-    border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
 
     // Сетка для колонок.
     // Учитываем структуру WP: .wp-block-group > .wp-block-group__inner-container > col1 + col2
@@ -22,18 +22,18 @@
     &__yes,
     &__no {
         padding: conf.$default-space;
+
+        // Базовый фон — переопределяется ниже по варианту callout
         background-color: conf.$color-section-light;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background-color: conf.$color-section-dark;
         }
 
-        // Убираем верхний отступ у заголовка (Do / Don't)
         p:first-child {
             margin-top: 0;
         }
 
-        // Стилизация списка внутри колонок
         ul {
             list-style: none;
             padding-left: 0;
@@ -54,13 +54,262 @@
         }
     }
 
-    &__yes {
-        border-top: 3px solid conf.$color-success;
-        strong { color: conf.$color-success; text-transform: uppercase; }
+    // ── Вариант: default ─────────────────────────────────────────────────────
+    @if conf.$callout == 'default' {
+        border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
+
+        &__yes {
+            border-top: 3px solid conf.$color-success-light;
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-success-dark;
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border-top: 3px solid conf.$color-error-light;
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-error-dark;
+                strong { color: conf.$color-error-dark; }
+            }
+        }
     }
 
-    &__no {
-        border-top: 3px solid conf.$color-error;
-        strong { color: conf.$color-error; text-transform: uppercase; }
+    // ── Вариант: subtle-tinted ───────────────────────────────────────────────
+    @else if conf.$callout == 'subtle-tinted' {
+        border-radius: f.get-radius-single();
+
+        & > .wp-block-group__inner-container {
+            gap: 1em;
+        }
+
+        &__yes {
+            border: 1px solid conf.$color-success-light;
+            border-radius: f.get-radius();
+            background-color: rgba(conf.$color-success-light, 0.08);
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-success-dark;
+                background-color: rgba(conf.$color-success-dark, 0.08);
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border: 1px solid conf.$color-error-light;
+            border-radius: f.get-radius();
+            background-color: rgba(conf.$color-error-light, 0.08);
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-error-dark;
+                background-color: rgba(conf.$color-error-dark, 0.08);
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+
+    // ── Вариант: left-accent-bar ─────────────────────────────────────────────
+    @else if conf.$callout == 'left-accent-bar' {
+        border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
+
+        &__yes {
+            border-top: none;
+            border-left: 4px solid conf.$color-success-light;
+            background-color: rgba(conf.$color-success-light, 0.1);
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-success-dark;
+                background-color: rgba(conf.$color-success-dark, 0.1);
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border-top: none;
+            border-left: 4px solid conf.$color-error-light;
+            background-color: rgba(conf.$color-error-light, 0.1);
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-error-dark;
+                background-color: rgba(conf.$color-error-dark, 0.1);
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+
+    // ── Вариант: solid-filled ────────────────────────────────────────────────
+    @else if conf.$callout == 'solid-filled' {
+        border-radius: f.get-radius-single();
+
+        *, .wp-block-list li {
+            color: #ffffff;
+        }
+
+        &__yes {
+            border-top: none;
+            background-color: color.adjust(conf.$color-success-light, $lightness: -20%);
+            
+            strong { color: inherit; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                background-color: color.adjust(conf.$color-success-dark, $lightness: -15%);
+            }
+        }
+
+        &__no {
+            border-top: none;
+            background-color: color.adjust(conf.$color-error-light, $lightness: -10%);
+            strong { color: inherit; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                background-color: color.adjust(conf.$color-error-dark, $lightness: -15%);
+            }
+        }
+    }
+
+    // ── Вариант: dashed-outline ──────────────────────────────────────────────
+    @else if conf.$callout == 'dashed-outline' {
+        border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
+
+        & > .wp-block-group__inner-container {
+            gap: 1em;
+        }
+
+        &__yes,
+        &__no {
+            background-color: transparent;
+
+            @include f.dark-mode {
+                background-color: transparent;
+            }
+        }
+
+        &__yes {
+            border: 1.5px dashed conf.$color-success-light;
+            border-radius: f.get-radius();
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-success-dark;
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border: 1.5px dashed conf.$color-error-light;
+            border-radius: f.get-radius();
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-color: conf.$color-error-dark;
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+
+    // ── Вариант: icon-badge-card ─────────────────────────────────────────────
+    @else if conf.$callout == 'icon-badge-card' {
+        border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
+
+        &__yes,
+        &__no {
+            background-color: #ffffff;
+            border-top: none;
+            border: 1px solid conf.$color-border-light;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+            @include f.dark-mode {
+                background-color: conf.$color-section-dark;
+                border-color: conf.$color-border-dark;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        &__yes {
+            border-top: 3px solid conf.$color-success-light;
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-success-dark;
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border-top: 3px solid conf.$color-error-light;
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-error-dark;
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+
+    // ── Вариант: minimal-inline ──────────────────────────────────────────────
+    @else if conf.$callout == 'minimal-inline' {
+        border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
+
+        &__yes,
+        &__no {
+            background-color: transparent;
+
+            @include f.dark-mode {
+                background-color: transparent;
+            }
+        }
+
+        &__yes {
+            border-top: 2px solid conf.$color-success-light;
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-success-dark;
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border-top: 2px solid conf.$color-error-light;
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-error-dark;
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+
+    // ── Фоллбэк для всех остальных значений $callout ─────────────────────────
+    @else {
+        border-radius: 3px 3px f.get-radius-single() f.get-radius-single();
+        
+        &__yes {
+            border-top: 3px solid conf.$color-success-light;
+            strong { color: conf.$color-success-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-success-dark;
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        &__no {
+            border-top: 3px solid conf.$color-error-light;
+            strong { color: conf.$color-error-light; text-transform: uppercase; }
+
+            @include f.dark-mode {
+                border-top-color: conf.$color-error-dark;
+                strong { color: conf.$color-error-dark; }
+            }
+        }
     }
 }

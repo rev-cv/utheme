@@ -1,5 +1,6 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
 /* ------------------------------------------------------ */
 // ПЕРЕМЕННЫЕ
@@ -19,7 +20,7 @@ $zebra-bg-dark: rgba(255, 255, 255, 0.02);
     display: grid; // Grid лучше справляется с изоляцией overflow, чем block
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 2rem; // Чтобы тень не обрезалась снизу
+    // padding-bottom: 0.5rem;
     user-select: none;
 
     &::-webkit-scrollbar {
@@ -58,14 +59,14 @@ $zebra-bg-dark: rgba(255, 255, 255, 0.02);
         border-collapse: collapse;
         min-width: 100% !important;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             box-shadow: 0 4px 24px $table-border-dark;
         }
 
         thead {
             background: conf.$color-accent-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: conf.$color-accent-dark;
             }
         }
@@ -75,7 +76,7 @@ $zebra-bg-dark: rgba(255, 255, 255, 0.02);
             font-weight: 600;
             color: conf.$color-bg-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-bg-dark;
             }
 
@@ -89,7 +90,7 @@ $zebra-bg-dark: rgba(255, 255, 255, 0.02);
             color: conf.$color-text-light;
             background: transparent;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-text-dark;
                 border-bottom: 1px solid $table-border-dark;
             }
@@ -102,7 +103,7 @@ $zebra-bg-dark: rgba(255, 255, 255, 0.02);
                 &:hover {
                     background: sys.mix(conf.$color-bg-light, #000, 95%);
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background: sys.mix(conf.$color-bg-dark, #fff, 90%);
                     }
                 }

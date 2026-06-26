@@ -1,0 +1,68 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$det-border-light: rgba(0, 0, 0, 0.12);
+$det-border-dark:  rgba(255, 255, 255, 0.12);
+$det-text-main:    conf.$color-text-light;
+$det-text-dark:    conf.$color-text-dark;
+$det-accent:       conf.$color-accent-light;
+$det-accent-dark:  conf.$color-accent-dark;
+$det-transition:   180ms ease;
+
+@mixin styles {
+    .wp-block-details {
+        border-bottom: 1px solid $det-border-light;
+        user-select: none;
+
+        @include f.dark-mode { border-bottom-color: $det-border-dark; }
+
+        > summary {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: .875rem 0;
+            font-weight: 500;
+            color: $det-text-main;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+
+            @include f.dark-mode { color: $det-text-dark; }
+            &::-webkit-details-marker { display: none; }
+
+            // horizontal bar (always visible)
+            &::after {
+                content: "";
+                width: 10px;
+                height: 1.5px;
+                background: currentColor;
+                flex-shrink: 0;
+            }
+
+            // vertical bar (fades/rotates when open)
+            &::before {
+                content: "";
+                position: absolute;
+                right: 4px;
+                top: 50%;
+                width: 1.5px;
+                height: 10px;
+                background: currentColor;
+                transform: translateY(-50%);
+                transition: transform $det-transition, opacity $det-transition;
+            }
+        }
+
+        &[open] > summary::before {
+            transform: translateY(-50%) rotate(90deg);
+            opacity: 0;
+        }
+
+        &[open] > *:nth-child(2) { margin-top: 4px; }
+
+        > *:not(summary) { margin: 0; }
+        > *:last-child   { margin-bottom: 1rem; }
+    }
+}

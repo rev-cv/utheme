@@ -1,8 +1,8 @@
-@use "../conf" as conf;
+﻿@use "../conf" as conf;
 @use "../funcs" as f;
 
 .card-grid {
-    margin-block: 2.5rem;
+    // margin-block: 2.5rem;
 
     & > .wp-block-group__inner-container {
         display: grid;
@@ -23,7 +23,7 @@
 
     @if conf.$is-border == 'true' {
         border: 1px solid conf.$color-border-light;
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             border-color: conf.$color-border-dark;
         }
     }

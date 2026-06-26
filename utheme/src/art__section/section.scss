@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -10,21 +10,24 @@ aside {
 
     // Общие стили для всех контентных блоков внутри статьи
     section {
+        display: flex;
+        flex-direction: column;
+        gap: $section-padding;
         background: conf.$color-section-light;
         border-radius: f.get-radius();
         padding: $section-padding;
-        margin: $section-margin-y auto;
+        // margin: $section-margin-y auto;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
         overflow: hidden;
 
         @if conf.$is-border == 'true' {
             border: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-section-dark;
         }
 
@@ -34,15 +37,6 @@ aside {
         h4 {
             margin-top: 0;
         }
-
-        p:last-of-type,
-        .wp-block-list:last-child {
-            margin-bottom: 0;
-        }
-
-        .wp-block-list {
-            margin-top: .6em;
-        }
     }
 
     section section {
@@ -50,18 +44,9 @@ aside {
         background: transparent;
     }
 
-    section h1,
-    h2+section {
-        margin-top: 0;
-    }
-
     // Специфичные стили только для <section>
     section h4 {
         font-size: 1.2em;
-    }
-
-    section:first-of-type {
-        margin-top: 0;
     }
 
     hr {

@@ -1,4 +1,4 @@
-@use 'sass:color';
+﻿@use 'sass:color';
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -40,7 +40,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             background: conf.$color-section-light;
             cursor: pointer;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: conf.$color-section-dark;
             }
 
@@ -90,7 +90,7 @@ $sp-xs: calc(#{$sp} * 0.35);
                 outline: 2px solid conf.$color-accent-light;
                 outline-offset: 2px;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     outline-color: conf.$color-accent-dark;
                 }
             }
@@ -170,7 +170,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             .more-pages__card-title {
                 color: conf.$color-text-light;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-text-dark;
                 }
             }
@@ -178,7 +178,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             .more-pages__desc {
                 color: color.change(conf.$color-text-light, $alpha: .65);
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: color.change(conf.$color-text-dark, $alpha: .65);
                 }
             }

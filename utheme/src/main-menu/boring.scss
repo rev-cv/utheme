@@ -13,7 +13,7 @@
 
     // ── Общее ─────────────────────────────────────────────────────────────────
 
-    body.menu-open {
+    body.ut-menu-open {
         overflow: auto !important;
     }
 
@@ -23,7 +23,7 @@
 
     // ── Шапка ─────────────────────────────────────────────────────────────────
 
-    #site-header {
+    .ut-site-header {
         position: fixed;
         top: 0; left: 0;
         width: 100%;
@@ -38,12 +38,12 @@
 
         @if conf.$is-border == 'true' {
             border-bottom: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
 
-        .header-island {
+        .ut-site-header__island {
             display: flex;
             align-items: center;
             height: 100%;
@@ -51,7 +51,7 @@
             position: relative;
         }
 
-        .site-logo {
+        .ut-site-header__logo {
             flex-shrink: 0;
             max-width: 50vw;
             overflow: hidden;
@@ -68,7 +68,7 @@
             }
         }
 
-        .site-name {
+        .ut-site-header__name {
             margin-left: 15px;
             font-size: clamp(.7em, 3vw, 1.1em);
             font-weight: 600;
@@ -98,7 +98,7 @@
             }
         }
 
-        .menu-toggle {
+        .ut-toggle {
             flex-shrink: 0;
             @if conf.$menu-accent-align == 'right' and conf.$is-menu-title == 'true' {
                 margin-left: 10px;
@@ -129,7 +129,7 @@
 
 // ── Панель ────────────────────────────────────────────────────────────────
 
-    .side-panel {
+    .ut-panel {
         position: fixed;
         top: $header-height;
         left: 0;
@@ -150,7 +150,7 @@
 
     // ── Навигационная шапка панели ────────────────────────────────────────────
 
-    .side-panel-header {
+    .ut-panel__head {
         display: flex;
         align-items: center;
         gap: 8px;
@@ -164,20 +164,13 @@
         margin: 0 auto;
         box-sizing: border-box;
 
-        &:has(.drill-back[hidden]) {
+        &:has(.ut-drill__back[hidden]) {
             height: 0;
             padding-top: 0;
             padding-bottom: 0;
         }
 
-        // @include f.mode((
-        //     border-bottom: (
-        //         1px solid rgba(conf.$color-border-light, 0.5),
-        //         1px solid rgba(conf.$color-border-dark,  0.5),
-        //     ),
-        // ));
-
-        .drill-back {
+        .ut-drill__back {
             background: none;
             border: none;
             cursor: pointer;
@@ -187,7 +180,6 @@
             gap: 6px;
             border-radius: f.get-radius();
             transition: color 0.2s ease;
-            // растягиваем на весь свободный горизонтальный простор
             flex: 1;
             min-width: 0;
 
@@ -196,13 +188,13 @@
             &:hover { color: conf.$color-accent-light; }
             &[hidden] { display: none; }
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 &:hover { color: conf.$color-accent-dark; }
             }
 
             svg { flex-shrink: 0; }
 
-            .drill-title {
+            .ut-drill__title {
                 @include f.font-txt;
                 font-size: clamp(.65rem, 2vw, .85rem);
                 font-weight: 600;
@@ -214,61 +206,60 @@
             }
         }
 
-        .menu-close { display: none; }
+        .ut-close { display: none; }
     }
 
     // ── Вьюпорт и панели ─────────────────────────────────────────────────────
 
-    @keyframes boring-drill-in {
+    @keyframes ut-drill-in {
         from { opacity: 0; transform: translateX(12px); }
         to   { opacity: 1; transform: translateX(0); }
     }
 
-    @keyframes boring-drill-back {
+    @keyframes ut-drill-out {
         from { opacity: 0; transform: translateX(-12px); }
         to   { opacity: 1; transform: translateX(0); }
     }
 
-    .drill-viewport {
+    .ut-drill__viewport {
         overflow-y: auto;
         overflow-x: hidden;
         flex: 1;
         min-height: 0;
     }
 
-    .side-nav {
+    .ut-side-nav {
         max-width: conf.$max-width;
         margin: 0 auto;
     }
 
     // Все панели скрыты по умолчанию
-    .drill-panel:not(.drill-panel--active) {
+    .ut-drill__panel:not(.ut-drill__panel--active) {
         display: none !important;
     }
 
     // Активная панель: display задаётся специфическим селектором ниже
-    .side-menu-list.drill-panel--active {
+    .ut-drill__root.ut-drill__panel--active {
         display: grid;
-        animation: boring-drill-in 0.25s ease;
+        animation: ut-drill-in 0.25s ease;
     }
 
-    .sub-menu-list.drill-panel--active,
-    .sub-sub-menu-list.drill-panel--active {
+    .ut-item__sub.ut-drill__panel--active,
+    .ut-item__sub-sub.ut-drill__panel--active {
         display: grid;
-        animation: boring-drill-in 0.25s ease;
+        animation: ut-drill-in 0.25s ease;
     }
 
-    // Анимация «назад» добавляется JS-классом .is-going-back на side-panel
-    .side-panel.is-going-back {
-        .side-menu-list.drill-panel--active,
-        .sub-menu-list.drill-panel--active,
-        .sub-sub-menu-list.drill-panel--active {
-            animation-name: boring-drill-back;
+    // Анимация «назад» добавляется JS-классом .ut-is-going-back на panel
+    .ut-panel.ut-is-going-back {
+        .ut-drill__root.ut-drill__panel--active,
+        .ut-item__sub.ut-drill__panel--active,
+        .ut-item__sub-sub.ut-drill__panel--active {
+            animation-name: ut-drill-out;
         }
     }
 
     // ── Общий уголок-триггер drill-in ─────────────────────────────────────────
-    // Применяется к .submenu-toggle (уровень 1) и .drill-corner (уровни 2–3)
 
     %drill-corner-base {
         position: absolute;
@@ -295,7 +286,7 @@
 
     // ── Уровень 1: карточки с картинками ──────────────────────────────────────
 
-    .side-menu-list {
+    .ut-drill__root {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 10px;
@@ -304,9 +295,9 @@
         margin: 0;
         box-sizing: border-box;
         width: 100%;
-        align-content: start; // группируем сверху вниз
+        align-content: start;
 
-        .menu-item-card {
+        .ut-item {
             position: relative;
             overflow: hidden;
             border-radius: f.get-radius();
@@ -314,7 +305,7 @@
             cursor: pointer;
 
             // Скрываем row-обёртку, всё позиционируем внутри li напрямую
-            .menu-item-row {
+            .ut-item__row {
                 display: contents;
             }
 
@@ -325,7 +316,7 @@
                 text-decoration: none;
             }
 
-            .menu-thumb {
+            .ut-item__thumb {
                 position: absolute;
                 inset: 0;
                 overflow: hidden;
@@ -339,7 +330,7 @@
                 }
             }
 
-            .menu-title {
+            .ut-item__label {
                 @include f.font-txt;
                 position: absolute;
                 inset: 0;
@@ -357,20 +348,20 @@
                 z-index: 1;
             }
 
-            // Уголок-триггер drill-in (перестилизованный .submenu-toggle)
-            .submenu-toggle {
+            // Уголок-триггер drill-in
+            .ut-item__toggle {
                 @extend %drill-corner-base;
                 color: #fff;
                 background: transparent;
             }
 
             &:hover {
-                .menu-thumb {
+                .ut-item__thumb {
                     filter: brightness(0.65) blur(0);
                     transform: scale(1.04);
                 }
-                
-                .submenu-toggle {
+
+                .ut-item__toggle {
                     background: rgba(255, 255, 255, 0.4);
                 }
             }
@@ -379,8 +370,8 @@
 
     // ── Уровни 2 и 3: одинаковые текстовые плитки ────────────────────────────
 
-    .sub-menu-list.drill-panel,
-    .sub-sub-menu-list.drill-panel {
+    .ut-item__sub.ut-drill__panel,
+    .ut-item__sub-sub.ut-drill__panel {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 8px;
@@ -394,8 +385,8 @@
     }
 
     // Стиль одной плитки (уровни 2 и 3) — квадратные, идентичные
-    .sub-menu-item,
-    .sub-sub-menu-item {
+    .ut-item__sub-item,
+    .ut-item__sub-sub-item {
         position: relative;
         overflow: hidden;
         border-radius: f.get-radius();
@@ -409,8 +400,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            // отступ справа, чтобы текст не лез под уголок
-            padding: 12px ;
+            padding: 12px;
             text-decoration: none;
             font-size: clamp(16px, 2vw, 18px);
             font-weight: 500;
@@ -435,13 +425,13 @@
                     ),
                 ));
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-accent-dark;
                 }
             }
         }
 
-        .drill-corner {
+        .ut-drill__corner {
             @extend %drill-corner-base;
             background: rgba(conf.$color-accent-light, 0.15);
             color: conf.$color-accent-light;
@@ -450,7 +440,7 @@
                 background: rgba(conf.$color-accent-light, 0.35);
             }
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: rgba(conf.$color-accent-dark, 0.2);
                 color: conf.$color-accent-dark;
 
@@ -464,22 +454,22 @@
     // ── Мобильный брейкпойнт: прямоугольные карточки ─────────────────────────
 
     @media (max-width: 600px) {
-        .side-menu-list {
-            .menu-item-card {
+        .ut-drill__root {
+            .ut-item {
                 aspect-ratio: 16 / 7;
             }
         }
 
-        .sub-menu-item,
-        .sub-sub-menu-item {
+        .ut-item__sub-item,
+        .ut-item__sub-sub-item {
             aspect-ratio: 16 / 5;
 
             a { font-size: clamp(14px, 4vw, 17px); }
         }
 
         // Масштабируем угловой треугольник под уменьшенную высоту карточки
-        .submenu-toggle,
-        .drill-corner {
+        .ut-item__toggle,
+        .ut-drill__corner {
             width: 72px;
             height: 72px;
             padding: 0 14px 14px 0;
@@ -490,7 +480,7 @@
 
     // ── Оверлей ───────────────────────────────────────────────────────────────
 
-    .menu-overlay {
+    .ut-overlay {
         position: fixed;
         top: $header-height;
         left: 0;
@@ -500,9 +490,8 @@
         z-index: $z - 2;
         display: none;
 
-        body.menu-open & {
+        body.ut-menu-open & {
             display: block;
         }
     }
 }
-

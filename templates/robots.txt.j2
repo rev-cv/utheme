@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /wp-admin/
+Disallow: /wp-json/
+Disallow: /?s=
+Disallow: /cdn-cgi/
+Disallow: /?rest_route=
+Allow: /
+{% if site.domain %}
+
+Sitemap: https://{{ site.domain }}/wp-sitemap.xml
+{% endif %}

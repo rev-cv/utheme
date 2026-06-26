@@ -49,28 +49,28 @@ $title_posts = function_exists( 'get_site_translation' ) ? get_site_translation(
                 </ul>
             </section>
 
+            <?php
+            $archive_query = new WP_Query([
+                'post_type'      => 'post',
+                'posts_per_page' => -1,
+                'post_status'    => 'publish'
+            ]);
+
+            if ( $archive_query->have_posts() ) : ?>
             <section class="sitemap-section">
                 <h2><?php echo esc_html( $title_posts ); ?></h2>
                 <ul>
-                    <?php
-                    $archive_query = new WP_Query([
-                        'post_type'      => 'post',
-                        'posts_per_page' => -1,
-                        'post_status'    => 'publish'
-                    ]);
-
-                    if ( $archive_query->have_posts() ) :
-                        while ( $archive_query->have_posts() ) : $archive_query->the_post(); ?>
+                    <?php while ( $archive_query->have_posts() ) : $archive_query->the_post(); ?>
                             <li>
                                 <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                                 <time datetime="<?php echo esc_attr( get_the_modified_date( 'Y-m-d' ) ); ?>"><?php echo get_the_modified_date(); ?></time>
                             </li>
                         <?php endwhile;
                         wp_reset_postdata();
-                    endif;
                     ?>
                 </ul>
             </section>
+            <?php endif; ?>
         </div>
     </div>
 </main>

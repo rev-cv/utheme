@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -16,7 +16,7 @@
         margin-bottom: 1rem;
         border: 3px solid conf.$color-accent-light;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             border-color: conf.$color-accent-dark;
         }
 
@@ -54,7 +54,7 @@
             color: #fff;
         }
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-accent-dark;
             color: conf.$color-bg-dark;
 

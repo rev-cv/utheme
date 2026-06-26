@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -11,13 +11,13 @@
         background: conf.$color-section-light;
         transition: transform 0.2s, box-shadow 0.2s;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-section-dark;
         }
 
         @if conf.$is-border == 'true' {
             border: 1px solid conf.$color-border-light;
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
@@ -46,24 +46,27 @@
             background: #000;
             color: #fff;
             padding: 10px 15px;
+
+            position: relative;
             
             margin-top: -30px;
-            position: relative;
-            z-index: 2;
             margin-left: 20px;
+
+            z-index: 2;
             
             font-size: 1rem;
-            line-height: 1.4;
+            line-height: 1.4em;
             border-radius: f.get-radius("small");
 
-            // Ограничение в 3 строки.
-            // Примечание: это делает фон блочным, а не облегающим текст как в прототиpe.
-            // Это компромисс для поддержки многострочных заголовков.
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
             max-width: calc(100% - 40px); // Чтобы не вылезал за пределы карточки
+            max-height: calc(3 * 1.4em + 20px); // 3 строки × line-height + padding top/bottom
+
+            span {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
         }
 
         p {
@@ -79,7 +82,7 @@
             -webkit-line-clamp: 3;
             overflow: hidden;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: rgba(conf.$color-text-dark, 0.7);
             }
         }

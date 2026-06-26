@@ -32,6 +32,10 @@
 .u-preview { background: #f9f9f9; height: 160px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid #eee; border-radius: 4px; }
 .u-preview--tall { height: 280px; }
 .u-preview img { max-width: 100%; max-height: 100%; object-fit: cover; }
+.u-radius-preview-box { width: 100px; height: 100px; background: #2271b1; transition: border-radius 0.2s ease; }
+.u-font-preview-box { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 20px; box-sizing: border-box; pointer-events: none; user-select: none; }
+.u-font-preview-hd { font-family: var(--fpb-hd, sans-serif); font-size: 24px; font-weight: var(--fpb-hd-w, 700); line-height: var(--fpb-hd-lh, 1.2); letter-spacing: var(--fpb-hd-ls, 0); text-transform: var(--fpb-hd-case, none); font-style: var(--fpb-hd-style, normal); color: #1d2327; }
+.u-font-preview-txt { font-family: var(--fpb-txt, sans-serif); font-size: 13px; font-weight: var(--fpb-txt-w, 400); line-height: var(--fpb-txt-lh, 1.5); letter-spacing: var(--fpb-txt-ls, 0); color: #50575e; }
 
 /* ── Basic tab fields ────────────────────────────────────────────────────── */
 .u-basic-field { display: flex; flex-direction: column; gap: 5px; }
@@ -89,6 +93,10 @@
 /* Inline SVG иконка */
 .u-icon-svg { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 18px; height: 18px; }
 .u-icon-svg svg { width: 18px; height: 18px; fill: currentColor; display: block; }
+
+/* Icon-set: 4 иконки в ряд (для набора callout-иконок) */
+.u-icon-svg--set { width: auto; gap: 5px; }
+.u-icon-svg--set svg { width: 15px; height: 15px; }
 
 /* ── Descriptions ────────────────────────────────────────────────────────── */
 .u-desc { font-size: 12px; color: #777; line-height: 1.5; margin: 0; }
@@ -149,6 +157,24 @@ input:checked + .slider:before { transform: translateX(24px); }
 .system-color-item { background: #fff; padding: 15px; border: 1px solid #ccd0d4; border-radius: 4px; }
 .system-color-item label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 13px; }
 
+/* Theme mode column awareness */
+[data-theme-col].u-theme-col-inactive {
+    opacity: 0.3;
+    pointer-events: none;
+}
+.color-table-header [data-theme-col].u-theme-col-inactive {
+    text-decoration: line-through;
+    opacity: 0.4;
+}
+.color-table-header [data-theme-col].u-theme-col-active {
+    color: #2271b1;
+    font-weight: 700;
+}
+.color-table-header [data-theme-col].u-theme-col-active::after {
+    content: ' ✓';
+    font-size: 11px;
+}
+
 /* Range inputs */
 input[type="range"] { width: 200px; vertical-align: middle; }
 
@@ -156,6 +182,12 @@ input[type="range"] { width: 200px; vertical-align: middle; }
 .u-typo-presets { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
 .u-typo-presets-label { font-size: 12px; color: #777; }
 .u-typo-preset { padding: 3px 10px; font-size: 12px; height: auto; line-height: 1.6; }
+
+/* ── Content Width controls ──────────────────────────────────────────────── */
+.u-width-presets { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.u-width-presets-label { font-size: 12px; color: #777; }
+.u-width-preset { padding: 3px 10px; font-size: 12px; height: auto; line-height: 1.6; }
+.u-width-preset.is-active { background: #2271b1; border-color: #2271b1; color: #fff; }
 
 /* Таблицеподобная сетка: label | hd-ctrl | txt-ctrl */
 .u-typo-table {
@@ -182,6 +214,24 @@ input[type="range"] { width: 200px; vertical-align: middle; }
 
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── H1 Gradient field ───────────────────────────────────────────────────── */
+.u-h1-row { align-items: start; }
+.u-gradient-field { display: flex; flex-direction: column; gap: 7px; }
+.is-hidden { display: none !important; }
+
+.u-gradient-toggle { display: flex; border: 1px solid #ccd0d4; border-radius: 4px; overflow: hidden; width: fit-content; }
+.u-gradient-toggle-btn { display: flex; align-items: center; padding: 3px 10px; font-size: 12px; font-weight: 600; cursor: pointer; background: #fff; color: #555; user-select: none; transition: background 0.15s, color 0.15s; }
+.u-gradient-toggle-btn + .u-gradient-toggle-btn { border-left: 1px solid #ccd0d4; }
+.u-gradient-toggle-btn.is-active { background: #2271b1; color: #fff; }
+.u-gradient-toggle-btn input[type="radio"] { display: none; }
+
+.u-gradient-extra { display: flex; flex-direction: column; gap: 6px; }
+.u-gradient-angle-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+.u-gradient-angle-label { font-weight: 600; }
+.u-gradient-angle-r { width: 90px; }
+.u-gradient-angle-out { font-weight: 700; color: #2271b1; min-width: 36px; }
+.u-gradient-strip { height: 10px; border-radius: 4px; width: 160px; }
 
 /* Color loading state */
 .u-colors-loading { opacity: 0.5; pointer-events: none; transition: opacity .2s; }

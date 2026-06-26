@@ -1,0 +1,88 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$tx-light:  conf.$color-text-light;
+$tx-dark:   conf.$color-text-dark;
+$act-light: conf.$color-accent-light;
+$act-dark:  conf.$color-accent-dark;
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .6rem;
+        user-select: none;
+        contain: layout style;
+
+        .page-toc-title {
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
+        }
+
+        ol.page-toc-list {
+            list-style: none;
+            counter-reset: toc-counter;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li.page-toc-level-2 {
+            counter-increment: toc-counter;
+            padding: calc(conf.$default-space / 4) 0;
+
+            a {
+                font-size: clamp(.9rem, 3vw, 1.1rem);
+                display: inline;
+                color: $tx-light;
+                text-decoration: none;
+                // Подчёркивание растёт при наведении
+                background-image: linear-gradient($act-light, $act-light);
+                background-size: 0% 1px;
+                background-repeat: no-repeat;
+                background-position: 0 100%;
+                transition: background-size 0.25s ease, color 0.25s ease;
+                padding-bottom: 2px;
+
+                @include f.dark-mode {
+                    color: $tx-dark;
+                    background-image: linear-gradient($act-dark, $act-dark);
+                }
+
+                // Надстрочный номер
+                &::before {
+                    content: counter(toc-counter, decimal-leading-zero);
+                    font-size: .6em;
+                    font-family: monospace;
+                    vertical-align: super;
+                    margin-right: 5px;
+                    letter-spacing: 0.04em;
+                    color: sys.adjust($tx-light, $lightness: 30%);
+
+                    @include f.dark-mode {
+                        color: sys.adjust($tx-dark, $lightness: -25%);
+                    }
+                }
+
+                &:hover {
+                    background-size: 100% 1px;
+                    color: $act-light;
+                    text-decoration: none;
+
+                    @include f.dark-mode { color: $act-dark; }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title { font-size: .75em; }
+        li a { font-size: .7em; }
+    }
+
+}

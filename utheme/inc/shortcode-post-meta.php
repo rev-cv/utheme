@@ -42,12 +42,16 @@ function post_meta_info_shortcode($atts)
 ?>
     <span class="article-meta">
         <?php if (!empty($author)): ?>
-            <a
-                rel="author"
-                class="author"
-                href="<?php echo home_url('/about-us/'); ?>"
-                title="<?php echo esc_html($author); ?>"><?php echo esc_html($author); ?>
-            </a>
+            <?php if (has_about_us_page()): ?>
+                <a
+                    rel="author"
+                    class="author"
+                    href="<?php echo get_about_us_url(); ?>"
+                    title="<?php echo esc_html($author); ?>"><?php echo esc_html($author); ?>
+                </a>
+            <?php else: ?>
+                <span rel="author" class="author"><?php echo esc_html($author); ?></span>
+            <?php endif; ?>
         <?php endif; ?>
         <time datetime="<?php echo esc_attr($iso_date); ?>"><?php echo esc_html($formatted_date); ?></time>
         <span>

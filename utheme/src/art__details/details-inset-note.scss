@@ -1,0 +1,76 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$det-bg-light:    conf.$color-section-light;
+$det-bg-dark:     conf.$color-section-dark;
+$det-text-main:   conf.$color-text-light;
+$det-text-dark:   conf.$color-text-dark;
+$det-accent:      conf.$color-accent-light;
+$det-accent-dark: conf.$color-accent-dark;
+$det-transition:  180ms ease;
+
+@mixin styles {
+    .wp-block-details {
+        background: $det-bg-light;
+        border-left: 3px solid $det-accent;
+        border-radius: 0 f.get-radius() f.get-radius() 0;
+        user-select: none;
+
+        @include f.dark-mode {
+            background: $det-bg-dark;
+            border-left-color: $det-accent-dark;
+        }
+
+        > summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: .75rem 1rem;
+            font-weight: 500;
+            color: $det-text-main;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+
+            @include f.dark-mode { color: $det-text-dark; }
+            &::-webkit-details-marker { display: none; }
+
+            // "i" icon in circle
+            &::before {
+                content: "i";
+                width: 1rem;
+                height: 1rem;
+                border: 1px solid $det-accent;
+                color: $det-accent;
+                border-radius: 50%;
+                font-size: .65em;
+                font-style: italic;
+                font-weight: 600;
+                font-family: Georgia, "Times New Roman", serif;
+                display: grid;
+                place-items: center;
+                flex-shrink: 0;
+                line-height: 1.5em;
+
+                @include f.dark-mode {
+                    border-color: $det-accent-dark;
+                    color: $det-accent-dark;
+                }
+            }
+        }
+
+        > *:not(summary) {
+            margin: 0 1rem;
+        }
+
+        &[open] > *:nth-child(2) { margin-top: 4px; }
+        > *:last-child            { margin-bottom: 1rem; }
+
+        > summary:focus-visible {
+            outline: 2px solid $det-accent;
+            outline-offset: 2px;
+            border-radius: 3px;
+            @include f.dark-mode { outline-color: $det-accent-dark; }
+        }
+    }
+}

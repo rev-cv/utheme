@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -22,7 +22,7 @@
             border: 1px solid conf.$color-border-light;
         }
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background-color: conf.$color-section-dark;
             @if conf.$is-border == 'true' {
                 border-color: conf.$color-border-dark;
@@ -56,7 +56,7 @@
             text-overflow: ellipsis;
             max-height: calc(1.3em * 3); // Fallback для старых браузеров
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-text-dark;
             }
         }
@@ -76,7 +76,7 @@
             text-overflow: ellipsis;
             max-height: calc(1.5em * 5); // Fallback для старых браузеров
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: rgba(conf.$color-text-dark, 0.8);
             }
         }
@@ -93,14 +93,14 @@
             background-color: conf.$color-primary-light;
             color: conf.$color-section-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background-color: conf.$color-primary-dark;
                 color: conf.$color-section-dark;
             }
 
             &:hover {
                 background-color: sys.scale(conf.$color-primary-light, $lightness: -10%);
-                @media (prefers-color-scheme: dark) { 
+                @include f.dark-mode { 
                     background-color: sys.scale(conf.$color-primary-dark, $lightness: -10%);
                 }
             }

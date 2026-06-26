@@ -1,0 +1,129 @@
+@use "sass:color";
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$icon-size: 1.25rem;
+
+@mixin _apply-icon($color-light, $color-dark, $icon-select) {
+    &::before {
+        background-color: $color-light;
+        -webkit-mask-image: $icon-select;
+        mask-image: $icon-select;
+
+        @include f.dark-mode {
+            background-color: $color-dark;
+        }
+    }
+}
+
+@mixin styles {
+    article {
+        .callout {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: calc(conf.$default-space * 0.75) conf.$default-space;
+            border-top: none;
+            border-right: none;
+            border-bottom: none;
+            border-left: 4px solid transparent;
+            border-radius: 0;
+            color: conf.$color-callout-txt-light;
+
+            @include f.dark-mode {
+                color: conf.$color-callout-txt-dark;
+            }
+
+            &::before {
+                content: '';
+                display: block;
+                width: $icon-size;
+                height: $icon-size;
+                flex-shrink: 0;
+                margin-top: 0.1em;
+                -webkit-mask-size: contain;
+                mask-size: contain;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .callout {
+                flex-direction: column;
+                gap: 0.375rem;
+                padding-left: calc(conf.$default-space * 0.625);
+
+                &::before {
+                    margin-top: 0;
+                }
+            }
+        }
+
+        .info-callout {
+            border-left-color: conf.$color-info-light;
+            background-color: rgba(conf.$color-info-light, 0.1);
+
+            strong { color: conf.$color-info-light; }
+
+            @include _apply-icon(conf.$color-info-light, conf.$color-info-dark, conf.$callout-info-icon-select);
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-info-dark;
+                background-color: rgba(conf.$color-info-dark, 0.1);
+
+                strong { color: conf.$color-info-dark; }
+            }
+        }
+
+        .success-callout {
+            border-left-color: conf.$color-success-light;
+            background-color: rgba(conf.$color-success-light, 0.1);
+
+            strong { color: conf.$color-success-light; }
+
+            @include _apply-icon(conf.$color-success-light, conf.$color-success-dark, conf.$callout-success-icon-select);
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-success-dark;
+                background-color: rgba(conf.$color-success-dark, 0.1);
+
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        .warning-callout {
+            border-left-color: conf.$color-warning-light;
+            background-color: rgba(conf.$color-warning-light, 0.1);
+
+            strong { color: conf.$color-warning-light; }
+
+            @include _apply-icon(conf.$color-warning-light, conf.$color-warning-dark, conf.$callout-warning-icon-select);
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-warning-dark;
+                background-color: rgba(conf.$color-warning-dark, 0.1);
+
+                strong { color: conf.$color-warning-dark; }
+            }
+        }
+
+        .danger-callout {
+            border-left-color: conf.$color-error-light;
+            background-color: rgba(conf.$color-error-light, 0.1);
+
+            strong { color: conf.$color-error-light; }
+
+            @include _apply-icon(conf.$color-error-light, conf.$color-error-dark, conf.$callout-danger-icon-select);
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-error-dark;
+                background-color: rgba(conf.$color-error-dark, 0.1);
+
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+}

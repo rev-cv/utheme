@@ -1,0 +1,63 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$det-border-light: rgba(0, 0, 0, 0.10);
+$det-border-dark:  rgba(255, 255, 255, 0.10);
+$det-mute-light:   rgba(0, 0, 0, 0.38);
+$det-mute-dark:    rgba(255, 255, 255, 0.38);
+$det-text-main:    conf.$color-text-light;
+$det-text-dark:    conf.$color-text-dark;
+$det-accent:       conf.$color-accent-light;
+$det-accent-dark:  conf.$color-accent-dark;
+$det-transition:   200ms ease;
+
+@mixin styles {
+    .wp-block-details {
+        padding-left: 1.5rem;
+        position: relative;
+        user-select: none;
+
+        > summary {
+            padding: 4px 0;
+            font-weight: 500;
+            color: $det-text-main;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color $det-transition;
+
+            @include f.dark-mode { color: $det-text-dark; }
+            &::-webkit-details-marker { display: none; }
+
+            // hanging marker in the left gutter
+            &::before {
+                content: "›";
+                position: absolute;
+                left: .25rem;
+                top: 2px;
+                font-family: ui-monospace, monospace;
+                font-size: 1.15em;
+                line-height: 1;
+                color: $det-mute-light;
+                transform-origin: 50% 55%;
+                transition: transform $det-transition;
+
+                @include f.dark-mode { color: $det-mute-dark; }
+            }
+        }
+
+        &[open] > summary {
+            border-bottom-color: $det-border-light;
+            padding-bottom: 6px;
+
+            @include f.dark-mode { border-bottom-color: $det-border-dark; }
+
+            &::before { transform: rotate(90deg); }
+        }
+
+        &[open] > *:nth-child(2) { margin-top: 8px; }
+
+        > *:not(summary) { margin: 0; }
+    }
+}

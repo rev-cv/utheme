@@ -1,0 +1,51 @@
+@use "sass:color";
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    article {
+        .callout {
+            padding: calc(conf.$default-space * 0.875) conf.$default-space;
+            border: none;
+            border-radius: f.get-radius();
+
+            * {
+                color: #ffffff;
+            }
+
+            strong { color: inherit; }
+        }
+
+        .info-callout {
+            background-color: color.adjust(conf.$color-info-light, $lightness: -25%);
+
+            @include f.dark-mode {
+                background-color: color.adjust(conf.$color-info-dark, $lightness: -20%);
+            }
+        }
+
+        .success-callout {
+            background-color: color.adjust(conf.$color-success-light, $lightness: -20%);
+
+            @include f.dark-mode {
+                background-color: color.adjust(conf.$color-success-dark, $lightness: -15%);
+            }
+        }
+
+        .warning-callout {
+            background-color: color.adjust(conf.$color-warning-light, $lightness: -30%);
+
+            @include f.dark-mode {
+                background-color: color.adjust(conf.$color-warning-dark, $lightness: -20%);
+            }
+        }
+
+        .danger-callout {
+            background-color: color.adjust(conf.$color-error-light, $lightness: -10%);
+
+            @include f.dark-mode {
+                background-color: color.adjust(conf.$color-error-dark, $lightness: -15%);
+            }
+        }
+    }
+}

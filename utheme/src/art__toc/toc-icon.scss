@@ -1,5 +1,6 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
 /* ------------------------------------------------------ */
 // ПЕРЕМЕННЫЕ
@@ -26,10 +27,11 @@ $icon-svg: conf.$toc-icon-select;
         contain: layout style;
 
         .page-toc-title {
-            margin: 0 0 .8em;
             display: block;
             width: fit-content;
             padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
         }
 
         ol.page-toc-list,
@@ -63,7 +65,7 @@ $icon-svg: conf.$toc-icon-select;
                 font-weight: normal;
                 text-decoration: none;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: $tx-dark;
                 }
 
@@ -84,7 +86,7 @@ $icon-svg: conf.$toc-icon-select;
                     -webkit-mask-position: center;
                     mask-position: center;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background-color: $act-dark;
                     }
                 }
@@ -94,7 +96,7 @@ $icon-svg: conf.$toc-icon-select;
                     transform: translateX(8px);
                     color: $act-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: $act-dark;
                     }
                 }
@@ -113,9 +115,5 @@ $icon-svg: conf.$toc-icon-select;
         }
     }
 
-    article div.toc {
-        margin-bottom: clamp(.7em, 5vw, 2em) !important;
-        margin-top: clamp(1.4em, 5vw, 3em) !important;
-    }
 
 }

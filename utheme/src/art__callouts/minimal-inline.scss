@@ -1,0 +1,98 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$dot-size: 6px;
+
+@mixin styles {
+    article {
+        .callout {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: calc(conf.$default-space * 0.5) calc(conf.$default-space * 0.75);
+            background: transparent;
+            border: none;
+            border-left: 2px solid transparent;
+            border-radius: 0;
+            color: conf.$color-callout-txt-light;
+
+            @include f.dark-mode {
+                color: conf.$color-callout-txt-dark;
+            }
+
+            &::before {
+                content: '';
+                display: block;
+                flex-shrink: 0;
+                width: $dot-size;
+                height: $dot-size;
+                border-radius: 50%;
+                margin-top: 0.55em;
+            }
+        }
+
+        .info-callout {
+            border-left-color: conf.$color-info-light;
+
+            &::before { background-color: conf.$color-info-light; }
+
+            strong { color: conf.$color-info-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-info-dark;
+
+                &::before { background-color: conf.$color-info-dark; }
+
+                strong { color: conf.$color-info-dark; }
+            }
+        }
+
+        .success-callout {
+            border-left-color: conf.$color-success-light;
+
+            &::before { background-color: conf.$color-success-light; }
+
+            strong { color: conf.$color-success-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-success-dark;
+
+                &::before { background-color: conf.$color-success-dark; }
+
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        .warning-callout {
+            border-left-color: conf.$color-warning-light;
+
+            &::before { background-color: conf.$color-warning-light; }
+
+            strong { color: conf.$color-warning-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-warning-dark;
+
+                &::before { background-color: conf.$color-warning-dark; }
+
+                strong { color: conf.$color-warning-dark; }
+            }
+        }
+
+        .danger-callout {
+            border-left-color: conf.$color-error-light;
+
+            &::before { background-color: conf.$color-error-light; }
+
+            strong { color: conf.$color-error-light; }
+
+            @include f.dark-mode {
+                border-left-color: conf.$color-error-dark;
+
+                &::before { background-color: conf.$color-error-dark; }
+
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+}

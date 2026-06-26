@@ -1,0 +1,97 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$tx-light:  conf.$color-text-light;
+$tx-dark:   conf.$color-text-dark;
+$act-light: conf.$color-accent-light;
+$act-dark:  conf.$color-accent-dark;
+$brd-light: conf.$color-border-light;
+$brd-dark:  conf.$color-border-dark;
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .8rem;
+        user-select: none;
+        contain: layout style;
+
+        .page-toc-title {
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
+        }
+
+        ol.page-toc-list {
+            list-style: none;
+            counter-reset: toc-counter;
+            column-count: 2;
+            column-gap: 2em;
+            column-rule: 1px solid $brd-light;
+            padding-left: 0;
+            margin: 0;
+
+            @include f.dark-mode {
+                column-rule-color: $brd-dark;
+            }
+
+            @media (max-width: 600px) {
+                column-count: 1;
+                column-rule: none;
+            }
+        }
+
+        li.page-toc-level-2 {
+            counter-increment: toc-counter;
+            break-inside: avoid;
+            display: flex;
+            gap: .5em;
+            align-items: baseline;
+            padding: calc(conf.$default-space / 4) 0;
+
+            &::before {
+                content: counter(toc-counter, decimal-leading-zero);
+                font-size: .7em;
+                font-family: monospace;
+                color: sys.adjust($tx-light, $lightness: 30%);
+                min-width: 1.6em;
+                flex-shrink: 0;
+
+                @include f.dark-mode {
+                    color: sys.adjust($tx-dark, $lightness: -25%);
+                }
+            }
+
+            a {
+                font-size: clamp(.75rem, 2.5vw, .9rem);
+                font-weight: 500;
+                color: $tx-light;
+                text-decoration: none;
+                transition: color 200ms ease;
+
+                @include f.dark-mode { color: $tx-dark; }
+
+                &:hover {
+                    color: $act-light;
+                    text-decoration: none;
+
+                    @include f.dark-mode { color: $act-dark; }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title { font-size: .75em; }
+
+        ol.page-toc-list { column-count: 1; }
+
+        li a { font-size: .7em; }
+    }
+
+}

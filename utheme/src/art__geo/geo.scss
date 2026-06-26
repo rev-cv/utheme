@@ -1,4 +1,4 @@
-@use 'sass:color';
+﻿@use 'sass:color';
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -6,9 +6,20 @@ $sp:    conf.$default-space;
 $sp-sm: calc(#{$sp} * 0.55);
 $sp-xs: calc(#{$sp} * 0.35);
 
+// Grid breakpoints for .tc-brand-list orphan-span rules.
+// h-pad = 2 × clamp(16px,3vw,32px) at its maximum (32px × 2).
+$_h-pad:         64px;
+$_max-content:   conf.$max-width - $_h-pad; // effective max content width
+$_col2-content:  444px * 2;                 // 888px  — min content for 2 desktop cols
+$_col3-content:  444px * 3;                 // 1332px — min content for 3 desktop cols
+$_col2-viewport: 945px;                     // viewport where content ≈ 888px via 3vw clamp
+$_col3-viewport: $_col3-content + $_h-pad;  // 1396px — viewport where 3 cols become possible
+
 /* ─── Brand-list card widget ─────────────────────────────── */
 
 .dynamic-injection-container {
+
+    h2 { display: none; }
 
     .tc-brand-list {
         display: grid;
@@ -23,18 +34,29 @@ $sp-xs: calc(#{$sp} * 0.35);
             margin-bottom: 2rem;
         }
 
-        // Last card stretches to fill the orphan empty column.
-        // Breakpoints derived from: content = viewport − 2×clamp(16px,3vw,32px), max-width 1200px.
-        // 3-col never occurs: max content ~1136px < 444px×3.
+        // Stretches orphan last card to fill empty column(s).
+        // Breakpoints derived from: content = viewport − 2×clamp(16px,3vw,32px), capped at $max-width.
         .tc-card:last-child {
             // Mobile 2-col (minmax 200px): content ≥ 400px → viewport ≥ 426px
             @media (min-width: 426px) and (max-width: 540px) {
                 &:nth-child(2n + 1) { grid-column: span 2; }
             }
-            // Desktop 2-col (minmax 444px): content ≥ 888px → viewport ≥ 945px
-            @media (min-width: 945px) {
-                &:nth-child(2n + 1) { grid-column: span 2; }
+
+            @if $_max-content >= $_col3-content {
+                // 3 cols possible at wide viewports — bound 2-col rule and add 3-col rule
+                @media (min-width: #{$_col2-viewport}) and (max-width: #{$_col3-viewport - 1px}) {
+                    &:nth-child(2n + 1) { grid-column: span 2; }
+                }
+                @media (min-width: #{$_col3-viewport}) {
+                    &:nth-child(3n + 1) { grid-column: span 3; }
+                }
+            } @else if $_max-content >= $_col2-content {
+                // 2 cols possible, 3 never
+                @media (min-width: #{$_col2-viewport}) {
+                    &:nth-child(2n + 1) { grid-column: span 2; }
+                }
             }
+            // else: $max-width too narrow for 2 desktop cols — no rule needed
         }
     }
 
@@ -48,7 +70,7 @@ $sp-xs: calc(#{$sp} * 0.35);
         align-items: center;
         column-gap: $sp-sm;
         row-gap: 0;
-        padding: $sp-sm $sp;
+        padding: $sp-sm;
 
         position: relative;
         background: conf.$color-section-light;
@@ -59,12 +81,12 @@ $sp-xs: calc(#{$sp} * 0.35);
         @if conf.$is-border == 'true' {
             border: 1px solid conf.$color-border-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 border-color: conf.$color-border-dark;
             }
         }
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-section-dark;
         }
 
@@ -101,7 +123,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             outline: 2px solid conf.$color-accent-light;
             outline-offset: 2px;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 outline-color: conf.$color-accent-dark;
             }
         }
@@ -158,14 +180,14 @@ $sp-xs: calc(#{$sp} * 0.35);
                 display: block;
                 transition: color 150ms;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-text-dark;
                 }
 
                 &:hover {
                     color: conf.$color-accent-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: conf.$color-accent-dark;
                     }
                 }
@@ -180,7 +202,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             text-overflow: ellipsis;
             color: color.change(conf.$color-text-light, $alpha: .6);
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: color.change(conf.$color-text-dark, $alpha: .65);
             }
         }
@@ -190,7 +212,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             color: conf.$color-accent-light;
             line-height: 1;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: conf.$color-accent-dark;
             }
         }
@@ -217,7 +239,7 @@ $sp-xs: calc(#{$sp} * 0.35);
         transition: background 150ms, color 150ms;
         justify-self: start;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             border-color: conf.$color-border-dark;
             color: conf.$color-text-dark;
         }
@@ -227,7 +249,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             color: #fff;
             border-color: transparent;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: conf.$color-accent-dark;
             }
         }
@@ -239,7 +261,7 @@ $sp-xs: calc(#{$sp} * 0.35);
         border-top: 1px solid conf.$color-border-light;
         margin-top: $sp-xs;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             border-color: conf.$color-border-dark;
         }
     }
@@ -261,7 +283,7 @@ $sp-xs: calc(#{$sp} * 0.35);
         white-space: nowrap;
         color: color.change(conf.$color-text-light, $alpha: .65);
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: color.change(conf.$color-text-dark, $alpha: .65);
         }
     }
@@ -270,7 +292,7 @@ $sp-xs: calc(#{$sp} * 0.35);
         color: conf.$color-text-light;
         font-weight: 600;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: conf.$color-text-dark;
         }
     }
@@ -279,7 +301,11 @@ $sp-xs: calc(#{$sp} * 0.35);
     .tc-error {
         padding: $sp;
         text-align: center;
-        color: conf.$color-error;
+        color: conf.$color-error-light;
+
+        @include f.dark-mode {
+            color: conf.$color-error-dark;
+        }
 
         p { margin: 0 0 .5em; }
 
@@ -292,7 +318,7 @@ $sp-xs: calc(#{$sp} * 0.35);
             padding: .4em 1.2em;
             cursor: pointer;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: conf.$color-accent-dark;
             }
         }
@@ -312,7 +338,7 @@ $sp-xs: calc(#{$sp} * 0.35);
         color: #fff;
         transition: filter 180ms ease, transform 150ms ease;
 
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             background: conf.$color-accent-dark;
         }
 
@@ -369,6 +395,61 @@ $sp-xs: calc(#{$sp} * 0.35);
             text-align: center;
         }
     }
+}
+
+/* ─── Skeleton loader (CLS prevention) ──────────────────── */
+
+.dynamic-injection-container .tc-card-skeleton {
+    height: 114px;
+    background: conf.$color-section-light;
+    border-radius: f.get-radius("card");
+    overflow: hidden;
+    position: relative;
+
+    @if conf.$is-border == 'true' {
+        border: 1px solid conf.$color-border-light;
+
+        @include f.dark-mode {
+            border-color: conf.$color-border-dark;
+        }
+    }
+
+    @include f.dark-mode {
+        background: conf.$color-section-dark;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            90deg,
+            transparent 25%,
+            color.change(conf.$color-text-light, $alpha: .05) 50%,
+            transparent 75%
+        );
+        background-size: 200% 100%;
+        animation: tc-skeleton-sweep 1.5s ease-in-out infinite;
+
+        @include f.dark-mode {
+            background: linear-gradient(
+                90deg,
+                transparent 25%,
+                color.change(conf.$color-text-dark, $alpha: .07) 50%,
+                transparent 75%
+            );
+            background-size: 200% 100%;
+        }
+    }
+
+    @media (max-width: 540px) {
+        height: 200px;
+    }
+}
+
+@keyframes tc-skeleton-sweep {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* ─── Floating sticky banner ─────────────────────────────── */

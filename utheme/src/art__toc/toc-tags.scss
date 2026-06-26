@@ -1,4 +1,4 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -23,7 +23,6 @@ $pad-x: calc(conf.$default-space / 2);
         contain: layout style;
 
         .page-toc-title {
-            margin: 0;
             padding: $pad-y $pad-x $pad-y 0;
             flex-shrink: 0;
             align-self: center;
@@ -32,13 +31,15 @@ $pad-x: calc(conf.$default-space / 2);
             white-space: nowrap;
             color: $tx-light;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 color: $tx-dark;
             }
 
             &::after {
                 content: ':';
             }
+
+            @if conf.$toc-show-title == 'false' { display: none; }
         }
 
         ol.page-toc-list {
@@ -71,12 +72,12 @@ $pad-x: calc(conf.$default-space / 2);
                 @if conf.$is-border == 'true' {
                     border: 1px solid conf.$color-border-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         border-color: conf.$color-border-dark;
                     }
                 }
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     background-color: $bg-dark;
                     color: $tx-dark;
                 }
@@ -85,7 +86,7 @@ $pad-x: calc(conf.$default-space / 2);
                     text-decoration: none;
                     background-color: sys.adjust($bg-light, $lightness: -8%);
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background-color: sys.adjust($bg-dark, $lightness: 8%);
                     }
                 }
@@ -103,9 +104,6 @@ $pad-x: calc(conf.$default-space / 2);
         }
     }
 
-    article div.toc {
-        margin-bottom: clamp(.7em, 5vw, 2em) !important;
-        margin-top: clamp(1.4em, 5vw, 3em) !important;
-    }
+
 
 }

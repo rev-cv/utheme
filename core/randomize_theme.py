@@ -7,7 +7,7 @@ _SCSS_FILE = Path(__file__).parent.parent / "utheme" / "src" / "conf.scss"
 _CONFIG = {
     "main-menu": [
         "island", "aside", "boring",
-        "docs", "newspaper", "hierarchical"
+        "docs", "hierarchical"
     ],
     "footer-menu": [
         "2columns", "central"
@@ -25,8 +25,8 @@ _CONFIG = {
         "default", "frame", "slide", "windows",
         "float", "soft", "split"
     ],
-    "is-img_contain": [
-        "true", "false"
+    "image-style": [
+        "original", "marginalia", "slide-up", "whisper", "corner-badge", "brutalist-strip"
     ],
     "is-left-align": [
         "true", "false"

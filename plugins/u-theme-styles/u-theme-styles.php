@@ -10,30 +10,43 @@ class UThemeConfigurator {
 
     private string $scss_file;
 
-    // Цветовые переменные — те что дублируются в ручном блоке.
-    // Основной блок в файле (с map.get-выражениями) НЕ ТРОГАЕМ НИКОГДА.
-    private array $color_vars = [
+    // Brand Colors — основная палитра, генерируется через map.get().
+    // НЕ трогаем в основном теле файла — пишутся только в MODE блок.
+    private array $brand_color_vars = [
         'color-primary-light', 'color-accent-light', 'color-text-light',
         'color-bg-light', 'color-section-light', 'color-H1-light', 'color-border-light',
         'color-primary-dark', 'color-accent-dark', 'color-text-dark',
         'color-bg-dark', 'color-section-dark', 'color-H1-dark', 'color-border-dark',
     ];
 
+    // Status Colors — цвета состояний (success/warning/error/info/callout-txt).
+    // Записываются напрямую в переменные conf.scss; MODE блок управляет алиасами неактивной стороны.
+    private array $status_color_vars = [
+        'color-success-light',     'color-success-dark',
+        'color-warning-light',     'color-warning-dark',
+        'color-error-light',       'color-error-dark',
+        'color-info-light',        'color-info-dark',
+        'color-callout-txt-light', 'color-callout-txt-dark',
+    ];
+
     // Конфиг рандомизации — повторяет randomize_theme.py
     private array $random_config = [
-        'main-menu'        => ['island', 'aside', 'boring', 'docs', 'newspaper', 'hierarchical'],
+        'main-menu'        => ['island', 'aside', 'boring', 'docs', 'hierarchical'],
         'menu-accent-align' => ['left', 'center', 'right'],
         'footer-menu'    => ['2columns', '4columns'],
         'more-pages'     => ['grid', 'list', 'slider', 'carousel'],
-        'toc-menu'       => ['circle', 'number', 'icon', 'tags'],
+        'toc-menu'       => ['circle', 'number', 'icon', 'tags', 'vertical-rule', 'two-columns', 'underline', 'card-row', 'numbers-right'],
         'stt-icon'       => [
             'chevron-one', 'chevron-two', 'triple-filled-arrow', 'triple-arrow', 
             'double-filled-arrow', 'double-arrow', 'circle-filled-1', 'circle-1', 
             'circle-2', 'arrow-warm', 'arrow-short', 'arrow-big', 'arrow-pin'],
         'is-not-section' => ['true', 'false'],
-        'details'        => ['plus', 'arrow'],
-        'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
-        'is-img_contain' => ['true', 'false'],
+        'details'        => ['plus', 'arrow', 'hairline', 'left-rule', 'bottom-rule', 'dashed', 'hanging-marker', 'pill-summary', 'inset-note'],
+        'callout'          => ['default', 'subtle-tinted', 'left-accent-bar', 'solid-filled', 'dashed-outline', 'icon-badge-card', 'minimal-inline'],
+        'callout-icon-set' => ['circle', 'shield', 'diamond'],
+        'article-card'   => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split', 'classic', 'aside', 'overlay', 'blurred', 'type-first', 'editorial', 'clipped'],
+        'image-style'    => ['original', 'marginalia', 'slide-up', 'whisper', 'corner-badge', 'brutalist-strip'],
+        'table-style'    => ['default', 'minimal', 'classic', 'cards', 'stripes', 'bold', 'outlined', 'dashed', 'tinted', 'editorial'],
         'is-left-align'  => ['true', 'false'],
         'is-border'      => ['true', 'false'],
         'font-vibe'      => [
@@ -47,15 +60,12 @@ class UThemeConfigurator {
         'radius-vibe' => ['sharp', 'neutral', 'dynamic', 'rounded', 'velocity', 'chess', 'sticker'],
     ];
 
-    // Маркеры ручного блока в конце файла.
-    // is_manual_mode() смотрит только на их наличие.
-    private const MANUAL_BLOCK_START = '/* Manual Color Configuration */';
-    private const MANUAL_BLOCK_END   = '/* End Manual Color Configuration */';
-
-    // Маркеры блока режима темы (dark-only / light-only).
-    // Блок всегда идёт после ручного блока цветов.
-    private const THEME_MODE_BLOCK_PREFIX = '/* Theme Mode:';
-    private const THEME_MODE_BLOCK_END    = '/* End Theme Mode */';
+    // Единый маркер MODE-блока в конце файла.
+    // Формат: /* MODE {LABEL} */ ... /* END MODE */
+    // Все 6 комбинаций (brand/status × dark-only/both/light-only × auto/manual)
+    // используют один паттерн — удаление и обнаружение через единый regex.
+    private const MODE_BLOCK_START_PREFIX = '/* MODE ';
+    private const MODE_BLOCK_END          = '/* END MODE */';
 
     public function __construct() {
         $this->scss_file = get_template_directory() . '/src/conf.scss';
@@ -67,38 +77,45 @@ class UThemeConfigurator {
     }
 
     public function add_menu(): void {
-        add_theme_page('U Theme Styles', 'U Theme Styles', 'manage_options', 'u-theme-styles', [$this, 'render_page']);
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#9CA2A7" d="M8.203 5.447L5.83 6.777l1.329-2.374l-1.33-2.374l2.374 1.33l2.374-1.33l-1.33 2.374l1.33 2.374zm11.394 9.305l2.374-1.329l-1.33 2.374l1.33 2.373l-2.374-1.329l-2.374 1.33l1.33-2.374l-1.33-2.374zm2.374-12.724l-1.33 2.374l1.33 2.374l-2.374-1.33l-2.374 1.33l1.33-2.374l-1.33-2.374l2.374 1.33zm-8.223 10.236l2.317-2.316l-2.013-2.013l-2.317 2.317zm.978-5.212l2.222 2.222c.37.35.37.968 0 1.338L5.867 21.694c-.37.37-.987.37-1.339 0l-2.222-2.221c-.37-.352-.37-.969 0-1.34l11.081-11.08c.37-.37.988-.37 1.34 0z"/></svg>';
+        add_menu_page('U Theme Styles', 'U Theme Styles', 'manage_options', 'u-theme-styles', [$this, 'render_page'], 'data:image/svg+xml;base64,' . base64_encode($svg), 3);
     }
 
     public function enqueue_assets(string $hook): void {
-        if ($hook !== 'appearance_page_u-theme-styles') return;
+        if ($hook !== 'toplevel_page_u-theme-styles') return;
         wp_enqueue_style('u-theme-admin-css', plugins_url('assets/admin-style.css', __FILE__));
         wp_enqueue_script('u-theme-admin-js', plugins_url('assets/admin-script.js', __FILE__), ['jquery'], null, true);
         wp_localize_script('u-theme-admin-js', 'uThemeData', [
-            'ajaxUrl'  => admin_url('admin-ajax.php'),
-            'nonce'    => wp_create_nonce('u_theme_preview_colors'),
-            'isManual' => $this->is_manual_mode(),
+            'ajaxUrl'   => admin_url('admin-ajax.php'),
+            'nonce'     => wp_create_nonce('u_theme_preview_colors'),
+            'isManual'  => $this->is_manual_mode(),
+            'themeMode' => $this->get_theme_mode(),
         ]);
     }
 
-    // Текущий режим темы: читаем из маркера блока.
+    // Текущий режим темы: читаем $theme-mode из основного тела файла (без MODE-блока).
     private function get_theme_mode(): string {
         if (!file_exists($this->scss_file)) return 'both';
-        if (preg_match('/\/\* Theme Mode: ([\w-]+) \*\//', file_get_contents($this->scss_file), $m)) {
+        $content  = file_get_contents($this->scss_file);
+        $stripped = $this->remove_mode_block($content);
+        if (preg_match('/^\$theme-mode:\s*["\']?([\w-]+)["\']?;/m', $stripped, $m)) {
             return $m[1];
         }
         return 'both';
     }
 
-    // Ручной режим = маркер присутствует в файле. Никакой эвристики.
+    // Ручной режим = MODE-блок в файле содержит "+ MANUAL".
     private function is_manual_mode(): bool {
         if (!file_exists($this->scss_file)) return false;
-        return str_contains(file_get_contents($this->scss_file), self::MANUAL_BLOCK_START);
+        $content = file_get_contents($this->scss_file);
+        return str_contains($content, self::MODE_BLOCK_START_PREFIX) &&
+               str_contains($content, '+ MANUAL');
     }
 
     // Читаем значения для формы.
-    // Цветовые переменные берём из ручного блока (если он есть),
-    // остальные — из основного тела файла.
+    // MODE-блок НЕ стрипим — он содержит hex-значения Brand Colors в manual-режимах.
+    // Пропускаем: map.get-выражения (из основного тела) и SCSS-ссылки ($var) из MODE-блока.
+    // preg_match_all идёт сверху вниз: последнее присвоение wins — MODE-блок всегда в конце.
     private function get_current_values(): array {
         if (!file_exists($this->scss_file)) return [];
         $content = file_get_contents($this->scss_file);
@@ -108,14 +125,8 @@ class UThemeConfigurator {
 
         foreach ($matches[1] as $i => $key) {
             $val = trim($matches[2][$i]);
-
-            // Пропускаем map.get-выражения из основного блока —
-            // они не нужны форме, для цветов читаем только ручной блок.
-            if (str_contains($val, 'map.get')) continue;
-
-            // preg_match_all идёт сверху вниз: если переменная встречается дважды
-            // (основной блок + ручной блок), второе значение перезапишет первое — это правильно,
-            // ручной блок всегда в конце файла и должен иметь приоритет.
+            if (str_contains($val, 'map.get')) continue;  // авто-генерируемые brand colors
+            if (str_starts_with($val, '$'))    continue;  // SCSS-ссылки из MODE-блока
             $values[$key] = trim($val, '"\'');
         }
 
@@ -131,9 +142,14 @@ class UThemeConfigurator {
                        ? $_POST['u_theme_mode'] : 'both';
         $content     = file_get_contents($this->scss_file);
 
-        // Валидация: в ручном режиме все цвета обязательны
+        // Валидация: в ручном режиме проверяем Brand Colors активной стороны
         if ($manual_mode) {
-            $missing = array_filter($this->color_vars, fn($c) => empty($fields[$c]));
+            $to_validate = match($theme_mode) {
+                'dark-only'  => array_filter($this->brand_color_vars, fn($v) => str_ends_with($v, '-dark')),
+                'light-only' => array_filter($this->brand_color_vars, fn($v) => str_ends_with($v, '-light')),
+                default      => $this->brand_color_vars,
+            };
+            $missing = array_filter($to_validate, fn($c) => empty($fields[$c]));
             if (!empty($missing)) {
                 add_settings_error('u_theme', 'missing_colors',
                     'Ошибка: не заданы цвета: ' . implode(', ', array_values($missing)), 'error');
@@ -141,25 +157,28 @@ class UThemeConfigurator {
             }
         }
 
-        // Шаг 1: всегда удаляем оба блока — ручной и режим темы.
-        // Они добавятся заново в конце если нужны.
-        $content = $this->remove_manual_color_block($content);
-        $content = $this->remove_theme_mode_block($content);
+        // Шаг 1: удаляем существующий MODE-блок (все варианты единым regex).
+        $content = $this->remove_mode_block($content);
 
-        // Шаг 2: обновляем НЕ-цветовые переменные в основном теле файла.
-        // Цветовые переменные ($color_vars) — не трогаем в основном теле никогда,
-        // там map.get-выражения которые должны оставаться нетронутыми.
+        // Шаг 2: обновляем НЕ-Brand-Color переменные в основном теле файла.
+        // Brand Colors ($brand_color_vars) — не трогаем, там map.get-выражения.
+        // Status Colors — записываем напрямую (они не в brand_color_vars).
         $string_vars = [
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages',
+            'table-style', 'image-style',
             'font-vibe', 'radius-vibe', 'style', 'toc-icon', 'stt-icon',
-            'is-menu-title', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
+            'is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border',
             'breadcrumbs-separator', 'menu-accent-align',
+            'callout', 'callout-icon-set',
+            'theme-mode',
+            'stt-ghost',
+            'paper-effect', 'toc-collapsible',
         ];
 
         // Чекбоксы: если не отмечен — браузер не отправляет поле вовсе.
         // Принудительно выставляем 'false' для всех булевых переменных,
         // которые отсутствуют в $_POST['u_fields'].
-        $bool_vars = ['is-menu-title', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border'];
+        $bool_vars = ['is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border', 'stt-ghost', 'paper-effect', 'toc-collapsible'];
         foreach ($bool_vars as $bvar) {
             if (!isset($fields[$bvar])) {
                 $fields[$bvar] = 'false';
@@ -174,6 +193,17 @@ class UThemeConfigurator {
             }
         }
 
+        // Параметры с единицей px: слайдер присылает число, пишем с суффиксом.
+        $px_vars = ['max-width'];
+        foreach ($px_vars as $var) {
+            if (isset($fields[$var]) && !str_ends_with($fields[$var], 'px')) {
+                $fields[$var] = $fields[$var] . 'px';
+            }
+        }
+
+        // theme-mode пишется через string_vars — подставляем в $fields чтобы попасть в foreach ниже.
+        $fields['theme-mode'] = $theme_mode;
+
         // hd-case и hd-italic принимают только CSS-ключевые слова (без кавычек в SCSS).
         if (isset($fields['hd-case']) && !in_array($fields['hd-case'], ['none', 'uppercase', 'lowercase'], true)) {
             $fields['hd-case'] = 'none';
@@ -183,45 +213,25 @@ class UThemeConfigurator {
         }
 
         foreach ($fields as $key => $value) {
-            // Цветовые переменные — пропускаем полностью, они пишутся только в ручной блок
-            if (in_array($key, $this->color_vars)) continue;
+            // Brand Colors — пропускаем, они пишутся только в MODE-блок
+            if (in_array($key, $this->brand_color_vars)) continue;
 
             $formatted = in_array($key, $string_vars) ? '"' . $value . '"' : $value;
 
             // Lookahead (?![\w-]): $color-text не совпадёт с $color-text-light
             // preg_replace_callback: значение подставляется напрямую, без риска
             // интерпретации $1, \\ как backreferences строки замены
-            $pattern = '/(\$' . preg_quote($key, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $pattern = '/(\$' . preg_quote($key, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content  = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $formatted . $m[4], $content);
         }
 
-        // Шаг 3: если ручной режим — добавляем блок цветов в конец файла.
-        // Шаг 4: если задан режим темы — добавляем блок после ручного (всегда последним).
-        if ($manual_mode) {
-            $defaults = [
-                'color-primary-light' => '#3498db', 'color-accent-light'  => '#e74c3c',
-                'color-text-light'    => '#333333', 'color-bg-light'      => '#ffffff',
-                'color-section-light' => '#f5f5f5', 'color-H1-light'      => '#2c3e50',
-                'color-border-light'  => '#dddddd', 'color-primary-dark'  => '#2980b9',
-                'color-accent-dark'   => '#c0392b', 'color-text-dark'     => '#ffffff',
-                'color-bg-dark'       => '#1a1a1a', 'color-section-dark'  => '#2a2a2a',
-                'color-H1-dark'       => '#5dade2', 'color-border-dark'   => '#444444',
-            ];
-
-            $block = "\n\n" . self::MANUAL_BLOCK_START . "\n";
-            foreach ($this->color_vars as $var) {
-                $val    = $fields[$var] ?? ($defaults[$var] ?? '#000000');
-                $block .= "\${$var}: {$val};\n";
-            }
-            $block   .= self::MANUAL_BLOCK_END . "\n";
-            $content .= $block;
+        // Шаг 3: строим и дописываем MODE-блок (пустая строка = режим both+auto, блок не нужен).
+        $mode_block = $this->build_mode_block($theme_mode, $manual_mode, $fields);
+        if ($mode_block !== '') {
+            $content .= $mode_block;
         }
 
-        if ($theme_mode !== 'both') {
-            $content .= $this->build_theme_mode_block($theme_mode);
-        }
-
-        file_put_contents($this->scss_file, $content);
+        file_put_contents($this->scss_file, $content, LOCK_EX);
 
         // Save site classification options (WP options, not SCSS vars)
         if (isset($_POST['site_stream'])) {
@@ -231,25 +241,46 @@ class UThemeConfigurator {
             update_option('site_subject', sanitize_text_field($_POST['site_subject']));
         }
 
+        // HTML lang override
+        if (isset($_POST['utheme_html_lang'])) {
+            update_option('utheme_html_lang', sanitize_text_field($_POST['utheme_html_lang']));
+        }
+        update_option('utheme_html_lang_enabled', isset($_POST['utheme_html_lang_enabled']) ? '1' : '0');
+
         add_settings_error('u_theme', 'saved', 'Настройки сохранены. Docker запустил пересборку!', 'updated');
+    }
+
+    private function get_callout_icon_set_names(): array {
+        $file = get_template_directory() . '/src/scheme.icons.callouts.scss';
+        if (!file_exists($file)) return ['circle', 'shield', 'diamond'];
+        $sets = [];
+        foreach (explode("\n", file_get_contents($file)) as $line) {
+            if (preg_match("/^\s+'([\w-]+)':\s*\(\s*$/", $line, $m)) {
+                $sets[] = $m[1];
+            }
+        }
+        return $sets ?: ['circle', 'shield', 'diamond'];
     }
 
     public function handle_randomize(): void {
         if (!isset($_POST['u_randomize_scss']) || !check_admin_referer('u_theme_update')) return;
         if (!file_exists($this->scss_file)) return;
 
+        $this->random_config['callout-icon-set'] = $this->get_callout_icon_set_names();
+
         $content     = file_get_contents($this->scss_file);
         $string_vars = [
-            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card',
-            'font-vibe', 'style', 'is-not-section', 'is-img_contain', 'is-left-align', 'is-border',
+            'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages', 'table-style', 'image-style',
+            'font-vibe', 'radius-vibe', 'style', 'is-not-section', 'is-left-align', 'is-border',
             'font-size', 'stt-icon', 'menu-accent-align',
+            'callout', 'callout-icon-set',
         ];
 
         // Переменные-списки
         foreach ($this->random_config as $var => $options) {
             $new_val   = $options[array_rand($options)];
             $formatted = in_array($var, $string_vars) ? '"' . $new_val . '"' : $new_val;
-            $pattern   = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $pattern   = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content   = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $formatted . $m[4], $content);
         }
 
@@ -259,44 +290,87 @@ class UThemeConfigurator {
         $new_density = round(0.5 + $density_raw * 0.05, 2);
 
         foreach (['seed-hue' => $new_seed, 'density-factor' => $new_density] as $var => $new_val) {
-            $pattern = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;]+)(;)/m';
+            $pattern = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $new_val . $m[4], $content);
         }
 
-        file_put_contents($this->scss_file, $content);
+        file_put_contents($this->scss_file, $content, LOCK_EX);
         add_settings_error('u_theme', 'randomized', 'Тема рандомизирована! Docker запустил пересборку.', 'updated');
     }
 
-    // Удаляем блок между маркерами включительно.
-    // Флаг s (DOTALL): точка захватывает переносы строк внутри блока.
-    // \n* вокруг: убираем пустые строки которые остаются после удаления.
-    private function remove_manual_color_block(string $content): string {
-        $start   = preg_quote(self::MANUAL_BLOCK_START, '/');
-        $end     = preg_quote(self::MANUAL_BLOCK_END,   '/');
+    // Удаляем любой MODE-блок (все 5 вариантов): /* MODE ... */ ... /* END MODE */
+    private function remove_mode_block(string $content): string {
+        $start   = preg_quote(self::MODE_BLOCK_START_PREFIX, '/');
+        $end     = preg_quote(self::MODE_BLOCK_END, '/');
         $pattern = '/\n*' . $start . '.*?' . $end . '\n*/s';
         return preg_replace($pattern, "\n", $content);
     }
 
-    private function remove_theme_mode_block(string $content): string {
-        $prefix  = preg_quote(self::THEME_MODE_BLOCK_PREFIX, '/');
-        $end     = preg_quote(self::THEME_MODE_BLOCK_END, '/');
-        $pattern = '/\n*' . $prefix . '.*?' . $end . '\n*/s';
-        return preg_replace($pattern, "\n", $content);
-    }
+    // Строим MODE-блок для одного из 6 режимов:
+    //   both  + auto   → '' (блок не нужен, дефолт)
+    //   dark  + auto   → /* MODE DARK ONLY */
+    //   light + auto   → /* MODE LIGHT ONLY */
+    //   both  + manual → /* MODE BOTH + MANUAL */
+    //   dark  + manual → /* MODE DARK ONLY + MANUAL */
+    //   light + manual → /* MODE LIGHT ONLY + MANUAL */
+    private function build_mode_block(string $theme_mode, bool $manual_mode, array $fields): string {
+        if ($theme_mode === 'both' && !$manual_mode) return '';
 
-    private function build_theme_mode_block(string $mode): string {
-        $color_keys = ['primary', 'accent', 'text', 'bg', 'section', 'H1', 'border'];
-        $block = "\n\n" . self::THEME_MODE_BLOCK_PREFIX . " {$mode} */\n";
-        if ($mode === 'dark-only') {
-            foreach ($color_keys as $key) {
-                $block .= "\$color-{$key}-light: \$color-{$key}-dark;\n";
+        $brand_keys  = ['primary', 'accent', 'text', 'bg', 'section', 'H1', 'border'];
+        $status_keys = ['success', 'warning', 'error', 'info', 'callout-txt'];
+
+        $label = match(true) {
+            $theme_mode === 'dark-only'  && !$manual_mode => 'DARK ONLY',
+            $theme_mode === 'light-only' && !$manual_mode => 'LIGHT ONLY',
+            $theme_mode === 'both'       && $manual_mode  => 'BOTH + MANUAL',
+            $theme_mode === 'dark-only'  && $manual_mode  => 'DARK ONLY + MANUAL',
+            default                                       => 'LIGHT ONLY + MANUAL',
+        };
+
+        $block = "\n\n" . self::MODE_BLOCK_START_PREFIX . "{$label} */\n";
+
+        if ($manual_mode) {
+            if ($theme_mode === 'dark-only') {
+                // Brand Colors: тёмные hex → потом light = dark
+                foreach ($brand_keys as $key) {
+                    $val    = $fields["color-{$key}-dark"] ?? '#000000';
+                    $block .= "\$color-{$key}-dark: {$val};\n";
+                }
+                foreach ($brand_keys  as $key) { $block .= "\$color-{$key}-light: \$color-{$key}-dark;\n"; }
+                // Status Colors: light = dark (dark берётся из прямых переменных conf.scss)
+                foreach ($status_keys as $key) { $block .= "\$color-{$key}-light: \$color-{$key}-dark;\n"; }
+
+            } elseif ($theme_mode === 'light-only') {
+                // Brand Colors: светлые hex → потом dark = light
+                foreach ($brand_keys as $key) {
+                    $val    = $fields["color-{$key}-light"] ?? '#ffffff';
+                    $block .= "\$color-{$key}-light: {$val};\n";
+                }
+                foreach ($brand_keys  as $key) { $block .= "\$color-{$key}-dark: \$color-{$key}-light;\n"; }
+                // Status Colors: dark = light
+                foreach ($status_keys as $key) { $block .= "\$color-{$key}-dark: \$color-{$key}-light;\n"; }
+
+            } else {
+                // both + manual: оба варианта hex для Brand Colors
+                foreach ($brand_keys as $key) {
+                    $vl     = $fields["color-{$key}-light"] ?? '#ffffff';
+                    $vd     = $fields["color-{$key}-dark"]  ?? '#000000';
+                    $block .= "\$color-{$key}-light: {$vl};\n";
+                    $block .= "\$color-{$key}-dark: {$vd};\n";
+                }
             }
-        } else { // light-only
-            foreach ($color_keys as $key) {
-                $block .= "\$color-{$key}-dark: \$color-{$key}-light;\n";
+        } else {
+            // Auto-режимы: только алиасы (hex в conf.scss, SCSS делает остальное)
+            if ($theme_mode === 'dark-only') {
+                foreach ($brand_keys  as $key) { $block .= "\$color-{$key}-light: \$color-{$key}-dark;\n"; }
+                foreach ($status_keys as $key) { $block .= "\$color-{$key}-light: \$color-{$key}-dark;\n"; }
+            } else {
+                foreach ($brand_keys  as $key) { $block .= "\$color-{$key}-dark: \$color-{$key}-light;\n"; }
+                foreach ($status_keys as $key) { $block .= "\$color-{$key}-dark: \$color-{$key}-light;\n"; }
             }
         }
-        $block .= self::THEME_MODE_BLOCK_END . "\n";
+
+        $block .= self::MODE_BLOCK_END . "\n";
         return $block;
     }
 

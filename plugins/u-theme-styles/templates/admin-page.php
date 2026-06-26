@@ -3,8 +3,8 @@
  * Вспомогательная функция: нативный цветовой пикер.
  */
 function u_color_field(string $name, string $value): void {
-    // Защищаемся от map.get-выражений (авто-режим) — показываем дефолт
-    if (str_contains($value, '(') || str_contains($value, 'map.')) {
+    // Защищаемся от map.get-выражений и SCSS-ссылок ($var) — показываем дефолт
+    if (str_contains($value, '(') || str_contains($value, 'map.') || str_starts_with($value, '$')) {
         $value = '#cccccc';
     }
     $safe_value = esc_attr($value);
@@ -15,6 +15,61 @@ function u_color_field(string $name, string $value): void {
         <input type="color" class="u-color-native" value="<?= $safe_value ?>" tabindex="-1" aria-hidden="true">
         <input type="text"  class="u-color-hex"    value="<?= $safe_value ?>" maxlength="7" placeholder="#000000">
         <input type="hidden" class="u-color-picker" name="<?= $safe_name ?>" value="<?= $safe_value ?>">
+    </div>
+    <?php
+}
+
+/**
+ * Вспомогательная функция: пикер для H1 — поддерживает solid-цвет и CSS-градиент.
+ * Сохраняет либо "#hex", либо "linear-gradient(Ndeg, #hex1, #hex2)".
+ */
+function u_h1_gradient_field(string $name, string $value): void {
+    $c1 = '#cccccc'; $c2 = '#ffffff'; $angle = 135; $is_grad = false;
+    if (preg_match('/^linear-gradient\(\s*(\d+)deg\s*,\s*(#[0-9a-fA-F]{3,6})\s*,\s*(#[0-9a-fA-F]{3,6})\s*\)$/', $value, $m)) {
+        $is_grad = true;
+        $angle   = (int) $m[1];
+        $c1      = $m[2];
+        $c2      = $m[3];
+    } elseif (preg_match('/^#[0-9a-fA-F]{3,6}$/', $value)) {
+        $c1 = $value;
+    }
+    $mode          = $is_grad ? 'gradient' : 'solid';
+    $strip_bg      = "linear-gradient({$angle}deg, {$c1}, {$c2})";
+    $safe_name     = esc_attr($name);
+    $safe_val      = esc_attr($value ?: $c1);
+    ?>
+    <div class="u-gradient-field" data-mode="<?= $mode ?>">
+
+        <div class="u-gradient-toggle">
+            <label class="u-gradient-toggle-btn <?= !$is_grad ? 'is-active' : '' ?>">
+                <input type="radio" class="u-gradient-mode-r" value="solid"    <?= !$is_grad ? 'checked' : '' ?>> Solid
+            </label>
+            <label class="u-gradient-toggle-btn <?= $is_grad ? 'is-active' : '' ?>">
+                <input type="radio" class="u-gradient-mode-r" value="gradient" <?= $is_grad  ? 'checked' : '' ?>> Gradient
+            </label>
+        </div>
+
+        <div class="u-color-field">
+            <span class="u-color-swatch u-grad-c1-swatch" style="background-color:<?= esc_attr($c1) ?>"></span>
+            <input type="color" class="u-color-native u-grad-c1-native" value="<?= esc_attr($c1) ?>" tabindex="-1" aria-hidden="true">
+            <input type="text"  class="u-color-hex u-grad-c1-hex"       value="<?= esc_attr($c1) ?>" maxlength="7" placeholder="#000000">
+        </div>
+
+        <div class="u-gradient-extra <?= !$is_grad ? 'is-hidden' : '' ?>">
+            <div class="u-color-field">
+                <span class="u-color-swatch u-grad-c2-swatch" style="background-color:<?= esc_attr($c2) ?>"></span>
+                <input type="color" class="u-color-native u-grad-c2-native" value="<?= esc_attr($c2) ?>" tabindex="-1" aria-hidden="true">
+                <input type="text"  class="u-color-hex u-grad-c2-hex"       value="<?= esc_attr($c2) ?>" maxlength="7" placeholder="#ffffff">
+            </div>
+            <div class="u-gradient-angle-row">
+                <span class="u-gradient-angle-label">Angle</span>
+                <input type="range" class="u-gradient-angle-r" min="0" max="360" value="<?= $angle ?>">
+                <output class="u-gradient-angle-out"><?= $angle ?>°</output>
+            </div>
+            <div class="u-gradient-strip" style="background:<?= esc_attr($strip_bg) ?>"></div>
+        </div>
+
+        <input type="hidden" name="<?= $safe_name ?>" class="u-gradient-value" value="<?= $safe_val ?>">
     </div>
     <?php
 }
@@ -40,35 +95,10 @@ function u_color_field(string $name, string $value): void {
             <!-- ── Basic ──────────────────────────────────────────────────── -->
             <section id="basic" class="tab-pane active">
                 <?php
-                $font_vibes = [
-                    'google'      => ['label' => 'Google',      'desc' => 'Heading: Google Sans · Text: Google Sans'],
-                    'strict'      => ['label' => 'Strict',      'desc' => 'Heading: Inter · Text: Roboto Mono'],
-                    'editorial'   => ['label' => 'Editorial',   'desc' => 'Heading: Playfair Display · Text: Lora'],
-                    'startup'     => ['label' => 'Startup',     'desc' => 'Heading: Inter · Text: Inter'],
-                    'space'       => ['label' => 'Space',       'desc' => 'Heading: Montserrat · Text: Open Sans'],
-                    'syntax'      => ['label' => 'Syntax',      'desc' => 'Heading: JetBrains Mono · Text: Inter'],
-                    'neo-swiss'   => ['label' => 'Neo Swiss',   'desc' => 'Heading: Arimo · Text: Heebo'],
-                    'engineer'    => ['label' => 'Engineer',    'desc' => 'Heading: Barlow Condensed · Text: Source Serif 4'],
-                    'boutique'    => ['label' => 'Boutique',    'desc' => 'Heading: Cormorant Garamond · Text: Montserrat'],
-                    'wisdom'      => ['label' => 'Wisdom',      'desc' => 'Heading: Cinzel · Text: Fauna One'],
-                    'noble'       => ['label' => 'Noble',       'desc' => 'Heading: Fraunces · Text: Manrope'],
-                    'manuscript'  => ['label' => 'Manuscript',  'desc' => 'Heading: DM Serif Display · Text: Source Sans 3'],
-                    'brutal'      => ['label' => 'Brutal',      'desc' => 'Heading: Archivo Black · Text: Archivo'],
-                    'manifesto'   => ['label' => 'Manifesto',   'desc' => 'Heading: Roboto · Text: Oswald'],
-                    'black-metal' => ['label' => 'Black Metal', 'desc' => 'Heading: Jost · Text: Unbounded'],
-                    'raw'         => ['label' => 'Raw',         'desc' => 'Heading: Space Mono · Text: Space Grotesk'],
-                    'velocity'    => ['label' => 'Velocity',    'desc' => 'Heading: Exo 2 · Text: Red Hat Display'],
-                    'courtside'   => ['label' => 'Courtside',   'desc' => 'Heading: Big Shoulders Display · Text: Saira Condensed'],
-                    'district'    => ['label' => 'District',    'desc' => 'Heading: Ruslan Display · Text: Inter'],
-                    'blast'       => ['label' => 'Blast',       'desc' => 'Heading: Rubik Mono One · Text: Inter'],
-                    'industry'    => ['label' => 'Industry',    'desc' => 'Heading: Oswald · Text: Source Sans 3'],
-                    'overdrive'   => ['label' => 'Overdrive',   'desc' => 'Heading: Bebas Neue · Text: Montserrat'],
-                    'organic'     => ['label' => 'Organic',     'desc' => 'Heading: Nunito · Text: Comfortaa'],
-                    'vintage'     => ['label' => 'Vintage',     'desc' => 'Heading: DM Sans · Text: DM Serif Display'],
-                    'interface'   => ['label' => 'Interface',   'desc' => 'Heading: DM Sans · Text: Source Sans 3'],
-                    'antidesign'  => ['label' => 'Anti Design', 'desc' => 'Heading: Arial · Text: Times New Roman'],
-                ];
-                $font_sizes = range(14, 22);
+                $font_registry     = function_exists('u_font_registry') ? u_font_registry() : [];
+                $font_vibes        = array_map(fn($v) => ['label' => $v['label'], 'desc' => $v['desc']], $font_registry);
+                $font_vibe_families = array_map(fn($v) => ['hd' => $v['hd'], 'txt' => $v['txt'], 'gf' => $v['gf']], $font_registry);
+                $font_sizes        = range(14, 22);
                 $current_font_vibe = $v['font-vibe'] ?? 'neo-swiss';
                 ?>
                 <?php
@@ -82,6 +112,15 @@ function u_color_field(string $name, string $value): void {
                     'sticker' => ['label' => 'Sticker', 'desc' => 'Бейдж и стикер. Крупные фиксированные радиусы, шапка скруглена только снизу — сайт выглядит как набор карточек-наклеек.'],
                 ];
                 $current_radius_vibe = $v['radius-vibe'] ?? 'neutral';
+                $radius_vibe_css = [
+                    'sharp'    => '2px',
+                    'neutral'  => '8px',
+                    'dynamic'  => '16px',
+                    'rounded'  => '20px',
+                    'velocity' => '8px 32px 8px 32px',
+                    'chess'    => '0px 20px 0px 20px',
+                    'sticker'  => '28px',
+                ];
                 ?>
 
                 <!-- ── Card 1: Font Size ──────────────────────────────────── -->
@@ -131,6 +170,7 @@ function u_color_field(string $name, string $value): void {
                                     foreach ($font_vibes as $k => $fv) $descs[$k] = $fv['desc'];
                                     echo json_encode($descs, JSON_UNESCAPED_UNICODE);
                                 ?>;
+                                var uFontVibeFamilies = <?= json_encode($font_vibe_families, JSON_UNESCAPED_UNICODE) ?>;
                                 </script>
                             </div>
 
@@ -234,12 +274,28 @@ function u_color_field(string $name, string $value): void {
                         </div>
 
                         <div class="u-card-right">
+                            <?php
+                            $fvf = $font_vibe_families[$current_font_vibe] ?? $font_vibe_families['neo-swiss'];
+                            if (!empty($fvf['gf'])): ?>
+                            <link rel="stylesheet" href="<?= esc_url($fvf['gf']) ?>">
+                            <?php endif; ?>
                             <div class="u-preview u-preview--tall">
-                                <img src="<?= plugins_url("assets/media/font-vibe-{$current_font_vibe}.webp", dirname(__FILE__)) ?>"
-                                     data-base-url="<?= plugins_url('assets/media/font-vibe-', dirname(__FILE__)) ?>"
-                                     alt="Font preview"
-                                     class="u-font-preview-img u-component-preview-img"
-                                     id="font-vibe-preview">
+                                <div class="u-font-preview-box"
+                                     id="font-vibe-preview"
+                                     style="
+                                        --fpb-hd: <?= esc_attr($fvf['hd']) ?>;
+                                        --fpb-txt: <?= esc_attr($fvf['txt']) ?>;
+                                        --fpb-hd-w: <?= esc_attr($hd_weight) ?>;
+                                        --fpb-hd-lh: <?= esc_attr($hd_height) ?>;
+                                        --fpb-hd-ls: <?= esc_attr($hd_ls) ?>;
+                                        --fpb-hd-case: <?= esc_attr($hd_case) ?>;
+                                        --fpb-hd-style: <?= esc_attr($hd_italic) ?>;
+                                        --fpb-txt-w: <?= esc_attr($txt_weight) ?>;
+                                        --fpb-txt-lh: <?= esc_attr($txt_height) ?>;
+                                        --fpb-txt-ls: <?= esc_attr($txt_ls) ?>">
+                                    <div class="u-font-preview-hd">Heading sample</div>
+                                    <div class="u-font-preview-txt">The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -272,6 +328,7 @@ function u_color_field(string $name, string $value): void {
                                     foreach ($radius_vibes as $k => $rv) $rdescs[$k] = $rv['desc'];
                                     echo json_encode($rdescs, JSON_UNESCAPED_UNICODE);
                                 ?>;
+                                var uRadiusVibeCss = <?= json_encode($radius_vibe_css) ?>;
                                 </script>
                             </div>
 
@@ -288,6 +345,51 @@ function u_color_field(string $name, string $value): void {
                                 </div>
                                 <p class="u-desc">Множитель пространства между элементами и строками. Меньше — компактнее, больше — воздушнее.</p>
                             </div>
+
+                            <?php
+                            $max_width_raw = $v['max-width'] ?? '1200px';
+                            $max_width_n   = (int) rtrim($max_width_raw, 'px');
+                            $width_presets = [960, 1024, 1140, 1200, 1280, 1440];
+                            ?>
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">
+                                    Content Width
+                                    <output id="max-width-output"><?= esc_html($max_width_raw) ?></output>
+                                </div>
+                                <div class="u-basic-field-control">
+                                    <input type="range" name="u_fields[max-width]" id="max-width-slider"
+                                           min="800" max="1920" step="10"
+                                           value="<?= esc_attr($max_width_n) ?>"
+                                           oninput="document.getElementById('max-width-output').textContent = this.value + 'px'; uSyncWidthPresets(this.value)">
+                                </div>
+                                <div class="u-width-presets">
+                                    <span class="u-width-presets-label">Presets:</span>
+                                    <?php foreach ($width_presets as $preset): ?>
+                                        <button type="button" class="u-width-preset button <?= $max_width_n === $preset ? 'is-active' : '' ?>"
+                                                data-width="<?= $preset ?>">
+                                            <?= $preset ?>px
+                                        </button>
+                                    <?php endforeach; ?>
+                                </div>
+                                <p class="u-desc">Максимальная ширина области контента. Определяет, насколько широко растягивается основной блок на больших экранах.</p>
+                            </div>
+                            <script>
+                            function uSyncWidthPresets(val) {
+                                var w = parseInt(val, 10);
+                                document.querySelectorAll('.u-width-preset').forEach(function(b) {
+                                    b.classList.toggle('is-active', parseInt(b.dataset.width, 10) === w);
+                                });
+                            }
+                            document.querySelectorAll('.u-width-preset').forEach(function(btn) {
+                                btn.addEventListener('click', function() {
+                                    var w = this.dataset.width;
+                                    var slider = document.getElementById('max-width-slider');
+                                    slider.value = w;
+                                    document.getElementById('max-width-output').textContent = w + 'px';
+                                    uSyncWidthPresets(w);
+                                });
+                            });
+                            </script>
 
                             <div class="u-basic-field">
                                 <div class="u-basic-field-label">Flags</div>
@@ -309,13 +411,14 @@ function u_color_field(string $name, string $value): void {
                                         </span>
                                     </label>
                                     <label class="u-checkbox-label">
-                                        <input type="checkbox" name="u_fields[is-img_contain]" value="true"
-                                            <?= ($v['is-img_contain'] ?? 'false') === 'true' ? 'checked' : '' ?>>
+                                        <input type="checkbox" name="u_fields[paper-effect]" value="true"
+                                            <?= ($v['paper-effect'] ?? 'false') === 'true' ? 'checked' : '' ?>>
                                         <span>
-                                            <strong>Contain Images</strong>
-                                            <span class="u-desc">Изображения вписываются в блок целиком (object-fit: contain) без обрезки по краям.</span>
+                                            <strong>Paper Effect</strong>
+                                            <span class="u-desc">Статья на отдельной подложке: body получает лёгкий тон primary-цвета, main — чистый фон с тенью.</span>
                                         </span>
                                     </label>
+
                                 </div>
                             </div>
 
@@ -323,13 +426,9 @@ function u_color_field(string $name, string $value): void {
 
                         <div class="u-card-right">
                             <div class="u-preview u-preview--tall">
-                                <img src="<?= plugins_url("assets/media/radius-vibe-{$current_radius_vibe}.webp", dirname(__FILE__)) ?>"
-                                     data-base-url="<?= plugins_url('assets/media/radius-vibe-', dirname(__FILE__)) ?>"
-                                     alt="Radius preview"
-                                     class="u-radius-preview-img u-component-preview-img"
+                                <div class="u-radius-preview-box"
                                      id="radius-vibe-preview"
-                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                                <span class="u-preview-placeholder" style="display:none"><?= esc_html($radius_vibes[$current_radius_vibe]['label'] ?? $current_radius_vibe) ?></span>
+                                     style="border-radius: <?= esc_attr($radius_vibe_css[$current_radius_vibe] ?? '8px') ?>"></div>
                             </div>
                         </div>
                     </div>
@@ -389,7 +488,7 @@ function u_color_field(string $name, string $value): void {
                     'main-menu' => [
                         'title'       => 'Main Menu',
                         'desc'        => 'Стиль отображения главного меню сайта.',
-                        'options'     => ['island', 'aside', 'boring', 'docs', 'newspaper', 'hierarchical'],
+                        'options'     => ['island', 'aside', 'boring', 'docs', 'hierarchical'],
                         'switch'      => 'is-menu-title',
                         'switch_desc' => 'Показывать название сайта в главном меню',
                     ],
@@ -400,17 +499,45 @@ function u_color_field(string $name, string $value): void {
                     ],
                     'toc-menu' => [
                         'title'       => 'Table of Contents',
-                        // 'desc'        => 'Оглавление статьи.<br><b>Circle</b> — круглые маркеры.<br><b>Number</b> — нумерованный список. <br><b>Icon</b> — иконки перед пунктами.<br><b>Tags</b> — теги-кнопки в ряд.',
                         'desc'        => '',
-                        'options'     => ['circle', 'number', 'icon', 'tags'],
+                        'options'     => ['circle', 'number', 'icon', 'tags', 'vertical-rule', 'two-columns', 'underline', 'card-row', 'numbers-right'],
                         'switch'      => 'is-not-section',
                         'switch_desc' => 'Отобразить оглавление без секции',
                         'icon_select' => true,
                     ],
                     'article-card' => [
                         'title'   => 'Article Card',
-                        'desc'    => 'Внешний вид карточки статьи в списках и архивах.',
-                        'options' => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split'],
+                        'desc'    => 'Внешний вид карточки статьи в списках и архивах.<br>
+                            <b>Default</b> — базовая карточка с изображением и ссылкой.<br>
+                            <b>Frame</b> — карточка в рамке.<br>
+                            <b>Slide</b> — карточка-слайд.<br>
+                            <b>Windows</b> — плиточный стиль.<br>
+                            <b>Float</b> — заголовок поверх изображения.<br>
+                            <b>Soft</b> — мягкий стиль без жёстких границ.<br>
+                            <b>Split</b> — диагональное разделение с анимацией.<br>
+                            <b>Classic</b> — изображение 16:10 сверху, чистый контент снизу.<br>
+                            <b>Aside</b> — горизонтальный сплит: картинка 42% слева, текст справа.<br>
+                            <b>Overlay</b> — полноразмерное фото, текст поверх с градиентом.<br>
+                            <b>Blurred</b> — размытый фон-декор, чёткий thumbnail в углу.<br>
+                            <b>Type-first</b> — заголовок-герой с inline-миниатюрой.<br>
+                            <b>Editorial</b> — редакционный стиль, верхняя граница, thumbnail.<br>
+                            <b>Clipped</b> — изображение с float, текст обтекает.',
+                        'options' => ['default', 'frame', 'slide', 'windows', 'float', 'soft', 'split', 'classic', 'aside', 'overlay', 'blurred', 'type-first', 'editorial', 'clipped'],
+                    ],
+                    'table-style' => [
+                        'title'   => 'Table Style',
+                        'desc'    => 'Вариант стилизации таблиц (.wp-block-table) в статьях.<br>
+                            <b>Default</b> — насыщенная шапка в цвет акцента, внешняя тень.<br>
+                            <b>Minimal</b> — без рамок, только нижние линии строк, UPPERCASE-заголовки.<br>
+                            <b>Classic</b> — полная сетка с рамками вокруг каждой ячейки.<br>
+                            <b>Cards</b> — строки как отдельные карточки с тенью и акцентной полоской слева.<br>
+                            <b>Stripes</b> — тёмная контрастная шапка + зебра чётных строк.<br>
+                            <b>Bold</b> — шапка-блок в цвет акцента с вертикальными разделителями.<br>
+                            <b>Outlined</b> — одна скруглённая рамка вокруг всей таблицы.<br>
+                            <b>Dashed</b> — пунктирные линии, заголовки и футер в цвет акцента.<br>
+                            <b>Tinted</b> — тонированная шапка и футер, вертикальные разделители.<br>
+                            <b>Editorial</b> — крупные заголовки, щедрые отступы, журнальный стиль.',
+                        'options' => ['default', 'minimal', 'classic', 'cards', 'stripes', 'bold', 'outlined', 'dashed', 'tinted', 'editorial'],
                     ],
                     'more-pages' => [
                         'title'   => 'More Pages',
@@ -456,6 +583,23 @@ function u_color_field(string $name, string $value): void {
                                                value="true"
                                                <?= ($v[$data['switch']] ?? '') === 'true' ? 'checked' : '' ?>>
                                         <span><?= $data['switch_desc'] ?? $data['switch'] ?></span>
+                                    </label>
+                                <?php endif; ?>
+
+                                <?php if ($id === 'toc-menu'): ?>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox"
+                                               name="u_fields[toc-show-title]"
+                                               value="true"
+                                               <?= ($v['toc-show-title'] ?? 'true') === 'true' ? 'checked' : '' ?>>
+                                        <span>Показывать заголовок оглавления</span>
+                                    </label>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox"
+                                               name="u_fields[toc-collapsible]"
+                                               value="true"
+                                               <?= ($v['toc-collapsible'] ?? 'false') === 'true' ? 'checked' : '' ?>>
+                                        <span>Разворачивающееся оглавление <span class="u-desc">(не работает с типом Tags и при скрытом заголовке)</span></span>
                                     </label>
                                 <?php endif; ?>
 
@@ -539,6 +683,14 @@ function u_color_field(string $name, string $value): void {
                                             </div>
                                         </div>
                                     </div>
+                                    <label class="u-checkbox-label">
+                                        <input type="checkbox" name="u_fields[stt-ghost]" value="true"
+                                            <?= ($v['stt-ghost'] ?? 'false') === 'true' ? 'checked' : '' ?>>
+                                        <span>
+                                            <strong>Ghost Mode</strong>
+                                            <span class="u-desc">Прозрачная кнопка — иконка инвертирует цвета контента под ней.</span>
+                                        </span>
+                                    </label>
                                 <?php endif; ?>
 
                                 <p class="u-desc"><?= $data['desc'] ?? '' ?></p>
@@ -556,6 +708,242 @@ function u_color_field(string $name, string $value): void {
                         </div>
                     </div>
                 <?php endforeach; ?>
+
+                <!-- ── Image Style ───────────────────────────────────── -->
+                <?php
+                $image_style_options = ['original', 'marginalia', 'slide-up', 'whisper', 'corner-badge', 'brutalist-strip'];
+                $current_image_style = $v['image-style'] ?? 'original';
+                $image_style_descs = [
+                    'original'       => 'Базовый вариант: картинка 16:9, подпись по центру (или слева при Left Align).',
+                    'marginalia'     => 'Подпись живёт в левом поле — как сноска в книге. На мобильном уходит под картинку.',
+                    'slide-up'       => 'Подпись скрыта и всплывает снизу при наведении. На touch-устройствах — по тапу.',
+                    'whisper'        => 'Крошечная моно-подпись со стрелкой — почти незаметна, не ломает чтение.',
+                    'corner-badge'   => 'В углу маленький [i] — при наведении плавно разворачивается в полную подпись.',
+                    'brutalist-strip' => 'Жёсткая чёрная рамка вокруг картинки, подпись всегда в чёрной полосе снизу.',
+                ];
+                ?>
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Image Style</h3>
+                        <select name="u_fields[image-style]" class="u-component-select" id="image-style-select">
+                            <?php foreach ($image_style_options as $opt): ?>
+                                <option value="<?= $opt ?>"
+                                    <?= $current_image_style === $opt ? 'selected' : '' ?>>
+                                    <?= ucfirst(str_replace('-', ' ', $opt)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+                            <p class="u-desc" id="image-style-desc">
+                                <?= $image_style_descs[$current_image_style] ?? '' ?>
+                            </p>
+                            <script>
+                            var uImageStyleDescs = <?= json_encode($image_style_descs, JSON_UNESCAPED_UNICODE) ?>;
+                            document.getElementById('image-style-select').addEventListener('change', function () {
+                                var desc = uImageStyleDescs[this.value] || '';
+                                document.getElementById('image-style-desc').textContent = desc;
+                                var img = document.getElementById('image-style-preview');
+                                if (img) img.src = img.dataset.baseUrl + this.value + '.webp';
+                            });
+                            </script>
+                        </div>
+                        <div class="u-card-right">
+                            <div class="u-preview">
+                                <img id="image-style-preview"
+                                     src="<?= plugins_url("assets/media/image-style-{$current_image_style}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/image-style-', dirname(__FILE__)) ?>"
+                                     alt="Image style preview"
+                                     class="u-component-preview-img"
+                                     onerror="this.closest('.u-card-right').style.display='none'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Callout ─────────────────────────────────────────── -->
+                <?php
+                $callout_options     = ['default', 'subtle-tinted', 'left-accent-bar', 'solid-filled', 'dashed-outline', 'icon-badge-card', 'minimal-inline'];
+                $current_callout     = $v['callout'] ?? 'default';
+                $current_icon_set    = $v['callout-icon-set'] ?? 'circle';
+                $callout_icon_sets   = [];
+
+                // Парсим scheme.icons.callouts.scss: извлекаем наборы с 4 inline-SVG
+                $callout_icons_file = get_template_directory() . '/src/scheme.icons.callouts.scss';
+                if (file_exists($callout_icons_file)) {
+                    $raw      = file_get_contents($callout_icons_file);
+                    $cur_set  = null;
+                    $cur_icons = [];
+                    foreach (explode("\n", $raw) as $line) {
+                        // Начало набора: '    'name': ('
+                        if (preg_match("/^\s+'([\w-]+)':\s*\(\s*$/", $line, $m)) {
+                            $cur_set   = $m[1];
+                            $cur_icons = [];
+                        // Строка с иконкой (utf8 format): 'type': url('data:image/svg+xml;utf8,...'),
+                        } elseif ($cur_set && preg_match(
+                            "/^\s+'(info|success|warning|danger)':\s*url\('data:image\/svg\+xml;utf8,(.*?)'\)\s*,?\s*$/",
+                            $line, $m
+                        )) {
+                            $cur_icons[$m[1]] = trim($m[2]);
+                        // Строка с иконкой (percent-encoded format): 'type': url("data:image/svg+xml,..."),
+                        } elseif ($cur_set && preg_match(
+                            "/^\s+'(info|success|warning|danger)':\s*url\(\"data:image\/svg\+xml,(.*?)\"\)\s*,?\s*$/",
+                            $line, $m
+                        )) {
+                            $cur_icons[$m[1]] = rawurldecode(trim($m[2]));
+                        // Конец набора: '    ),'
+                        } elseif ($cur_set && preg_match("/^\s+\),?\s*$/", $line) && count($cur_icons) === 4) {
+                            $callout_icon_sets[$cur_set] = $cur_icons;
+                            $cur_set = null;
+                        }
+                    }
+                }
+
+                // Иконки активного набора (fallback: первый набор)
+                $active_set_icons = $callout_icon_sets[$current_icon_set]
+                    ?? (reset($callout_icon_sets) ?: []);
+                ?>
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Callout</h3>
+                        <select name="u_fields[callout]" class="u-component-select" id="callout-select">
+                            <?php foreach ($callout_options as $opt): ?>
+                                <option value="<?= $opt ?>"
+                                    <?= $current_callout === $opt ? 'selected' : '' ?>>
+                                    <?= ucfirst(str_replace('-', ' ', $opt)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+
+                            <?php if (!empty($callout_icon_sets)): ?>
+                                <div class="u-icon-select-wrap">
+                                    <label class="u-basic-field-label">Icon Set</label>
+
+                                    <input type="hidden"
+                                           name="u_fields[callout-icon-set]"
+                                           id="callout-icon-set-value"
+                                           value="<?= esc_attr($current_icon_set) ?>">
+
+                                    <div class="u-icon-dropdown"
+                                         id="callout-icon-set-dropdown"
+                                         data-input-name="callout-icon-set">
+
+                                        <button type="button" class="u-icon-trigger" id="callout-icon-set-trigger">
+                                            <span class="u-icon-svg u-icon-svg--set">
+                                                <?= $active_set_icons['info']    ?? '' ?>
+                                                <?= $active_set_icons['success'] ?? '' ?>
+                                                <?= $active_set_icons['warning'] ?? '' ?>
+                                                <?= $active_set_icons['danger']  ?? '' ?>
+                                            </span>
+                                            <span class="u-icon-trigger-name" id="callout-icon-set-label">
+                                                <?= esc_html($current_icon_set) ?>
+                                            </span>
+                                            <span class="u-icon-chevron">▾</span>
+                                        </button>
+
+                                        <div class="u-icon-list" id="callout-icon-set-list" style="display:none">
+                                            <?php foreach ($callout_icon_sets as $set_name => $icons): ?>
+                                                <div class="u-icon-item <?= $current_icon_set === $set_name ? 'is-selected' : '' ?>"
+                                                     data-value="<?= esc_attr($set_name) ?>">
+                                                    <span class="u-icon-svg u-icon-svg--set">
+                                                        <?= $icons['info']    ?>
+                                                        <?= $icons['success'] ?>
+                                                        <?= $icons['warning'] ?>
+                                                        <?= $icons['danger']  ?>
+                                                    </span>
+                                                    <span class="u-icon-item-name"><?= esc_html($set_name) ?></span>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <p class="u-desc">
+                                Вариант информационных блоков (callout).<br>
+                                <b>Default</b> — акцентная левая рамка без иконки.<br>
+                                <b>Subtle Tinted</b> — полная рамка, тонированный фон, боковая иконка слева.<br>
+                                <b>Left Accent Bar</b> — 4px левая полоса, тонированный фон, иконка, острые углы.<br>
+                                <b>Solid Filled</b> — насыщенный сплошной фон, белый текст, как баннер-алерт.<br>
+                                <b>Dashed Outline</b> — без фона, пунктирная рамка в цвете акцента.<br>
+                                <b>Icon Badge Card</b> — белая карточка с тенью, иконка.<br>
+                                <b>Minimal Inline</b> — без фона и рамки, тонкая левая линия и акцентная точка.<br>
+                                Icon Set применяется в вариантах Subtle Tinted, Left Accent Bar и Icon Badge Card.
+                            </p>
+                        </div>
+
+                        <div class="u-card-right">
+                            <div class="u-preview">
+                                <img src="<?= plugins_url("assets/media/callout-{$current_callout}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/callout-', dirname(__FILE__)) ?>"
+                                     alt="Callout preview"
+                                     class="u-component-preview-img"
+                                     onerror="this.closest('.u-card-right').style.display='none'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Details ────────────────────────────────────────── -->
+                <?php
+                $details_options = ['arrow', 'plus', 'hairline', 'left-rule', 'bottom-rule', 'dashed', 'hanging-marker', 'pill-summary', 'inset-note'];
+                $current_details = $v['details'] ?? 'arrow';
+                $details_descs = [
+                    'arrow'          => 'Стрелка-шеврон справа. Блок на фоне секции, раскрытый заголовок отделяется линией.',
+                    'plus'           => 'Плюс слева трансформируется в ×. Блок на фоне секции — компактный FAQ-стиль.',
+                    'hairline'       => 'Тонкая рамка по периметру, шеврон слева. Минималистичный «безопасный» вариант без фона.',
+                    'left-rule'      => 'Только левая линейка, маркер +/–. Лёгкий вариант для FAQ внутри статьи.',
+                    'bottom-rule'    => 'Линия снизу + крест-плюс справа. Несколько подряд выглядят как аккордеон без рамок.',
+                    'dashed'         => 'Пунктирная рамка, треугольная стрелка. Намёк на «дополнительно — разверни если интересно».',
+                    'hanging-marker' => 'Без рамок: маркер › висит в левом поле, текст идёт в ритме абзацев.',
+                    'pill-summary'   => 'Заголовок как «таблетка», содержимое за тонкой левой линией.',
+                    'inset-note'     => 'Врезка: подложка секции + левый акцент в цвет акцента. Для блоков-примечаний.',
+                ];
+                ?>
+                <div class="u-component-card">
+                    <div class="u-card-header">
+                        <h3>Details / Accordion</h3>
+                        <select name="u_fields[details]" class="u-component-select" id="details-select">
+                            <?php foreach ($details_options as $opt): ?>
+                                <option value="<?= $opt ?>"
+                                    <?= $current_details === $opt ? 'selected' : '' ?>>
+                                    <?= ucfirst(str_replace('-', ' ', $opt)) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+                            <p class="u-desc" id="details-desc">
+                                <?= $details_descs[$current_details] ?? '' ?>
+                            </p>
+                            <script>
+                            var uDetailsDescs = <?= json_encode($details_descs, JSON_UNESCAPED_UNICODE) ?>;
+                            document.getElementById('details-select').addEventListener('change', function () {
+                                var desc = uDetailsDescs[this.value] || '';
+                                document.getElementById('details-desc').textContent = desc;
+                                var img = document.getElementById('details-preview');
+                                if (img) img.src = img.dataset.baseUrl + this.value + '.webp';
+                            });
+                            </script>
+                        </div>
+                        <div class="u-card-right">
+                            <div class="u-preview">
+                                <img id="details-preview"
+                                     src="<?= plugins_url("assets/media/details-{$current_details}.webp", dirname(__FILE__)) ?>"
+                                     data-base-url="<?= plugins_url('assets/media/details-', dirname(__FILE__)) ?>"
+                                     alt="Details preview"
+                                     class="u-component-preview-img"
+                                     onerror="this.closest('.u-card-right').style.display='none'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="u-component-card">
                     <div class="u-card-header">
@@ -665,11 +1053,12 @@ function u_color_field(string $name, string $value): void {
 
                 <!-- Manual mode -->
                 <div id="color-mode-manual" class="color-mode-content <?= $manual_mode ? 'active' : '' ?>">
+                    <h4>Brand Colors</h4>
                     <div class="color-table">
                         <div class="color-table-header">
                             <span>Color</span>
-                            <span>Light</span>
-                            <span>Dark</span>
+                            <span data-theme-col="light">Light</span>
+                            <span data-theme-col="dark">Dark</span>
                         </div>
 
                         <?php
@@ -710,37 +1099,62 @@ function u_color_field(string $name, string $value): void {
                             $vl = $v[$lk] ?? $default_light[$lk] ?? '#ffffff';
                             $vd = $v[$dk] ?? $default_dark[$dk]  ?? '#000000';
                         ?>
-                            <div class="color-table-row">
+                            <div class="color-table-row <?= $key === 'H1' ? 'u-h1-row' : '' ?>">
                                 <span class="color-label"><?= $label ?></span>
-                                <div class="color-input-wrapper">
-                                    <?php u_color_field("u_fields[{$lk}]", $vl) ?>
+                                <div class="color-input-wrapper" data-theme-col="light">
+                                    <?php if ($key === 'H1'): ?>
+                                        <?php u_h1_gradient_field("u_fields[{$lk}]", $vl) ?>
+                                    <?php else: ?>
+                                        <?php u_color_field("u_fields[{$lk}]", $vl) ?>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="color-input-wrapper">
-                                    <?php u_color_field("u_fields[{$dk}]", $vd) ?>
+                                <div class="color-input-wrapper" data-theme-col="dark">
+                                    <?php if ($key === 'H1'): ?>
+                                        <?php u_h1_gradient_field("u_fields[{$dk}]", $vd) ?>
+                                    <?php else: ?>
+                                        <?php u_color_field("u_fields[{$dk}]", $vd) ?>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
-                <!-- System States -->
-                <div class="system-colors-section">
-                    <h4>System States</h4>
-                    <div class="system-colors-grid">
+                <!-- Status Colors -->
+                <div class="system-colors-section" id="status-colors-section">
+                    <h4>Status Colors</h4>
+                    <div class="color-table">
+                        <div class="color-table-header">
+                            <span>Color</span>
+                            <span data-theme-col="light">Light</span>
+                            <span data-theme-col="dark">Dark</span>
+                        </div>
                         <?php
-                        $system_colors = [
-                            'color-success' => ['label' => 'Success', 'default' => '#5db97a'],
-                            'color-warning' => ['label' => 'Warning', 'default' => '#fcd34d'],
-                            'color-error'   => ['label' => 'Error',   'default' => '#dc2f02'],
-                            'color-info'    => ['label' => 'Info',    'default' => '#4fc3f7'],
+                        $system_state_rows = [
+                            'success'     => ['label' => 'Success',      'light_default' => '#5db97a', 'dark_default' => '#4caf68'],
+                            'warning'     => ['label' => 'Warning',      'light_default' => '#fcd34d', 'dark_default' => '#eab308'],
+                            'error'       => ['label' => 'Error',        'light_default' => '#dc2f02', 'dark_default' => '#ff6b4a'],
+                            'info'        => ['label' => 'Info',         'light_default' => '#4fc3f7', 'dark_default' => '#29b6f6'],
+                            'callout-txt' => ['label' => 'Callout Text', 'light_default' => '#1a1a2e', 'dark_default' => '#e8e8f0'],
                         ];
-                        foreach ($system_colors as $key => $cfg): ?>
-                            <div class="system-color-item">
-                                <label><?= $cfg['label'] ?></label>
-                                <?php u_color_field("u_fields[{$key}]", $v[$key] ?? $cfg['default']) ?>
+                        foreach ($system_state_rows as $key => $cfg):
+                            $lk = "color-{$key}-light";
+                            $dk = "color-{$key}-dark";
+                            $vl = $v[$lk] ?? $cfg['light_default'];
+                            $vd = $v[$dk] ?? $cfg['dark_default'];
+                        ?>
+                            <div class="color-table-row">
+                                <span class="color-label"><?= $cfg['label'] ?></span>
+                                <div class="color-input-wrapper" data-theme-col="light">
+                                    <?php u_color_field("u_fields[{$lk}]", $vl) ?>
+                                </div>
+                                <div class="color-input-wrapper" data-theme-col="dark">
+                                    <?php u_color_field("u_fields[{$dk}]", $vd) ?>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
+                    <p class="u-desc u-mode-hint" style="margin-top:8px"></p>
                 </div>
             </section>
 
@@ -763,8 +1177,11 @@ function u_color_field(string $name, string $value): void {
                     'mma', 'motorsport', 'padel', 'rugby', 'rugby_league', 'snooker',
                     'squash', 'table_tennis', 'tennis', 'volleyball', 'waterpolo',
                 ];
-                $cur_stream  = get_option('site_stream',  '');
-                $cur_subject = get_option('site_subject', '');
+                $cur_stream           = get_option('site_stream',              '');
+                $cur_subject          = get_option('site_subject',             '');
+                $cur_html_lang        = get_option('utheme_html_lang',         '');
+                $cur_html_lang_enabled = get_option('utheme_html_lang_enabled', '1');
+                $wp_default_lang      = get_bloginfo('language');
                 ?>
                 <div class="u-card">
                     <div class="u-card-body">
@@ -798,6 +1215,48 @@ function u_color_field(string $name, string $value): void {
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="u-card" style="margin-top:16px">
+                    <div class="u-card-body">
+                        <div class="u-card-left">
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">HTML Lang (frontend)</div>
+                                <div class="u-basic-field-control">
+                                    <input type="text"
+                                           name="utheme_html_lang"
+                                           value="<?= esc_attr($cur_html_lang) ?>"
+                                           placeholder="<?= esc_attr($wp_default_lang) ?>"
+                                           style="width:140px">
+                                    <p class="description" style="margin-top:4px">
+                                        WP locale для атрибута <code>lang</code> в <code>&lt;html&gt;</code>.
+                                        Примеры: <code>en_GB</code>, <code>fr_BE</code>, <code>pt_BR</code>.
+                                        Пусто — WordPress использует стандартное значение
+                                        (<code><?= esc_html($wp_default_lang) ?></code>).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="u-basic-field">
+                                <div class="u-basic-field-label">Кастомный lang</div>
+                                <div class="u-basic-field-control">
+                                    <label>
+                                        <input type="checkbox"
+                                               name="utheme_html_lang_enabled"
+                                               value="1"
+                                               <?= checked($cur_html_lang_enabled, '1', false) ?>>
+                                        Переопределять locale для фронтенда
+                                    </label>
+                                    <p class="description" style="margin-top:4px">
+                                        Если снять галку — WordPress выводит locale по умолчанию,
+                                        поле выше игнорируется.
+                                    </p>
                                 </div>
                             </div>
 

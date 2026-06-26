@@ -1,0 +1,210 @@
+# keyclass-main-menu.yml
+# BEM-based: only block names + standalone state classes are listed.
+# Elements (ut-panel__head etc.) are derived automatically — when ut-panel → amber,
+# ut-panel__head becomes amber__head via simple string replace.
+# Within every theme column all names must be unique — enforced at load time.
+# 21 keys × 25 variants = 525 entries, all globally unique.
+
+# ── Structural header ──────────────────────────────────────────────────────────
+ut-site-header: [
+  page-bar, top-bar, main-bar, site-bar,
+  header-row, head-band, page-head, site-head, nav-head,
+  main-wrap, top-wrap, head-row, header-band, nav-band,
+  site-strip, page-strip, main-strip, top-strip,
+  head-cap, page-cap, site-wrap, head-strip, nav-strip,
+  header-zone, top-zone
+]
+
+# ── Controls ──────────────────────────────────────────────────────────────────
+ut-toggle: [
+  menu-btn, nav-trigger, burger-btn, open-btn,
+  nav-btn, toggle-btn, menu-toggle, nav-toggle, open-trigger,
+  show-btn, expand-btn, pull-btn, ham-btn,
+  menu-handle, nav-handle, menu-icon, nav-icon, ham-icon,
+  menu-switch, nav-switch, open-switch, show-trigger,
+  menu-tap, nav-tap, open-tap
+]
+
+ut-close: [
+  close-btn, dismiss-btn, shut-btn, hide-btn,
+  close-trigger, hide-trigger, exit-btn, remove-btn, clear-btn,
+  off-btn, cancel-btn, close-handle, shut-handle, exit-handle,
+  close-switch, shut-switch, exit-switch,
+  close-icon, shut-icon, exit-icon,
+  close-tap, shut-tap, off-trigger, cancel-trigger, exit-tap
+]
+
+ut-overlay: [
+  bg-overlay, dim-cover, back-shade, dark-veil,
+  dim-overlay, back-overlay, dark-overlay, bg-shade, dark-shade,
+  back-cover, bg-cover, dim-veil, back-veil, page-veil, dark-cover,
+  screen-veil, screen-shade, screen-overlay, page-overlay, page-cover,
+  dim-shade, dim-screen, dark-screen, back-screen, page-shade
+]
+
+# ── Panel / sidebar (block) ────────────────────────────────────────────────────
+ut-panel: [
+  side-panel, nav-drawer, menu-sidebar, slide-tray,
+  nav-panel, menu-panel, side-drawer, menu-drawer, left-panel,
+  side-tray, menu-tray, nav-tray, left-drawer, nav-sidebar,
+  menu-board, side-board, nav-board, left-sidebar,
+  side-column, nav-column, menu-column,
+  side-pane, nav-pane, menu-pane, left-tray
+]
+
+# ── Item (block) ──────────────────────────────────────────────────────────────
+ut-item: [
+  menu-card, nav-tile, link-card, item-block,
+  menu-item, nav-item, link-item, nav-card, item-card,
+  link-block, item-tile, nav-block, link-tile, menu-block,
+  item-row, nav-row, link-row, menu-row,
+  item-cell, nav-cell, link-cell, menu-cell,
+  item-node, nav-node, link-node
+]
+
+# ── Drill-down (block) ────────────────────────────────────────────────────────
+ut-drill: [
+  drill-nav, level-nav, depth-nav, stage-nav,
+  drill-menu, level-menu, depth-menu, stage-menu,
+  drill-panel, level-panel, depth-panel, stage-panel,
+  drill-stack, level-stack, depth-stack, stage-stack,
+  drill-pane, level-pane, depth-pane, stage-pane,
+  drill-wrap, level-wrap, depth-wrap, stage-wrap,
+  drill-frame
+]
+
+# ── Island (block) ────────────────────────────────────────────────────────────
+ut-island: [
+  island-bar, float-bar, hover-bar, pop-bar,
+  island-nav, float-nav, hover-nav, pop-nav,
+  island-wrap, float-wrap, hover-wrap, pop-wrap,
+  island-menu, float-menu, hover-menu, pop-menu,
+  island-panel, float-panel, hover-panel, pop-panel,
+  island-dock, float-dock, hover-dock, pop-dock,
+  island-zone
+]
+
+# ── Desktop nav (block) ───────────────────────────────────────────────────────
+ut-nav: [
+  nav-wrap, link-shelf, menu-rail, bar-shelf,
+  nav-zone, link-zone, menu-zone, nav-shelf, link-rail,
+  bar-rail, bar-wrap, nav-frame, link-frame, menu-frame, bar-frame,
+  nav-grid, link-grid, menu-grid, bar-grid,
+  nav-list, link-list, menu-list, bar-list,
+  nav-stack, link-stack
+]
+
+# ── Dynamic menu (block) ──────────────────────────────────────────────────────
+ut-dyn: [
+  dyn-menu, live-menu, dyn-panel, live-strip,
+  dyn-nav, live-nav, dyn-bar, live-bar,
+  dyn-wrap, live-wrap, dyn-rail, live-rail,
+  dyn-shelf, live-shelf, dyn-strip, live-tray, dyn-tray,
+  live-dock, dyn-dock, live-grid, dyn-grid,
+  live-zone, dyn-zone, live-frame, dyn-frame
+]
+
+# ── Utility nav container (standalone) ────────────────────────────────────────
+ut-side-nav: [
+  panel-nav, drawer-nav, sidebar-nav, tray-nav,
+  left-nav, slide-nav, inner-nav, sub-nav, list-nav,
+  column-nav, dock-nav, frame-nav, shelf-nav, rail-nav, zone-nav,
+  side-menu, left-menu, slide-menu, inner-menu, dock-menu,
+  panel-menu, column-menu, frame-menu, shelf-menu, rail-menu
+]
+
+# ── Drill state ────────────────────────────────────────────────────────────────
+ut-is-going-back: [
+  going-back, back-anim, nav-reverse, is-reversing,
+  was-back, went-back, go-back, back-step, back-move, back-slide,
+  drill-back, back-drill, level-back, back-level,
+  step-back, slide-back, move-back, dir-back, nav-back, anim-back,
+  back-trans, back-flow, back-mode, rev-nav, nav-rev
+]
+
+# ── Desktop / layout state ────────────────────────────────────────────────────
+ut-is-desktop: [
+  is-desktop, wide-mode, desktop-view, nav-wide,
+  is-wide, is-large, is-full,
+  screen-wide, screen-full, view-wide, view-full, view-large,
+  mode-wide, mode-full, mode-large,
+  layout-wide, layout-full, layout-large,
+  desktop-mode, desktop-state, desktop-layout,
+  wide-view, wide-layout, full-view, large-view
+]
+
+ut-sub-flip: [
+  flip-left, rtl-drop, sub-reversed, flipped-sub,
+  sub-flip, flip-sub, flip-menu, menu-flip, flip-drop, drop-flip,
+  flip-inner, inner-flip, flip-dir, dir-flip,
+  flip-nav, nav-flip, flip-item, item-flip,
+  flip-pop, pop-flip, flip-panel, panel-flip,
+  flip-box, box-flip, flip-zone
+]
+
+ut-sub-sub-flip: [
+  deep-flip, nested-rtl, double-flip, inner-flipped,
+  deep-flipped, nested-flip, deep-reverse, nested-reverse,
+  nested-drop, deep-drop, sub-sub-flip, flip-deep, flip-nested,
+  deep-mirror, nested-mirror, deep-rev, nested-rev, double-rev,
+  inner-rev, inner-reverse, deep-dir, nested-dir, double-dir,
+  deep-alt, nested-alt
+]
+
+# ── Body state ────────────────────────────────────────────────────────────────
+ut-menu-open: [
+  menu-open, nav-open, panel-open, drawer-open,
+  menu-shown, nav-shown, panel-shown, drawer-shown,
+  menu-visible, nav-visible, panel-visible, drawer-visible,
+  menu-active, nav-active, panel-active,
+  menu-spread, nav-spread, panel-spread,
+  menu-deployed, nav-deployed, panel-deployed,
+  menu-revealed, nav-revealed, panel-revealed, drawer-revealed
+]
+
+ut-docs-menu-open: [
+  docs-open, sidebar-open, docs-showing, sidebar-active,
+  docs-visible, sidebar-visible, docs-active, sidebar-shown, docs-shown,
+  sidebar-revealed, docs-revealed, sidebar-spread, docs-spread,
+  sidebar-deployed, docs-deployed,
+  sidebar-on, docs-on, sidebar-in, docs-in,
+  sidebar-live, docs-live, sidebar-up, docs-up,
+  sidebar-go, docs-go
+]
+
+ut-docs-menu-closed: [
+  docs-closed, sidebar-closed, docs-hidden, sidebar-done,
+  docs-off, sidebar-off, docs-out, sidebar-out,
+  docs-away, sidebar-away, docs-gone, sidebar-gone,
+  docs-shut, sidebar-shut, docs-folded, sidebar-folded,
+  docs-retracted, sidebar-retracted,
+  docs-collapsed, sidebar-collapsed,
+  docs-ended, sidebar-ended, docs-nil, sidebar-nil, docs-down
+]
+
+# ── Generic state ─────────────────────────────────────────────────────────────
+ut-is-active: [
+  is-active, state-open, is-visible, is-shown,
+  is-live, is-on, is-up, is-go,
+  has-state, in-state, at-active, now-active, set-active, got-active,
+  state-on, state-live, state-up, state-go,
+  state-set, state-got, state-in, state-now, state-at,
+  flag-active, flag-on
+]
+
+ut-is-open: [
+  is-open, state-expanded, is-expanded, in-view,
+  is-spread, is-deployed, is-revealed, is-showing,
+  at-open, now-open, set-open, flag-open, mark-open,
+  open-state, open-flag, open-mark, open-mode,
+  state-spread, state-deployed, state-revealed,
+  at-spread, now-spread, flag-spread, mark-spread, open-now
+]
+
+ut-is-closed: [
+  is-closed, state-collapsed, is-collapsed, out-view,
+  is-hidden, is-gone, is-away, is-off, is-out, is-down,
+  at-closed, now-closed, set-closed, flag-closed, mark-closed,
+  closed-state, closed-flag, closed-mark, closed-mode,
+  state-hidden, state-gone, state-away, state-off, state-out, state-down
+]

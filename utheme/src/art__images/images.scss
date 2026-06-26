@@ -2,65 +2,321 @@
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
-article {
-    figure:has(img) {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        user-select: none;
-        margin: 0 auto 2rem auto;
-        overflow: hidden;
+// ─── Original ────────────────────────────────────────────────────────────────
+@if conf.$image-style == "original" {
+    article {
+        figure:has(img) {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            user-select: none;
+            overflow: hidden;
 
-        img {
-            max-height: 60vh;
-            border-radius: f.get-radius();
-            aspect-ratio: 16 / 9;
-
-            @if conf.$is-img_contain == 'true' {
-                object-fit: contain;
-                width: fit-content;
-                max-width: 100%;
-            } @else {
+            img {
+                max-height: 60vh;
+                border-radius: f.get-radius();
+                aspect-ratio: 16 / 9;
                 width: 100%;
                 object-fit: cover;
             }
-        }
 
-        figcaption {
-            font-style: italic;
-            margin: 0;
-            opacity: .7;
-            font-size: .8em;
-            padding-top: .2em;
-            text-wrap: balance;
+            figcaption {
+                font-style: italic;
+                margin: 0;
+                opacity: .7;
+                font-size: .8em;
+                padding-top: .2em;
+                text-wrap: balance;
 
-            @if conf.$is-left-align == "true" and conf.$is-img_contain == 'false' {
-                text-align: left;
-                align-self: self-start;
-            }
-            @else {
-                text-align: center;
+                @if conf.$is-left-align == "true" {
+                    text-align: left;
+                    align-self: self-start;
+                } @else {
+                    text-align: center;
+                }
             }
         }
     }
+}
 
-    @if conf.$is-img_contain == 'true' {
-        figure:has(img):first-of-type img {
-            min-height: 30vh;
-            width: 80%;
+// ─── Marginalia ───────────────────────────────────────────────────────────────
+// Caption lives in a left rail, aligned to the article's $max-width boundary.
+@if conf.$image-style == "marginalia" {
+    article {
+        padding-left: 200px;
 
-            @media (max-width: 800px) {
+        figure:has(img) {
+            position: relative;
+            user-select: none;
+
+            img {
+                border-radius: f.get-radius();
+                aspect-ratio: 16 / 9;
                 width: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            figcaption {
+                position: absolute;
+                left: -200px;
+                top: 0;
+                width: 180px;
+                margin: 0;
+                padding: 4px 14px 0 0;
+                font-style: italic;
+                font-size: .8em;
+                line-height: 1.45;
+                opacity: .7;
+                text-align: right;
+                text-wrap: balance;
+                border-right: 1px solid currentColor;
+            }
+        }
+
+        @media (max-width: 768px) {
+            padding-left: 0;
+
+            figure:has(img) figcaption {
+                position: static;
+                width: auto;
+                text-align: left;
+                border-right: none;
+                border-top: 1px solid currentColor;
+                padding: .4em 0 0;
             }
         }
     }
+}
 
-    figure:has(:has(img), .mobile-betting-container, .platforms-comparison, .bottom-space-p) {
-        margin-bottom: 1.6rem;
+// ─── Slide-up reveal ─────────────────────────────────────────────────────────
+// Caption hidden below the image, slides up on hover. Touch: tap to toggle.
+@if conf.$image-style == "slide-up" {
+    article {
+        figure:has(img) {
+            position: relative;
+            overflow: hidden;
+            border-radius: f.get-radius();
+            user-select: none;
+
+            img {
+                aspect-ratio: 16 / 9;
+                width: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            figcaption {
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                margin: 0 !important;
+                padding: 40px 16px 14px;
+                background: linear-gradient(to top, rgba(0, 0, 0, .82), transparent);
+                color: #fff;
+                font-size: .82em;
+                line-height: 1.45;
+                text-wrap: balance;
+                transform: translateY(100%);
+                transition: transform .38s cubic-bezier(.2, .7, .2, 1);
+
+                @if conf.$is-left-align == "true" {
+                    text-align: left;
+                } @else {
+                    text-align: center;
+                }
+            }
+
+            &:hover figcaption,
+            &:focus-within figcaption,
+            &.is-caption-open figcaption {
+                transform: translateY(0);
+            }
+        }
     }
+}
 
-    section figure:last-child {
-        margin-bottom: 0;
+// ─── Whisper ──────────────────────────────────────────────────────────────────
+// Tiny monospace caption under the image — nearly invisible, doesn't break reading.
+@if conf.$image-style == "whisper" {
+    article {
+        figure:has(img) {
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+
+            img {
+                border-radius: f.get-radius();
+                aspect-ratio: 16 / 9;
+                width: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            figcaption {
+                font-family: monospace;
+                font-size: .72em;
+                letter-spacing: .04em;
+                opacity: .6;
+                margin-top: .4em;
+                padding-left: 1.2em;
+                position: relative;
+                text-wrap: balance;
+
+                @if conf.$is-left-align == "true" {
+                    text-align: left;
+                } @else {
+                    text-align: left; // always left for the arrow prefix
+                }
+
+                &::before {
+                    content: "\2192";
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                }
+            }
+        }
+    }
+}
+
+// ─── Corner badge ─────────────────────────────────────────────────────────────
+// Collapsed [i] pill in the corner. Expands horizontally on hover, text fades in.
+// Height is fixed (26px always) — no reflow, no vertical jerk.
+// Touch: tap to open, tap again to close (JS .is-caption-open).
+@if conf.$image-style == "corner-badge" {
+    article {
+        figure:has(img) {
+            position: relative;
+            border-radius: f.get-radius();
+            overflow: hidden;
+            user-select: none;
+
+            img {
+                aspect-ratio: 16 / 9;
+                width: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            figcaption {
+                position: absolute;
+                left: 10px;
+                bottom: 10px;
+                margin: 0;
+                // 5 + 16px icon + 5 = 26px total height, never changes
+                padding: 5px;
+                background: rgba(16, 14, 10, .84);
+                backdrop-filter: blur(8px);
+                color: transparent;
+                font-size: .78em;
+                // line-height locked to icon height — no height change on text reveal
+                line-height: 16px;
+                border-radius: f.get-radius();
+                max-width: 26px;
+                overflow: hidden;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                gap: 0;
+                cursor: default;
+                // Exit: text fades out instantly, then badge collapses
+                transition:
+                    max-width .38s ease,
+                    padding .3s ease,
+                    gap .3s ease,
+                    color .1s ease;
+
+                &::before {
+                    content: "i";
+                    display: block;
+                    flex: 0 0 16px;
+                    width: 16px;
+                    height: 16px;
+                    background: conf.$color-accent-light;
+                    color: #fff;
+                    border-radius: f.get-radius();
+                    text-align: center;
+                    font-style: italic;
+                    font-weight: 700;
+                    font-size: .72em;
+                    line-height: 16px;
+                    flex-shrink: 0;
+
+                    @include f.dark-mode {
+                        background: conf.$color-accent-dark;
+                    }
+                }
+            }
+
+            &:hover figcaption,
+            &:focus-within figcaption,
+            &.is-caption-open figcaption {
+                max-width: calc(100% - 20px);
+                padding: 5px 10px 5px 5px;
+                gap: 7px;
+                color: rgba(255, 255, 255, .9);
+                // Enter: badge widens, text fades in after
+                transition:
+                    max-width .42s cubic-bezier(.2, .7, .2, 1),
+                    padding .35s ease,
+                    gap .35s ease,
+                    color .25s ease .35s;
+            }
+
+            .wp-element-caption {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+// ─── Brutalist strip ─────────────────────────────────────────────────────────
+// Hard black frame around the image; caption always in a black strip below.
+@if conf.$image-style == "brutalist-strip" {
+    article {
+        figure:has(img) {
+            border: 3px solid #1a1814;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+
+            @include f.dark-mode {
+                border-color: #ece7da;
+            }
+
+            img {
+                aspect-ratio: 16 / 9;
+                width: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            figcaption {
+                margin: 0;
+                padding: 6px 12px;
+                background: #1a1814;
+                color: #fff;
+                font-family: monospace;
+                font-size: .72em;
+                letter-spacing: .06em;
+                text-transform: uppercase;
+                line-height: 1.4;
+                text-wrap: balance;
+
+                @include f.dark-mode {
+                    background: #ece7da;
+                    color: #1a1814;
+                }
+
+                @if conf.$is-left-align == "true" {
+                    text-align: left;
+                } @else {
+                    text-align: center;
+                }
+            }
+        }
     }
 }

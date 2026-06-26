@@ -1,4 +1,4 @@
-@use 'sass:color';
+﻿@use 'sass:color';
 @use "../conf.scss" as conf;
 @use "../funcs.scss" as f;
 
@@ -45,7 +45,7 @@ $sp-sm: calc(#{$sp} * 0.55);
                     background: conf.$color-accent-light;
                     border-radius: 2px;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background: conf.$color-accent-dark;
                     }
                 }
@@ -66,7 +66,7 @@ $sp-sm: calc(#{$sp} * 0.55);
             background: conf.$color-section-light;
             cursor: pointer;
 
-            @media (prefers-color-scheme: dark) {
+            @include f.dark-mode {
                 background: conf.$color-section-dark;
             }
         }
@@ -81,7 +81,7 @@ $sp-sm: calc(#{$sp} * 0.55);
                 outline: 2px solid conf.$color-accent-light;
                 outline-offset: 2px;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     outline-color: conf.$color-accent-dark;
                 }
             }
@@ -167,7 +167,7 @@ $sp-sm: calc(#{$sp} * 0.55);
                 color: conf.$color-text-light;
                 font-size: clamp(1rem, 2.5vw, 1.5rem);
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: conf.$color-text-dark;
                 }
             }
@@ -175,7 +175,7 @@ $sp-sm: calc(#{$sp} * 0.55);
             .more-pages__desc {
                 color: color.change(conf.$color-text-light, $alpha: .65);
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: color.change(conf.$color-text-dark, $alpha: .65);
                 }
             }

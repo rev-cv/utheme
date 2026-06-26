@@ -1,5 +1,6 @@
-@use 'sass:color' as sys;
+﻿@use 'sass:color' as sys;
 @use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
 
 /* ------------------------------------------------------ */
 // ПЕРЕМЕННЫЕ
@@ -22,10 +23,11 @@ $space: conf.$default-space;
         contain: layout style;
 
         .page-toc-title {
-            margin: 0 0 .8em;
             display: block;
             width: fit-content;
             padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
         }
 
         ol.page-toc-list,
@@ -61,7 +63,7 @@ $space: conf.$default-space;
                 font-weight: normal;
                 text-decoration: none;
 
-                @media (prefers-color-scheme: dark) {
+                @include f.dark-mode {
                     color: $tx-dark;
                 }
 
@@ -90,7 +92,7 @@ $space: conf.$default-space;
                     // Установите здесь цвет фона вашей страницы (например, белый или из переменной)
                     color: #fff;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         background: $act-dark;
                         // Здесь цвет фона для темной темы
                         color: #1a1a1a;
@@ -102,7 +104,7 @@ $space: conf.$default-space;
                     transform: translateX(8px);
                     color: $act-light;
 
-                    @media (prefers-color-scheme: dark) {
+                    @include f.dark-mode {
                         color: $act-dark;
                     }
                 }
@@ -121,9 +123,5 @@ $space: conf.$default-space;
         }
     }
 
-    article div.toc {
-        margin-bottom: clamp(.7em, 5vw, 2em) !important;
-        margin-top: clamp(1.4em, 5vw, 3em) !important;
-    }
 
 }

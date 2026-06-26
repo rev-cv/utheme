@@ -63,12 +63,20 @@ def main():
         if not shared_db_dir.is_absolute():
             shared_db_dir = project_dir / shared_db_dir
     else:
-        shared_db_dir = next(
-            (p.parent / "wp-maria-db" for p in project_dir.parents if p.name == "sites"),
-            project_dir.parent / "wp-maria-db",
-        )
+        shared_db_dir = None
+        for parent in project_dir.parents:
+            if parent.name == "sites":
+                shared_db_dir = parent.parent / "wp-maria-db"
+                break
+            candidate = parent / "wp-maria-db"
+            if candidate.exists():
+                shared_db_dir = candidate
+                break
+        if shared_db_dir is None:
+            shared_db_dir = project_dir.parent.parent / "wp-maria-db"
 
-    db_root_password = extract_yaml_value(
+    db_env = parse_env(shared_db_dir / ".env")
+    db_root_password = db_env.get("DB_ROOT_PASSWORD") or extract_yaml_value(
         shared_db_dir / "docker-compose.yml", "MYSQL_ROOT_PASSWORD"
     )
 
@@ -128,6 +136,15 @@ def main():
         print("  [OK] uploads/ removed.")
     else:
         print("\n[3/3] uploads/ not found, skipping.")
+
+    # --- Step 4: remove generated wp-config.php ---
+    wp_config = project_dir / "wp-conf" / "wp-config.php"
+    if wp_config.exists():
+        print("\n[4/4] Removing wp-conf/wp-config.php...")
+        wp_config.unlink()
+        print("  [OK] wp-config.php removed.")
+    else:
+        print("\n[4/4] wp-conf/wp-config.php not found, skipping.")
 
     print("\nDone. Site destroyed.")
 

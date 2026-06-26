@@ -1,4 +1,4 @@
-@use "../conf.scss" as conf;
+﻿@use "../conf.scss" as conf;
 @use 'sass:color' as sys;
 @use "../funcs.scss" as f;
 
@@ -30,7 +30,7 @@ $footer-border-dark: rgba(conf.$color-text-dark, .1);
         font-size: $footer-text-font-size;
         line-height: 1.6;
         border-top: 1px solid $footer-border-light;
-        margin-top: 0;
+        margin-top: 1em;
 
         .container {
             max-width: conf.$max-width;
@@ -120,7 +120,7 @@ $footer-border-dark: rgba(conf.$color-text-dark, .1);
         }
 
         // Dark mode
-        @media (prefers-color-scheme: dark) {
+        @include f.dark-mode {
             color: $footer-text-dark;
             border-top-color: $footer-border-dark;
 

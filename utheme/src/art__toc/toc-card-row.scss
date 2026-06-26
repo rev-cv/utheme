@@ -1,0 +1,110 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$tx-light:     conf.$color-text-light;
+$tx-dark:      conf.$color-text-dark;
+$act-light:    conf.$color-accent-light;
+$act-dark:     conf.$color-accent-dark;
+$brd-light:    conf.$color-border-light;
+$brd-dark:     conf.$color-border-dark;
+
+$arrow-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'/%3E%3C%2Fsvg%3E");
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .5rem;
+        user-select: none;
+        contain: layout style;
+
+        .page-toc-title {
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
+        }
+
+        ol.page-toc-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li.page-toc-level-2 {
+            border-top: 1px solid sys.adjust($brd-light, $lightness: 5%);
+
+            &:first-child {
+                border-top: 1px solid $brd-light;
+            }
+
+            @include f.dark-mode {
+                border-color: $brd-dark;
+
+                &:first-child { border-color: sys.adjust($brd-dark, $lightness: 5%); }
+            }
+
+            a {
+                font-size: clamp(.8rem, 3vw, 1rem);
+                padding: .7em 0;
+                color: $tx-light;
+                text-decoration: none;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: .8em;
+                transition: color 150ms ease;
+
+                @include f.dark-mode { color: $tx-dark; }
+
+                // Стрелка появляется при hover
+                &::after {
+                    content: '';
+                    display: block;
+                    width: .9em;
+                    height: .9em;
+                    flex-shrink: 0;
+                    background-color: transparent;
+                    -webkit-mask-image: $arrow-svg;
+                    mask-image: $arrow-svg;
+                    -webkit-mask-size: contain;
+                    mask-size: contain;
+                    -webkit-mask-repeat: no-repeat;
+                    mask-repeat: no-repeat;
+                    -webkit-mask-position: center;
+                    mask-position: center;
+                    opacity: 0;
+                    transform: translateX(-6px);
+                    transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
+                }
+
+                &:hover {
+                    color: $act-light;
+                    text-decoration: none;
+
+                    &::after {
+                        opacity: 1;
+                        transform: translateX(0);
+                        background-color: $act-light;
+                    }
+
+                    @include f.dark-mode {
+                        color: $act-dark;
+
+                        &::after { background-color: $act-dark; }
+                    }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title { font-size: .75em; }
+        li a { font-size: .7em; }
+    }
+
+}

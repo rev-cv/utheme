@@ -1,0 +1,94 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card--editorial {
+        display: block;
+        border-top: 2px solid conf.$color-text-light;
+        border-bottom: 1px solid conf.$color-border-light;
+        @include f.dark-mode {
+            border-top-color: conf.$color-text-dark;
+            border-bottom-color: conf.$color-border-dark;
+        }
+        transition: box-shadow 0.2s ease;
+        @include f.mode((background: (conf.$color-section-light, conf.$color-section-dark)));
+
+        &:hover {
+            box-shadow: conf.$shadow-section-hover;
+        }
+
+        a {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: conf.$default-space;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .editorial-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .editorial-date {
+            @include f.font-txt;
+            font-size: 0.7rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding-top: 4px;
+            color: rgba(conf.$color-text-light, 0.45);
+            @include f.dark-mode { color: rgba(conf.$color-text-dark, 0.45); }
+        }
+
+        .editorial-thumb {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+            border-radius: f.get-radius("small");
+        }
+
+        .editorial-title {
+            @include f.font-hd;
+            margin: 0;
+            font-size: clamp(16px, 4.5vw, 1.35rem);
+            line-height: 1.2;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+        }
+
+        .editorial-desc {
+            @include f.font-txt;
+            margin: 0;
+            font-size: 0.84rem;
+            line-height: 1.55;
+            max-height: 7.5em;
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+            color: rgba(conf.$color-text-light, 0.65);
+            @include f.dark-mode { color: rgba(conf.$color-text-dark, 0.65); }
+        }
+
+        .editorial-foot {
+            display: flex;
+            margin-top: 4px;
+            padding-top: 10px;
+            border-top: 1px solid conf.$color-border-light;
+            @include f.dark-mode { border-top-color: conf.$color-border-dark; }
+        }
+
+        .editorial-cta {
+            @include f.font-txt;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            @include f.mode((color: (conf.$color-accent-light, conf.$color-accent-dark)));
+        }
+    }
+}

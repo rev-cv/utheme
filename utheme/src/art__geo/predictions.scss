@@ -1,0 +1,297 @@
+@use 'sass:color';
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$sp:    conf.$default-space;
+$sp-sm: calc(#{$sp} * 0.55);
+$sp-xs: calc(#{$sp} * 0.35);
+
+/* ─── Sports Predictions Widget ──────────────────────────── */
+
+.dynamic-injection-container {
+
+    h2 { display: none; }
+
+    /* ── Wrapper ────────────────────────────────────────────── */
+    .matches {
+        @if conf.$is-not-section == 'false' {
+            margin-bottom: 2rem;
+        }
+
+        h1, h3, h4, h5, h6 {
+            @include f.font-hd;
+            margin: 0 0 $sp-sm;
+            color: conf.$color-text-light;
+            font-size: clamp(.95rem, 3vw, 1.25rem);
+
+            @include f.dark-mode {
+                color: conf.$color-text-dark;
+            }
+        }
+
+        h2 {
+            @include f.font-hd;
+            font-size: clamp(.9rem, 3vw, 2rem);
+            position: relative;
+            display: inline-block;
+            text-wrap: balance;
+            width: fit-content;
+            margin: 0.6em 0 $sp 0;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            @include f.mode((background-color: (conf.$color-accent-light, conf.$color-accent-dark)));
+        }
+    }
+
+    /* ── Card grid ──────────────────────────────────────────── */
+    .matches-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: $sp-xs;
+    }
+
+    /* ── Match card ─────────────────────────────────────────── */
+    .match-card {
+        display: flex;
+        flex-direction: column;
+        gap: $sp-xs;
+        padding: $sp-sm;
+        background: conf.$color-section-light;
+        border-radius: f.get-radius("card");
+        transition: box-shadow 200ms ease;
+        position: relative;
+        overflow: hidden;
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid conf.$color-border-light;
+
+            @include f.dark-mode {
+                border-color: conf.$color-border-dark;
+            }
+        }
+
+        @include f.dark-mode {
+            background: conf.$color-section-dark;
+        }
+
+        &:hover {
+            box-shadow: conf.$shadow-section-hover;
+        }
+
+        // LIVE badge
+        &.is-live::after,
+        &[data-live="true"]::after {
+            content: "LIVE";
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e5251a;
+            color: #fff;
+            @include f.font-hd;
+            font-size: .6rem;
+            letter-spacing: .1em;
+            padding: 2px 8px 2px 16px;
+            border-radius: 999px;
+            z-index: 2;
+            animation: match-live-pulse 1.6s ease-in-out infinite;
+        }
+    }
+
+    /* ── Date & League ──────────────────────────────────────── */
+    .match-date {
+        font-size: .7rem;
+        text-align: center;
+        color: color.change(conf.$color-text-light, $alpha: .55);
+        letter-spacing: .02em;
+
+        @include f.dark-mode {
+            color: color.change(conf.$color-text-dark, $alpha: .55);
+        }
+    }
+
+    .match-league {
+        text-align: center;
+        font-size: .68rem;
+        @include f.font-hd;
+        color: conf.$color-accent-light;
+        letter-spacing: .08em;
+
+        @include f.dark-mode {
+            color: conf.$color-accent-dark;
+        }
+    }
+
+    /* ── Teams ──────────────────────────────────────────────── */
+    .teams {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $sp-sm;
+        padding: $sp-xs 0;
+    }
+
+    .team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .3rem;
+        flex: 1;
+        min-width: 0;
+
+        img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            display: block;
+            border-radius: 50%;
+        }
+
+        span {
+            @include f.font-hd;
+            font-size: clamp(.62rem, 2vw, .75rem);
+            color: conf.$color-text-light;
+            text-align: center;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+
+            @include f.dark-mode {
+                color: conf.$color-text-dark;
+            }
+        }
+    }
+
+    .vs {
+        @include f.font-hd;
+        font-size: .72rem;
+        color: conf.$color-accent-light;
+        border: 1.5px solid conf.$color-accent-light;
+        border-radius: f.get-radius("button");
+        padding: 3px 6px;
+        flex-shrink: 0;
+        line-height: 1;
+
+        @include f.dark-mode {
+            color: conf.$color-accent-dark;
+            border-color: conf.$color-accent-dark;
+        }
+    }
+
+    /* ── Result wrapper (plugin wraps odds here) ────────────── */
+    .match-result {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+
+        // Plugin выводит "Team A vs Team B" повторно — скрываем,
+        // т.к. команды уже видны в блоке .teams выше.
+        > strong { display: none; }
+    }
+
+    /* ── Odds ───────────────────────────────────────────────── */
+    .match-odds {
+        display: flex;
+        gap: .25rem;
+
+        span {
+            flex: 1;
+            padding: .4em .2em;
+            text-align: center;
+            border: 1px solid conf.$color-border-light;
+            border-radius: f.get-radius("button");
+            @include f.font-hd;
+            font-size: .8rem;
+            color: conf.$color-text-light;
+            cursor: pointer;
+            transition: background 150ms, color 150ms, border-color 150ms;
+            position: relative;
+
+            @include f.dark-mode {
+                border-color: conf.$color-border-dark;
+                color: conf.$color-text-dark;
+            }
+
+            // Метка исхода (1 / X / 2) под коэффициентом
+            &::after {
+                content: attr(data-type);
+                display: block;
+                font-size: .55rem;
+                color: color.change(conf.$color-text-light, $alpha: .5);
+                margin-top: 1px;
+                letter-spacing: .04em;
+
+                @include f.dark-mode {
+                    color: color.change(conf.$color-text-dark, $alpha: .5);
+                }
+            }
+
+            &:hover {
+                background: conf.$color-accent-light;
+                color: #fff;
+                border-color: transparent;
+
+                &::after { color: rgba(255, 255, 255, .75); }
+
+                @include f.dark-mode {
+                    background: conf.$color-accent-dark;
+                }
+            }
+        }
+    }
+
+    /* ── Visit / CTA button ─────────────────────────────────── */
+    .match-card .visit-btn {
+        @include f.font-hd;
+        display: block;
+        text-align: center;
+        padding: .45em 1em;
+        border-radius: f.get-radius("button");
+        border: none;
+        cursor: pointer;
+        font-size: clamp(.68rem, 2vw, .78rem);
+        background: conf.$color-accent-light;
+        color: #fff;
+        text-decoration: none;
+        transition: filter 180ms ease;
+        margin-top: auto;
+
+        @include f.dark-mode {
+            background: conf.$color-accent-dark;
+        }
+
+        &:hover {
+            filter: brightness(1.12);
+            color: #fff;
+        }
+    }
+
+    /* ── Loading state (пока AJAX не вернул данные) ─────────── */
+    .matches .tc-loading {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: .5rem;
+        padding: $sp;
+
+        p {
+            margin: 0;
+            font-size: .8rem;
+            color: color.change(conf.$color-text-light, $alpha: .5);
+
+            @include f.dark-mode {
+                color: color.change(conf.$color-text-dark, $alpha: .5);
+            }
+        }
+    }
+}
+
+/* ─── Animations ─────────────────────────────────────────── */
+
+@keyframes match-live-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .55; }
+}

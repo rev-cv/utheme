@@ -20,12 +20,13 @@ if ($current_slug === 'news') {
         'paged'          => $paged,
     );
 } else {
-    $home_id = get_option('page_on_front');
     $args = array(
         'post_type'      => 'page',
+        'post_parent'    => get_the_ID(),
         'posts_per_page' => 12,
         'paged'          => $paged,
-        'post__not_in'   => array($home_id),
+        'orderby'        => 'menu_order',
+        'order'          => 'ASC',
         'tax_query'      => array(
             array(
                 'taxonomy' => 'category',

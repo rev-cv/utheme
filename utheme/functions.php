@@ -1,4 +1,8 @@
 <?php
+remove_action('wp_head', 'wp_generator');
+add_filter('style_loader_src',  fn($src) => remove_query_arg('ver', $src));
+add_filter('script_loader_src', fn($src) => remove_query_arg('ver', $src));
+
 function my_theme_enqueue_styles()
 {
     wp_enqueue_style('my-theme-style', get_stylesheet_uri());
@@ -15,9 +19,9 @@ $includes = array(
     'shortcode-post-meta.php',
     'shortcode-related-articles.php',
     'shortcode-more-pages.php',
-    'shortcode-about-autor.php',
     'shortcode-breadcrumbs.php',
     "shortcode-inline.php",
+    'font-registry.php',
     'mod-google-font.php',
     'mod-seo.php',
     'mod-expert-checked.php',

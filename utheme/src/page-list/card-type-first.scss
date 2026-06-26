@@ -1,0 +1,78 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+@mixin styles {
+    .article-card--type-first {
+        display: block;
+        border-radius: f.get-radius("card");
+        border-left: 3px solid conf.$color-accent-light;
+        @include f.dark-mode { border-left-color: conf.$color-accent-dark; }
+        container-type: inline-size;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        box-shadow: conf.$shadow-section;
+        @include f.mode((background: (conf.$color-bg-light, conf.$color-bg-dark)));
+
+        @if conf.$is-border == 'true' {
+            border-top: 1px solid conf.$color-border-light;
+            border-right: 1px solid conf.$color-border-light;
+            border-bottom: 1px solid conf.$color-border-light;
+            @include f.dark-mode {
+                border-top-color: conf.$color-border-dark;
+                border-right-color: conf.$color-border-dark;
+                border-bottom-color: conf.$color-border-dark;
+            }
+        }
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: conf.$shadow-section-hover;
+        }
+
+        a {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: conf.$default-space;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .type-first-title {
+            @include f.font-hd;
+            margin: 0;
+            font-size: clamp(18px, 6cqi, 1.6rem);
+            line-height: 1.1;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            @include f.mode((color: (conf.$color-text-light, conf.$color-text-dark)));
+        }
+
+        .type-first-stamp {
+            display: inline-block;
+            width: 0.9em;
+            height: 0.9em;
+            margin-left: 0.25em;
+            vertical-align: -0.05em;
+            background-size: cover;
+            background-position: center;
+            border-radius: 3px;
+            box-shadow: 0 0 0 1px conf.$color-border-light inset;
+            @include f.dark-mode {
+                box-shadow: 0 0 0 1px conf.$color-border-dark inset;
+            }
+        }
+
+        .type-first-desc {
+            @include f.font-txt;
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.55;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: rgba(conf.$color-text-light, 0.65);
+            @include f.dark-mode { color: rgba(conf.$color-text-dark, 0.65); }
+        }
+    }
+}

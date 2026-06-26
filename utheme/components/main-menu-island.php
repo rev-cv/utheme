@@ -1,62 +1,56 @@
-<header id="island-wrapper">
-    <div class="island-main">
-        <div class="island-logo">
+<header class="ut-island">
+    <div class="ut-island__bar">
+        <div class="ut-site-header__logo">
             <?php the_custom_logo(); ?>
         </div>
 
-        <div class="island-name">
+        <div class="ut-site-header__name">
             <a href="<?php echo home_url(); ?>"><?php bloginfo('name'); ?></a>
         </div>
 
-        <div class="island-trigger">
-            <button id="menu-toggle" aria-label="Toggle Menu">
+        <div class="ut-island__trigger">
+            <button class="ut-toggle" aria-label="Toggle Menu" aria-expanded="false">
                 <span></span>
-                <span class="icon-dots"><span></span><span></span><span></span></span>
+                <span class="ut-island__dots"><span></span><span></span><span></span></span>
             </button>
         </div>
     </div>
 
-    <div class="island-dropdown">
+    <div class="ut-island__dropdown">
         <?php wp_nav_menu([
-            "theme_location" => "header-menu",
-            "container" => "nav",
-            "container_class" => "island-nav",
-            "menu_class" => "island-grid",
-            "walker" => new Island_Walker() // Кастомный класс для картинок 
+            "theme_location"        => "header-menu",
+            "container"             => "nav",
+            "container_class"       => "ut-island__nav",
+            "container_aria_label"  => "Main menu",
+            "menu_class"            => "ut-island__grid",
+            "walker"                => new Island_Walker(),
         ]); ?>
     </div>
 </header>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const wrapper = document.getElementById('island-wrapper');
-        const btn = document.getElementById('menu-toggle');
+        const wrapper = document.querySelector('.ut-island');
+        const btn = document.querySelector('.ut-toggle');
+
+        function setOpen(open) {
+            wrapper.classList.toggle('ut-is-open', open);
+            btn.setAttribute('aria-expanded', String(open));
+        }
 
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-
-            wrapper.classList.toggle('is-open');
-
-            const btnText = btn.querySelector('span');
-            if (wrapper.classList.contains('is-open')) {
-                btnText.textContent = '✖';
-                btnText.textContent = '';
-            } else {
-                btnText.textContent = '';
-            }
+            setOpen(!wrapper.classList.contains('ut-is-open'));
         });
 
-        const links = document.querySelectorAll('.island-grid a');
+        const links = document.querySelectorAll('.ut-island__grid a');
         links.forEach(link => {
-            link.addEventListener('click', () => {
-                wrapper.classList.remove('is-open');
-            });
+            link.addEventListener('click', () => setOpen(false));
         });
 
         document.addEventListener('click', function(e) {
-            if (wrapper.classList.contains('is-open') && !wrapper.contains(e.target)) {
-                wrapper.classList.remove('is-open');
-                btn.querySelector('span').textContent = '';
+            if (wrapper.classList.contains('ut-is-open') && !wrapper.contains(e.target)) {
+                setOpen(false);
             }
         });
     });

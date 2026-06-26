@@ -1,0 +1,90 @@
+@use 'sass:color' as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$tx-light:  conf.$color-text-light;
+$tx-dark:   conf.$color-text-dark;
+$act-light: conf.$color-accent-light;
+$act-dark:  conf.$color-accent-dark;
+$brd-light: conf.$color-border-light;
+$brd-dark:  conf.$color-border-dark;
+
+@mixin styles {
+
+    article .toc,
+    aside .toc {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .6rem;
+        user-select: none;
+        contain: layout style;
+
+        .page-toc-title {
+            display: block;
+            width: fit-content;
+            padding-right: .2em;
+
+            @if conf.$toc-show-title == 'false' { display: none; }
+        }
+
+        ol.page-toc-list {
+            list-style: none;
+            counter-reset: toc-counter;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li.page-toc-level-2 {
+            counter-increment: toc-counter;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: .8em;
+            align-items: baseline;
+            padding: calc(conf.$default-space / 4) 0;
+            border-bottom: 1px solid $brd-light;
+
+            &:last-child { border-bottom: none; }
+
+            @include f.dark-mode {
+                border-color: $brd-dark;
+            }
+
+            // Номер справа
+            &::after {
+                content: counter(toc-counter, decimal-leading-zero);
+                font-family: monospace;
+                font-size: .7em;
+                color: sys.adjust($tx-light, $lightness: 30%);
+                min-width: 1.4em;
+                text-align: right;
+
+                @include f.dark-mode {
+                    color: sys.adjust($tx-dark, $lightness: -25%);
+                }
+            }
+
+            a {
+                font-size: clamp(.8rem, 3vw, 1rem);
+                color: $tx-light;
+                text-decoration: none;
+                transition: color 200ms ease, transform 200ms ease;
+
+                @include f.dark-mode { color: $tx-dark; }
+
+                &:hover {
+                    color: $act-light;
+                    text-decoration: none;
+                    transform: translateX(3px);
+
+                    @include f.dark-mode { color: $act-dark; }
+                }
+            }
+        }
+    }
+
+    aside .toc {
+        .page-toc-title { font-size: .75em; }
+        li a { font-size: .7em; }
+    }
+
+}

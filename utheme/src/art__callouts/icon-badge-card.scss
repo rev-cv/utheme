@@ -1,0 +1,102 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+$badge-size: 2.25rem;
+
+@mixin _apply-badge($color-light, $color-dark, $icon-select) {
+    &::before {
+        background-color: $color-light;
+        -webkit-mask-image: $icon-select;
+        mask-image: $icon-select;
+
+        @include f.dark-mode {
+            background-color: $color-dark;
+        }
+    }
+}
+
+@mixin styles {
+    article {
+        .callout {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: calc(conf.$default-space * 0.875) conf.$default-space;
+            background-color: #ffffff;
+            border: 1px solid conf.$color-border-light;
+            border-radius: f.get-radius();
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            color: conf.$color-callout-txt-light;
+
+            @include f.dark-mode {
+                background-color: conf.$color-section-dark;
+                border-color: conf.$color-border-dark;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+                color: conf.$color-callout-txt-dark;
+            }
+
+            &::before {
+                content: '';
+                display: flex;
+                flex-shrink: 0;
+                width: $badge-size;
+                height: $badge-size;
+                border-radius: f.get-radius();
+                -webkit-mask-size: 55%;
+                mask-size: 55%;
+                -webkit-mask-repeat: no-repeat;
+                mask-repeat: no-repeat;
+                -webkit-mask-position: center;
+                mask-position: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .callout {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: calc(conf.$default-space * 0.75) calc(conf.$default-space * 0.75);
+            }
+        }
+
+        .info-callout {
+            @include _apply-badge(conf.$color-info-light, conf.$color-info-dark, conf.$callout-info-icon-select);
+
+            strong { color: conf.$color-info-light; }
+
+            @include f.dark-mode {
+                strong { color: conf.$color-info-dark; }
+            }
+        }
+
+        .success-callout {
+            @include _apply-badge(conf.$color-success-light, conf.$color-success-dark, conf.$callout-success-icon-select);
+
+            strong { color: conf.$color-success-light; }
+
+            @include f.dark-mode {
+                strong { color: conf.$color-success-dark; }
+            }
+        }
+
+        .warning-callout {
+            @include _apply-badge(conf.$color-warning-light, conf.$color-warning-dark, conf.$callout-warning-icon-select);
+
+            strong { color: conf.$color-warning-light; }
+
+            @include f.dark-mode {
+                strong { color: conf.$color-warning-dark; }
+            }
+        }
+
+        .danger-callout {
+            @include _apply-badge(conf.$color-error-light, conf.$color-error-dark, conf.$callout-danger-icon-select);
+
+            strong { color: conf.$color-error-light; }
+
+            @include f.dark-mode {
+                strong { color: conf.$color-error-dark; }
+            }
+        }
+    }
+}

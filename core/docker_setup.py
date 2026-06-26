@@ -18,26 +18,28 @@ WEB_NETWORK  = "web_network"
 
 # ─── Публичный API ───────────────────────────────────────────────────────────
 
-def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> None:
+def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> dict | None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
 
+    theme_slug = manifest.get("site", {}).get("theme_slug", "utheme")
+    _update_theme_mount(theme_slug)
     _clean_wp_config_volume(wp_conf_dir)
+    _ensure_htaccess(wp_conf_dir)
     _ensure_shared_db()
     _create_site_db()
+    if (wp_conf_dir / "robots.txt").exists():
+        _add_volume_to_compose("./wp-conf/robots.txt:/var/www/html/robots.txt")
     _start_container(container)
     _patch_provision_url(wp_conf_dir)
     _copy_staging(staging_dir, container)
     _copy_provision_sh(wp_conf_dir, container)
     _run_provision_sh(container)
-    _process_credentials(container)
+    credentials = _process_credentials(container)
     _cleanup_tmp(container, staging_dir.name)
     _extract_wp_config(container, wp_conf_dir)
 
-    # print("  Рандомизация темы...")
-    # from .randomize_theme import randomize_theme
-    # randomize_theme()
-
     print("\n  Деплой завершён.")
+    return credentials
 
 
 # ─── Шаги ────────────────────────────────────────────────────────────────────
@@ -83,6 +85,19 @@ def _find_free_port() -> None:
 def _clean_wp_config_volume(wp_conf_dir: Path) -> None:
     if not (wp_conf_dir / "wp-config.php").exists():
         _remove_volume_from_compose("/var/www/html/wp-config.php")
+
+
+def _ensure_htaccess(wp_conf_dir: Path) -> None:
+    dest = wp_conf_dir / ".htaccess"
+    if dest.is_dir():
+        import shutil
+        shutil.rmtree(dest)
+    if not dest.exists():
+        template = Path(__file__).parent.parent / "wp-conf" / ".htaccess"
+        if template.is_file():
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            import shutil
+            shutil.copy2(template, dest)
 
 
 def _ensure_shared_db() -> None:
@@ -174,11 +189,15 @@ def _start_container(container: str) -> None:
     print("  Запуск контейнера WordPress...")
     _ensure_network(WEB_NETWORK)
 
-    # HOST_PORT=0 → ядро ОС атомарно назначает свободный порт, гонка исключена
+    # Если контейнер уже запущен — берём его реальный порт (конфликта нет, он уже его держит).
+    # Если не запущен или не существует — HOST_PORT=0: ядро ОС атомарно назначает свободный порт.
+    r = subprocess.run(["docker", "port", container, "80"], capture_output=True, text=True)
+    host_port = r.stdout.strip().split(":")[-1].strip() if r.returncode == 0 and r.stdout.strip() else "0"
+
     result = subprocess.run(
         COMPOSE + ["up", "-d", WP_SERVICE],
         capture_output=True, text=True,
-        env={**os.environ, "HOST_PORT": "0"},
+        env={**os.environ, "HOST_PORT": host_port},
     )
     if result.returncode != 0:
         print(f"  [!] Docker error:\n{result.stderr}")
@@ -274,12 +293,12 @@ def _run_provision_sh(container: str) -> None:
     print("  provision.sh выполнен.")
 
 
-def _process_credentials(container: str) -> None:
-    """Читает temp_wp.json из uploads/, пишет в .env и *_access.txt."""
+def _process_credentials(container: str) -> dict | None:
+    """Читает temp_wp.json из uploads/, пишет в .env и *_access.txt. Возвращает данные."""
     json_path = Path("uploads") / "temp_wp.json"
     if not json_path.exists():
         print("  temp_wp.json не найден, пропуск.")
-        return
+        return None
 
     import json
     data = json.loads(json_path.read_text(encoding="utf-8"))
@@ -317,6 +336,14 @@ def _process_credentials(container: str) -> None:
          "rm", "-f", "/var/www/html/wp-content/uploads/temp_wp.json"],
         capture_output=True,
     )
+
+    return {
+        "site_url":    os.getenv("SITE_URL", ""),
+        "admin_user":  admin_user,
+        "admin_pass":  admin_pass,
+        "admin_email": admin_email,
+        "app_pass":    app_pass,
+    }
 
 
 def _cleanup_tmp(container: str, staging_name: str) -> None:
@@ -427,7 +454,11 @@ def _shared_db_dir() -> Path:
     for parent in current.parents:
         if parent.name == "sites":
             return parent.parent / "wp-maria-db"
-    return current.parent / "wp-maria-db"
+        candidate = parent / "wp-maria-db"
+        if candidate.exists():
+            return candidate
+    # создаём на уровень выше месячной папки (e:\kuren\wp-maria-db)
+    return current.parent.parent / "wp-maria-db"
 
 
 def _read_db_root_password(shared_db_dir: Path) -> str | None:
@@ -472,6 +503,19 @@ networks:
 """
 
 
+def _update_theme_mount(theme_slug: str) -> None:
+    dc_path = Path("docker-compose.yml")
+    content = dc_path.read_text(encoding="utf-8")
+    updated = re.sub(
+        r'(\./utheme:/var/www/html/wp-content/themes/)\S+',
+        rf'\g<1>{theme_slug}',
+        content,
+    )
+    if updated != content:
+        dc_path.write_text(updated, encoding="utf-8", newline="\n")
+        print(f"  Theme mount: ./utheme → /themes/{theme_slug}")
+
+
 def _add_volume_to_compose(volume_line: str) -> bool:
     dc_path = Path("docker-compose.yml")
     content = dc_path.read_text(encoding="utf-8")
@@ -510,3 +554,60 @@ def _remove_volume_from_compose(dest_path: str) -> bool:
              if not (dest_path in l and l.strip().startswith("- "))]
     dc_path.write_text("\n".join(lines), encoding="utf-8")
     return True
+
+
+# ─── Управление плагинами ─────────────────────────────────────────────────────
+
+def install_plugin(slug: str) -> None:
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    print(f"  Установка плагина '{slug}'...")
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "plugin", "install", slug, "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        output = (result.stdout + result.stderr).strip()
+        print(f"  [!] Не удалось установить плагин '{slug}': {output}")
+    else:
+        print(f"  Плагин '{slug}' установлен (не активирован).")
+
+
+def activate_plugin(slug: str) -> None:
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    print(f"  Активация плагина '{slug}'...")
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "plugin", "activate", slug, "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        output = (result.stdout + result.stderr).strip()
+        print(f"  [!] Не удалось активировать плагин: {output}")
+    else:
+        print(f"  Плагин '{slug}' активирован.")
+
+
+def configure_geo_plugin() -> None:
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    print("  Настройка GEO: включение стилей плагина...")
+    # tc_disable_styles = 1 → плагин НЕ грузит свой CSS → стили темы управляют виджетом.
+    result = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "eval", "update_option('tc_disable_styles', 1);", "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    if result.returncode != 0:
+        print(f"  [!] Не удалось настроить GEO: {(result.stdout + result.stderr).strip()}")
+        return
+
+    verify = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "option", "get", "tc_disable_styles", "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    val = verify.stdout.strip()
+    if val == "1":
+        print("  GEO: стили плагина отключены, управляет тема (tc_disable_styles = 1).")
+    else:
+        print(f"  [!] GEO: неожиданное значение tc_disable_styles = {val!r}")
