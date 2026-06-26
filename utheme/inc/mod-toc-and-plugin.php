@@ -17,6 +17,32 @@
  */
 
 /**
+ * Генерирует CSS-safe якорь для TOC.
+ * sanitize_title() на кириллице может вернуть percent-encoded slug (%d0...),
+ * который ломает document.querySelector('#%d0...') в JS.
+ */
+function my_theme_toc_anchor_id(string $text, int $index): string
+{
+    $base = sanitize_title($text);
+
+    // Для кириллицы/не-ASCII WordPress часто возвращает %d0%... — делаем стабильный ASCII fallback.
+    if ($base === '' || preg_match('/%[0-9a-f]{2}/i', $base)) {
+        $base = substr(md5($text), 0, 10);
+    }
+
+    // Дополнительная защита: только символы, безопасные для CSS-селектора и HTML id.
+    $base = preg_replace('/[^a-z0-9_-]+/i', '-', $base);
+    $base = trim(preg_replace('/-+/', '-', $base), '-_');
+
+    if ($base === '') {
+        $base = substr(md5($text), 0, 10);
+    }
+
+    // Префикс нужен, чтобы id не начинался с цифры.
+    return 'section-' . $base . '-' . $index;
+}
+
+/**
  * Парсит h2-заголовки из HTML и возвращает готовый HTML блока TOC.
  * Возвращает пустую строку если заголовков нет.
  */
@@ -31,8 +57,8 @@ function build_toc_html(string $content): string
 
     foreach ($matches[0] as $index => $match) {
         $text_content = strip_tags($matches[1][$index][0]);
-        $slug = sanitize_title($text_content) . '-' . $index;
-        $toc_items .= '<li class="page-toc-level-2"><a href="#' . $slug . '" title="move to this section">' . esc_html($text_content) . '</a></li>';
+        $slug = my_theme_toc_anchor_id($text_content, $index);
+        $toc_items .= '<li class="page-toc-level-2"><a href="#' . esc_attr($slug) . '" title="move to this section">' . esc_html($text_content) . '</a></li>';
     }
 
     $toc_tag      = my_theme_get_config('is-not-section', false) ? 'div' : 'section';
@@ -74,7 +100,7 @@ function my_theme_dynamic_content_injection($content)
     foreach ($matches[0] as $index => $match) {
         $full_tag = $match[0];
         $text_content = strip_tags($matches[1][$index][0]);
-        $slug = sanitize_title($text_content) . '-' . $index;
+        $slug = my_theme_toc_anchor_id($text_content, $index);
 
         $original_pos = $match[1];
         $current_pos = $original_pos + $offset_shift;
@@ -92,21 +118,38 @@ function my_theme_dynamic_content_injection($content)
         }
 
         if ($is_inside_section) {
-            // Удаляем старый ID у секции, если он есть, чтобы не дублировать
-            $modified_content = preg_replace('/ id=["\'].*?["\']/i', '', $modified_content, 1, $count);
-            $id_attr = ' id="' . $slug . '"';
-            $modified_content = substr_replace($modified_content, $id_attr, $section_pos + 8, 0);
+            // Меняем id только у текущего открывающего <section>, не у первого id во всём контенте.
+            $section_open_end = strpos($modified_content, '>', $section_pos);
 
-            $local_shift = strlen($id_attr);
-            $offset_shift += $local_shift;
-            $current_pos += $local_shift;
+            if ($section_open_end !== false) {
+                $section_open_tag = substr($modified_content, $section_pos, $section_open_end - $section_pos + 1);
+                $clean_section_open_tag = preg_replace('/\s+id=(["\']).*?\1/i', '', $section_open_tag);
+                $new_section_open_tag = preg_replace(
+                    '/^<section\b/i',
+                    '<section id="' . esc_attr($slug) . '"',
+                    $clean_section_open_tag,
+                    1
+                );
+
+                $modified_content = substr_replace(
+                    $modified_content,
+                    $new_section_open_tag,
+                    $section_pos,
+                    strlen($section_open_tag)
+                );
+
+                $local_shift = strlen($new_section_open_tag) - strlen($section_open_tag);
+                $offset_shift += $local_shift;
+                $current_pos += $local_shift;
+            }
+
             $target_pos_for_this_item = $section_pos;
         } else {
             // 1. Очищаем старый ID (и с двойными, и с одинарными кавычками)
             $cleaned_h2 = preg_replace('/ id=["\'].*?["\']/i', '', $full_tag);
 
             // 2. Вставляем новый чистый ID
-            $new_h2 = str_replace('<h2', '<h2 id="' . $slug . '"', $cleaned_h2);
+            $new_h2 = str_replace('<h2', '<h2 id="' . esc_attr($slug) . '"', $cleaned_h2);
 
             // 3. Заменяем в контенте
             $modified_content = substr_replace($modified_content, $new_h2, $current_pos, strlen($full_tag));
@@ -120,7 +163,7 @@ function my_theme_dynamic_content_injection($content)
             $first_insertion_pos = $target_pos_for_this_item;
         }
 
-        $toc_items .= '<li class="page-toc-level-2"><a href="#' . $slug . '" title="move to this section">' . $text_content . '</a></li>';
+        $toc_items .= '<li class="page-toc-level-2"><a href="#' . esc_attr($slug) . '" title="move to this section">' . esc_html($text_content) . '</a></li>';
     }
 
     // — TOC — вставляется перед первым h2 (или в [toc_position]) —
