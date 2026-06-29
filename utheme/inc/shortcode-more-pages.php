@@ -103,7 +103,10 @@ function render_more_pages(int $count = 5, string $style = ''): string {
                 }
                 $desc = $desc ? wp_trim_words($desc, 15, '…') : '';
 
-                $img_url   = get_the_post_thumbnail_url($pid, 'large');
+                $thumb_id  = get_post_thumbnail_id($pid);
+                $img_url   = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'large') : false;
+                $img_alt   = $thumb_id ? trim((string) get_post_meta($thumb_id, '_wp_attachment_image_alt', true)) : '';
+                if (!$img_alt) $img_alt = $title;
                 $has_thumb = $img_url ? ' has-thumb' : '';
             ?>
                 <div class="more-pages__card<?php echo esc_attr($has_thumb); ?>">
@@ -113,7 +116,7 @@ function render_more_pages(int $count = 5, string $style = ''): string {
                     <?php if ($img_url) : ?>
                         <div class="more-pages__thumb">
                             <img src="<?php echo esc_url($img_url); ?>"
-                                 alt=""
+                                 alt="<?php echo esc_attr($img_alt); ?>"
                                  loading="lazy">
                         </div>
                     <?php endif; ?>

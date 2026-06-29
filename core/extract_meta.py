@@ -115,14 +115,19 @@ def resolve_resource_paths(base_path: Path, pages_list: list[dict]) -> list[dict
         
         # если это директория — ищем .html, потом .md
         if resource_path.is_dir():
-            html_files = list(resource_path.glob("*.html"))
-            md_files   = list(resource_path.glob("*.md"))
-            if html_files:
-                target_file = html_files[0]
-            elif md_files:
-                target_file = md_files[0]
+            for name in ("index.html", "index.md"):
+                if (resource_path / name).exists():
+                    target_file = resource_path / name
+                    break
             else:
-                target_file = resource_path / "index.html"
+                html_files = list(resource_path.glob("*.html"))
+                md_files   = list(resource_path.glob("*.md"))
+                if html_files:
+                    target_file = html_files[0]
+                elif md_files:
+                    target_file = md_files[0]
+                else:
+                    target_file = resource_path / "index.html"
         # если файл уже с расширением .html или .md
         elif resource_path.suffix in (".html", ".md"):
             target_file = resource_path

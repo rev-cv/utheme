@@ -68,13 +68,27 @@ def compress_images(pics: list[dict], out_dir: Path, max_kb: int) -> None:
 
         slot   = get_slot()
         src    = Path(src)
-        dst    = out_dir / src.with_suffix(".webp").name
         src_kb = src.stat().st_size / 1024
         name   = src.name[:col]
 
         with lock:
             states[slot] = (name, src_kb, "", "→ ...")
             redraw()
+
+        # SVG не конвертируется в WebP — копируем как есть
+        if src.suffix.lower() == '.svg':
+            dst = out_dir / src.name
+            if not dst.exists():
+                shutil.copy2(src, dst)
+            dst_kb = dst.stat().st_size / 1024
+            pic["selected_image"] = dst
+            with lock:
+                states[slot] = (name, src_kb, f"{dst_kb:.1f} KB", "svg")
+                counters["done"] += 1
+                emit_completed(f"  {name:<{col}} {src_kb:>6.1f} KB   {dst_kb:>6.1f} KB   svg")
+            return
+
+        dst    = out_dir / src.with_suffix(".webp").name
 
         if dst.exists():
             dst_kb = dst.stat().st_size / 1024

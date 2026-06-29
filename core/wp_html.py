@@ -54,7 +54,12 @@ def _handle_image(tag):
     """Обработка изображений (img)."""
     src = tag.get('src', '')
     alt = tag.get('alt', '')
-    fname = Path(src).stem + ".webp"
+    src_path = Path(src)
+    # SVG остаётся SVG — PIL не умеет их конвертировать
+    if src_path.suffix.lower() == '.svg':
+        fname = src_path.name
+    else:
+        fname = src_path.stem + ".webp"
     return (
         f'<!-- wp:image {{"id":%%IMGID:{fname}%%,"sizeSlug":"full","linkDestination":"none"}} -->\n'
         f'<figure class="wp-block-image size-full">'
@@ -175,11 +180,20 @@ def _handle_div(tag):
             for child in card_div.children:
                 if isinstance(child, NavigableString) and not child.strip():
                     continue
+                if not hasattr(child, 'name'):
+                    continue
 
-                if hasattr(child, 'name') and child.name in BLOCK_HANDLERS:
-                    handler = BLOCK_HANDLERS[child.name]
-                    card_blocks.append(handler(child))
-            
+                if child.name in BLOCK_HANDLERS:
+                    card_blocks.append(BLOCK_HANDLERS[child.name](child))
+                elif child.name == 'span':
+                    text = child.get_text(strip=True)
+                    if text:
+                        cls = ' '.join(child.get('class', []))
+                        if cls:
+                            card_blocks.append(f'<!-- wp:paragraph {{"className":"{cls}"}} -->\n<p class="{cls}">{text}</p>\n<!-- /wp:paragraph -->')
+                        else:
+                            card_blocks.append(f'<!-- wp:paragraph -->\n<p>{text}</p>\n<!-- /wp:paragraph -->')
+
             if card_blocks:
                 card_content = '\n'.join(card_blocks)
                 item_block = f'<!-- wp:group {{"className":"table-grid-item","layout":{{"type":"constrained"}}}} -->\n<div class="wp-block-group table-grid-item">{card_content}</div>\n<!-- /wp:group -->'
