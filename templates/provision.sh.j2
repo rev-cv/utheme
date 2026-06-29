@@ -183,6 +183,8 @@ add_filter('wp_check_filetype_and_ext', function(\$data, \$file, \$filename, \$m
     }
     return \$data;
 }, 10, 4);
+// Skip thumbnail generation — originals are already compressed, resizes are unused
+add_filter('intermediate_image_sizes_advanced', '__return_empty_array');
 \$results = [];
 foreach (glob('/tmp/staging/images/*') as \$file) {
     if (!is_file(\$file)) continue;
@@ -219,22 +221,20 @@ fi
 
 # Заменяем плейсхолдеры в .wp файлах реальными ID и URL
 echo "Resolving image placeholders in .wp files..."
-for page_file in /tmp/staging/pages/*.wp; do
-    [ -f "$page_file" ] || continue
-    for fname in "${!MEDIA_IDS[@]}"; do
-        img_id=${MEDIA_IDS[$fname]}
-        img_url=${MEDIA_URLS[$fname]}
-        sed -i "s@%%IMGID:${fname}%%@${img_id}@g" "$page_file"
-        sed -i "s@%%IMGSRC:${fname}%%@${img_url}@g" "$page_file"
-    done
+_sed_args=()
+_has_media=0
+for fname in "${!MEDIA_IDS[@]}"; do
+    _sed_args+=(-e "s@%%IMGID:${fname}%%@${MEDIA_IDS[$fname]}@g")
+    _sed_args+=(-e "s@%%IMGSRC:${fname}%%@${MEDIA_URLS[$fname]}@g")
+    _has_media=1
 done
+if [ $_has_media -eq 1 ]; then
+    for page_file in /tmp/staging/pages/*.wp; do
+        [ -f "$page_file" ] || continue
+        sed -i "${_sed_args[@]}" "$page_file"
+    done
+fi
 echo "Placeholders resolved."
-
-# Регенерация метаданных (размеры, thumbnails) для всех загруженных медиафайлов.
-# Без этого Gutenberg-редактор не может получить width/height через REST API и показывает битые картинки.
-echo "Regenerating attachment metadata..."
-wp media regenerate --yes 2>/dev/null || true
-echo "Metadata regenerated."
 
 # Заменяем плейсхолдеры внутренних ссылок %%PAGEURL:slug%% → реальный URL
 echo "Resolving internal link placeholders in .wp files..."

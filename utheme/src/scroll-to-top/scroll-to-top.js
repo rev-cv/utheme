@@ -43,10 +43,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const tocLinks = document.querySelectorAll('.page-toc-list a');
     tocLinks.forEach(link => {
         link.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href');
-            if (!targetId || !targetId.startsWith('#')) return;
+            const rawHref = this.getAttribute('href');
+            if (!rawHref || !rawHref.startsWith('#')) return;
 
-            const targetElement = document.querySelector(targetId);
+            let id;
+            try { id = decodeURIComponent(rawHref.slice(1)); } catch (_) { id = rawHref.slice(1); }
+            const targetElement = document.getElementById(id);
             if (!targetElement) return;
 
             targetElement.scrollIntoView({
