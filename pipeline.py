@@ -129,9 +129,9 @@ def run():
     # ── 12. УСТАНОВКА ПЛАГИНОВ ───────────────────────────────────────────────
     _phase(12, 13, "Установка плагинов")
     if platform.system() == "Windows":
-        docker_setup.activate_plugin("u-theme-styles")
-        if (ROOT_DIR / "plugins" / "GEO").exists():
-            docker_setup.configure_geo_plugin()
+        # docker_setup.activate_plugin("u-theme-styles")  # TODO: временно отключено
+        # if (ROOT_DIR / "plugins" / "GEO").exists():      # TODO: временно отключено
+        #     docker_setup.configure_geo_plugin()           # TODO: временно отключено
         wp_plugins_raw = os.getenv("WP_PLUGINS", "")
         for entry in [e.strip() for e in wp_plugins_raw.split(",") if e.strip()]:
             slug, _, flag = entry.partition(":")

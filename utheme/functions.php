@@ -27,7 +27,8 @@ $includes = array(
     'mod-expert-checked.php',
     'mod-header-box.php',
     'mod_img-lazy.php',
-    'mod-toc-and-plugin.php',
+    'mod-toc.php',
+    'mod-geo-integration.php',
     'mod_img-walker.php',
     'mod-sitemap.php',
 );

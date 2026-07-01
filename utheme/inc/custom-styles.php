@@ -1,9 +1,5 @@
 <?php
 
-/*
-Подключает стили и скрипты темы.
-Функция использует массивы для определения списка CSS и JS файлов.
-*/
 function mytheme_scripts()
 {
     $theme_version = '1.1';
@@ -29,8 +25,6 @@ function mytheme_scripts()
         }
     }
 
-    // 2. Подключаем скрипты
-    // Каждый скрипт — это отдельный элемент с уникальным handle
     $scripts = [
         'mytheme-scroll-to-top' => [
             'path' => '/src/scroll-to-top/scroll-to-top.js',
@@ -51,13 +45,12 @@ function mytheme_scripts()
     ];
 
     foreach ($scripts as $handle => $details) {
-        wp_enqueue_script(
-            $handle,
-            $template_uri . $details['path'],
-            $details['deps'],
-            $theme_version,
-            true // Загрузка в футере
-        );
+        $file_path = get_template_directory() . $details['path'];
+        if (!file_exists($file_path)) continue;
+        $js_content = file_get_contents($file_path);
+        wp_register_script($handle, false, $details['deps'], false, true);
+        wp_enqueue_script($handle);
+        wp_add_inline_script($handle, $js_content);
     }
 }
 add_action('wp_enqueue_scripts', 'mytheme_scripts', 999);
@@ -96,19 +89,15 @@ function clean_css_for_validator($buffer) {
         '/@starting-style\s*\{[^{}]*\{[^{}]*\}[^{}]*\}/s',
     ];
 
-    // Для первых двух пунктов (calc) заменим их на безопасные значения
-    // Для остальных — просто удалим
     $buffer = preg_replace($search[0], 'right:16px', $buffer);
     $buffer = preg_replace($search[1], 'top:16px', $buffer);
     
-    // Удаляем всё остальное из списка
     for ($i = 2; $i < count($search); $i++) {
         $buffer = preg_replace($search[$i], '', $buffer);
     }
 
     return $buffer;
 }
-// Перехват вывода
 add_action('template_redirect', function() {
     ob_start("clean_css_for_validator");
 });
