@@ -79,7 +79,7 @@ def build_manifest(structure: dict, pics: list[dict], spec_dir: Path) -> dict:
         item["seo_title"] = item.get("headline") or item.get("title")
         item["seo_descr"] = item.get("description")
         item["images"]    = [
-            Path(img["selected_image"]).name
+            {"filename": Path(img["selected_image"]).name, "alt": img.get("seo", {}).get("alt", "")}
             for img in item.get("images", [])
             if img.get("selected_image")
         ]

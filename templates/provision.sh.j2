@@ -159,6 +159,10 @@ echo "Importing media from /tmp/staging/images/ ..."
 declare -A MEDIA_IDS   # filename → attachment_id
 declare -A MEDIA_URLS  # filename → public URL
 
+cat > /tmp/image_alts.json << 'ALTSEOF'
+{{ image_alts_json }}
+ALTSEOF
+
 while IFS=$'\t' read -r _f1 _f2 _f3; do
     if [ "$_f1" = "WARN" ]; then
         echo "  WARN: failed to import $_f2"
@@ -185,6 +189,7 @@ add_filter('wp_check_filetype_and_ext', function(\$data, \$file, \$filename, \$m
 }, 10, 4);
 // Skip thumbnail generation — originals are already compressed, resizes are unused
 add_filter('intermediate_image_sizes_advanced', '__return_empty_array');
+\$alts    = json_decode(file_get_contents('/tmp/image_alts.json'), true) ?: [];
 \$results = [];
 foreach (glob('/tmp/staging/images/*') as \$file) {
     if (!is_file(\$file)) continue;
@@ -198,6 +203,9 @@ foreach (glob('/tmp/staging/images/*') as \$file) {
     }
     // Force slug to include extension so it never collides with a page slug
     wp_update_post(['ID' => \$id, 'post_name' => str_replace('.', '-', \$fname)]);
+    if (!empty(\$alts[\$fname])) {
+        update_post_meta(\$id, '_wp_attachment_image_alt', \$alts[\$fname]);
+    }
     \$_abs = wp_get_attachment_url(\$id);
     \$_rel = str_replace(get_site_url(), '', \$_abs);
     \$results[] = \$fname . chr(9) . \$id . chr(9) . \$_rel;
@@ -280,7 +288,7 @@ file_put_contents('/tmp/wp_page_ids.txt', '');
         'template'     => '{{ page.template }}',
         'parent_slug'  => '{{ page.parent if page.parent else "" }}',
         'cats'         => [{% for cat in (page.categories or []) %}'{{ cat }}'{% if not loop.last %}, {% endif %}{% endfor %}],
-        'thumb'        => '{{ page.images[0] if page.images else "" }}',
+        'thumb'        => '{{ page.images[0].filename if page.images else "" }}',
         'seo_headline' => '{{ page.seo_title | b64 if page.seo_title else "" }}',
         'seo_desc'     => '{{ page.seo_descr | b64 if page.seo_descr else "" }}',
         'schema_html'  => '{{ page.schema_html | b64 if page.schema_html is defined and page.schema_html else "" }}',
@@ -329,7 +337,7 @@ while IFS=$'\t' read -r _slug _pid; do
         echo "  Created '$_slug' (ID: $_pid)"
     fi
 done < /tmp/wp_page_ids.txt
-rm -f /tmp/create_pages.php /tmp/media_ids.json /tmp/wp_page_ids.txt
+rm -f /tmp/create_pages.php /tmp/media_ids.json /tmp/wp_page_ids.txt /tmp/image_alts.json
 
 # Homepage and privacy page
 if [ -n "${PAGE_IDS[index]}" ]; then

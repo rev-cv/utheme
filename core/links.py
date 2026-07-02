@@ -108,7 +108,8 @@ def check_internal_links(manifest: dict, staging_dir: Path) -> None:
     image_stems: set[str] = set()
     for p in manifest.get('pages', []):
         for img in p.get('images', []):
-            image_stems.add(Path(img).stem)
+            fname = img["filename"] if isinstance(img, dict) else img
+            image_stems.add(Path(fname).stem)
     for key in ('favicon', 'logo'):
         val = manifest.get('site', {}).get(key)
         if val:

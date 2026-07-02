@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
@@ -56,6 +57,13 @@ def generate_sh(manifest: dict, out_path: Path) -> None:
         "welcome_content": welcome_content,
         "has_news_page":   manifest.get("has_news_page", False),
         "is_new":          os.getenv("IS_NEW", "").strip().lower() in ("yes", "1", "true"),
+        "image_alts_json": json.dumps(
+            {img["filename"]: img["alt"]
+             for page in manifest.get("pages", [])
+             for img in page.get("images", [])
+             if isinstance(img, dict) and img.get("alt")},
+            ensure_ascii=False,
+        ),
     }
 
     rendered = template.render(ctx)
