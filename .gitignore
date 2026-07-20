@@ -7,6 +7,8 @@ Desktop.ini
 # CLAUDE.md
 
 TASKS.md
+.tasks
+.wiki
 
 # --- Python & Automation ---
 __pycache__/

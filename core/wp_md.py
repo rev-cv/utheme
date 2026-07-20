@@ -66,7 +66,7 @@ def _process_fenced_block(header: str, content: str) -> str:
             lines = item.strip().split('\n', 1)
             question = lines[0].lstrip('#').strip()
             answer_html = _render_inner(lines[1]) if len(lines) > 1 else ''
-            tags.append(f'<details><summary>{question}</summary>{answer_html}</details>')
+            tags.append(f'<details data-ut-faq="1"><summary>{question}</summary>{answer_html}</details>')
         return '\n'.join(tags) + '\n'
 
     if block_type in ('hero-subtitle', 'hero-label'):

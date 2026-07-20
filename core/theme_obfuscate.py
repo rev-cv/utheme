@@ -31,6 +31,8 @@ from urllib.parse import urlparse
 
 import yaml
 
+from core.console import action, result
+
 # Valid CSS class name: lowercase letter, then lowercase letters/digits/hyphens.
 _CSS_NAME_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 # Canonical key must start with "ut-" then be a valid CSS name.
@@ -182,12 +184,14 @@ def obfuscate_theme(
 
     Returns the applied class_map.
     """
-    result = subprocess.run(
+    action(f"Обфускация CSS-классов темы для {urlparse(site_url).netloc or site_url}")
+
+    git_result = subprocess.run(
         ["git", "restore", str(theme_dir)],
         cwd=theme_dir.parent,
         capture_output=True,
     )
-    if result.returncode != 0:
+    if git_result.returncode != 0:
         # Not a git repo (project copy) — theme_dir is already in canonical state.
         pass
 
@@ -208,5 +212,5 @@ def obfuscate_theme(
                 changed += 1
 
     domain = urlparse(site_url).netloc or site_url
-    print(f"  Class obfuscation: {changed} files updated for {domain}")
+    result(f"Обновлено файлов: {changed} (домен: {domain})", style="green")
     return class_map

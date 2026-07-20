@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from core.console import console, action, result, error
+
 
 def check_structure_flexible(root_directory, required_items) -> list[str]:
     """
@@ -11,7 +13,7 @@ def check_structure_flexible(root_directory, required_items) -> list[str]:
       - str с '*'           — glob-шаблон (напр. "CL*")
       - list[Path]          — список альтернатив (достаточно одного)
     """
-    print(f"\nПроверка структуры проекта в: {root_directory}")
+    action(f"Проверка структуры проекта в: {root_directory}")
 
     root_path     = Path(root_directory)
     missing_items = []
@@ -39,13 +41,12 @@ def check_structure_flexible(root_directory, required_items) -> list[str]:
             missing_items.append(f"Отсутствует: {_rel(target_path)}")
 
     if missing_items:
-        print("    ОШИБКА: Структура проекта не соответствует требованиям!")
-        for error in missing_items:
-            print(f"        {error}")
+        error("Структура проекта не соответствует требованиям!")
+        for e in missing_items:
+            console.print(f"        {e}")
         return missing_items
 
-    print("Общая структура проекта подтверждена.")
-    print('\n' + '=' * 50)
+    result("Общая структура проекта подтверждена.", style="green")
     return []
 
 

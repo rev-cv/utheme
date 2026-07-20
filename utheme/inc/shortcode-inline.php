@@ -26,6 +26,48 @@ function replace_placeholders_safely($content) {
 add_filter('the_title', 'replace_placeholders_safely', 20);
 add_filter('the_content', 'replace_placeholders_safely', 20);
 
+// Маркер <!-- ut:faq --> нужен только на этапе сборки микроразметки (my_custom_seo_head() читает
+// его из сырого post_content до этого фильтра) — в HTML, отдаваемый браузеру, он попадать не должен.
+function strip_faq_schema_marker($content) {
+    if (empty($content) || !is_string($content)) {
+        return $content;
+    }
+    return str_replace('<!-- ut:faq -->', '', $content);
+}
+add_filter('the_content', 'strip_faq_schema_marker', 20);
+
+function get_link_shorthand_slug_map() {
+    static $map = null;
+    if ($map !== null) {
+        return $map;
+    }
+
+    $map = get_transient('link_shorthand_slug_map');
+    if ($map === false) {
+        $map = [];
+        $post_ids = get_posts([
+            'post_type'      => 'any',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+        ]);
+        foreach ($post_ids as $post_id) {
+            $map[get_post_field('post_name', $post_id)] = get_permalink($post_id);
+        }
+        set_transient('link_shorthand_slug_map', $map, DAY_IN_SECONDS);
+    }
+
+    return $map;
+}
+
+function invalidate_link_shorthand_slug_map() {
+    delete_transient('link_shorthand_slug_map');
+}
+add_action('save_post', 'invalidate_link_shorthand_slug_map');
+add_action('deleted_post', 'invalidate_link_shorthand_slug_map');
+add_action('trashed_post', 'invalidate_link_shorthand_slug_map');
+add_action('untrashed_post', 'invalidate_link_shorthand_slug_map');
+
 function handle_custom_link_shorthand($content) {
     if (empty($content) || !is_string($content)) {
         return $content;
@@ -41,17 +83,9 @@ function handle_custom_link_shorthand($content) {
             return sprintf('<a href="%s">%s</a>', esc_url(home_url('/')), esc_html($link_text));
         }
 
-        $posts = get_posts([
-            'name'           => $slug,
-            'post_type'      => 'any',
-            'post_status'    => 'publish',
-            'posts_per_page' => 1,
-            'fields'         => 'ids',
-        ]);
-
-        if (!empty($posts)) {
-            $url = get_permalink($posts[0]);
-            return sprintf('<a href="%s">%s</a>', esc_url($url), esc_html($link_text));
+        $map = get_link_shorthand_slug_map();
+        if (isset($map[$slug])) {
+            return sprintf('<a href="%s">%s</a>', esc_url($map[$slug]), esc_html($link_text));
         }
 
         return esc_html($link_text);

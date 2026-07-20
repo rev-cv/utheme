@@ -2,6 +2,8 @@ import re
 import random
 from pathlib import Path
 
+from core.console import action, result
+
 _SCSS_FILE = Path(__file__).parent.parent / "utheme" / "src" / "conf.scss"
 
 _CONFIG = {
@@ -65,8 +67,10 @@ _NO_QUOTE_VARS = {"density-factor", "seed-hue", "font-size"}
 
 
 def randomize_theme() -> None:
+    action("Рандомизация темы (conf.scss)")
+
     if not _SCSS_FILE.exists():
-        print(f"  [!] conf.scss не найден: {_SCSS_FILE}")
+        result(f"conf.scss не найден: {_SCSS_FILE}", style="bold red")
         return
 
     content = _SCSS_FILE.read_text(encoding="utf-8")
@@ -94,8 +98,8 @@ def randomize_theme() -> None:
 
     _SCSS_FILE.write_text(content, encoding="utf-8")
     if changes:
-        print("  Тема рандомизирована:")
+        result(f"Тема рандомизирована ({len(changes)} параметров):", style="green")
         for line in changes:
-            print(line)
+            result(line.strip())
     else:
-        print("  Тема: случайные значения совпали с текущими, без изменений.")
+        result("Случайные значения совпали с текущими, без изменений.")

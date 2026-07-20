@@ -180,6 +180,48 @@ add_action('wp_head', function() {
 /**
  * 4. Основной вывод SEO и Schema.org
  */
+
+// true = @id страницы и author статьи собраны буквально как в примере ТЗ (голый URL, встроенный
+// дубль Organization). false = более строгий вариант с однозначными @id-ссылками (URL#webpage,
+// ссылка на Organization). Оба места (webpage_id/article_author) читают этот флаг, так что
+// переключение не рассинхронивает граф.
+define('UT_SCHEMA_LITERAL_SPEC', true);
+
+/**
+ * Вытаскивает вопросы/ответы настоящего FAQ (помеченные маркером <!-- ut:faq --> в пайплайне,
+ * core/wp_html.py) из сырого post_content — до применения фильтров the_content. Возвращает
+ * массив сущностей Question для FAQPage.mainEntity, либо [] если на странице нет FAQ-блоков.
+ */
+function ut_extract_faq_entities($post_id) {
+    $content = get_post_field('post_content', $post_id);
+    if (!$content || strpos($content, '<!-- ut:faq -->') === false) {
+        return [];
+    }
+
+    $pattern = '/<!--\s*ut:faq\s*-->\s*<!--\s*wp:details\s*-->\s*<details[^>]*><summary[^>]*>(.*?)<\/summary>(.*?)<\/details>\s*<!--\s*\/wp:details\s*-->/s';
+    if (!preg_match_all($pattern, $content, $matches, PREG_SET_ORDER)) {
+        return [];
+    }
+
+    $entities = [];
+    foreach ($matches as $m) {
+        $question = trim(wp_strip_all_tags($m[1]));
+        $answer   = trim(wp_strip_all_tags($m[2]));
+        if ($question === '' || $answer === '') continue;
+
+        $entities[] = [
+            "@type" => "Question",
+            "name"  => $question,
+            "acceptedAnswer" => [
+                "@type" => "Answer",
+                "text"  => $answer,
+            ],
+        ];
+    }
+
+    return $entities;
+}
+
 add_action('wp_head', 'my_custom_seo_head', 1);
 function my_custom_seo_head() {
     if (!is_singular()) return;
@@ -187,6 +229,7 @@ function my_custom_seo_head() {
     global $post;
     $post_id    = $post->ID;
     $site_name  = get_bloginfo('name');
+    $site_lang  = get_bloginfo('language');
     $curr_date  = get_the_modified_date('c') ?: current_time('c');
 
     // Данные из мета-полей
@@ -196,12 +239,20 @@ function my_custom_seo_head() {
     $social_headline = replace_placeholders_safely(get_post_meta($post_id, '_custom_seo_headline', true)) ?: $seo_title;
 
     $img_url  = get_the_post_thumbnail_url($post_id, 'full') ?: '';
-    $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme_mod('custom_logo'), 'full') : '';
+    $logo_id  = get_theme_mod('custom_logo');
+    $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : '';
 
-    // Вывод тегов
-    echo "\n<title>" . esc_attr($seo_title) . "</title>\n";
+    // Номер страницы пагинации — суффикс в title начиная со 2-й страницы
+    $page_num  = max((int) get_query_var('page'), (int) get_query_var('paged'));
+    $title_out = $seo_title;
+    if ($page_num > 1) {
+        $title_out .= ' – ' . get_site_translation('page') . ' ' . $page_num;
+    }
+
+    // Вывод тегов (всегда — независимо от того, какая часть графа ниже будет выведена/подавлена)
+    echo "\n<title>" . esc_attr($title_out) . "</title>\n";
     if ($seo_desc) echo '<meta name="description" content="' . $seo_desc . "\" />\n";
-    
+
     // Open Graph & Twitter
     echo '<meta property="og:type" content="article" />' . "\n";
     echo '<meta property="og:title" content="' . esc_attr($social_headline) . "\" />\n";
@@ -211,27 +262,17 @@ function my_custom_seo_head() {
         echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
     }
 
-    // Хлебные крошки
-    $breadcrumb_items = [];
-    if (function_exists('get_my_breadcrumbs_items')) {
-        foreach (get_my_breadcrumbs_items() as $i => $item) {
-            $breadcrumb_items[] = [
-                "@type" => "ListItem",
-                "position" => $i + 1,
-                "name" => $item['name'],
-                "item" => $item['url'],
-            ];
-        }
+    $is_list    = is_page_template('page-list.php');
+    $is_utility = has_category('Utility Pages', $post_id);
+
+    // Страницы политик/утилитарные (кроме листингов — у них своя ветка ниже) — без микроразметки вообще.
+    if ($is_utility && !$is_list) {
+        return;
     }
 
-    // Подсчет слов для кириллицы
-    $content = strip_tags(get_post_field('post_content', $post_id));
-    $word_count = count(preg_split('~[^\p{L}\p{N}]+~u', $content, -1, PREG_SPLIT_NO_EMPTY));
+    $webpage_id = UT_SCHEMA_LITERAL_SPEC ? get_permalink() : get_permalink() . '#webpage';
 
-    // Сборка графа
-    $graph = [];
-
-    // 1. Organization
+    // 1. Organization (общая часть графа, повторяется на каждой странице с одним и тем же @id)
     $org = [
         "@type" => "Organization",
         "@id"   => home_url('/#organization'),
@@ -239,53 +280,124 @@ function my_custom_seo_head() {
         "url"   => home_url('/'),
     ];
     if ($logo_url) {
-        $org["logo"] = ["@type" => "ImageObject", "url" => $logo_url];
+        $org["logo"] = [
+            "@type"      => "ImageObject",
+            "@id"        => home_url('/#logo'),
+            "url"        => $logo_url,
+            "contentUrl" => $logo_url,
+            "caption"    => $site_name,
+            "inLanguage" => $site_lang,
+        ];
     }
-    $graph[] = $org;
 
     // 2. WebSite
-    $graph[] = [
+    $website = [
         "@type" => "WebSite",
         "@id"   => home_url('/#website'),
         "url"   => home_url('/'),
         "name"  => $site_name,
         "publisher" => ["@id" => home_url('/#organization')],
+        "inLanguage" => $site_lang,
     ];
 
-    // 3. WebPage
-    $graph[] = [
-        "@type" => "WebPage",
-        "@id"   => get_permalink() . '#webpage',
-        "url"   => get_permalink(),
-        "name"  => $seo_title,
-        "isPartOf" => ["@id" => home_url('/#website')],
-        "datePublished" => get_the_date('c'),
-        "dateModified"  => $curr_date,
-        "breadcrumb" => ["@id" => get_permalink() . '#breadcrumb'],
-    ];
+    $graph = [$org, $website];
 
-    // 4. BreadcrumbList
-    if ($breadcrumb_items) {
-        $graph[] = [
-            "@type" => "BreadcrumbList",
-            "@id"   => get_permalink() . '#breadcrumb',
-            "itemListElement" => $breadcrumb_items
+    if ($is_list) {
+        // Страница-листинг (page-list.php): CollectionPage вместо Article, без BreadcrumbList/FAQ.
+        $has_part = [];
+        foreach ($GLOBALS['ut_collectionpage_items'] ?? [] as $item) {
+            $has_part[] = [
+                "@type" => "WebPage",
+                "url"   => $item['url'],
+                "name"  => $item['name'],
+            ];
+        }
+
+        $collection = [
+            "@type" => "CollectionPage",
+            "@id"   => $webpage_id,
+            "url"   => get_permalink(),
+            "name"  => $seo_title,
+            "description" => $seo_desc,
+            "isPartOf" => ["@id" => home_url('/#website')],
+            "inLanguage" => $site_lang,
         ];
-    }
+        if ($has_part) {
+            $collection["hasPart"] = $has_part;
+        }
+        $graph[] = $collection;
+    } else {
+        // Обычная страница (page.php) или пост (single.php): WebPage + Article (+FAQPage условно),
+        // BreadcrumbList — только для постов (is_single()), не для страниц.
+        $breadcrumb_items = [];
+        if (function_exists('get_my_breadcrumbs_items')) {
+            foreach (get_my_breadcrumbs_items() as $i => $item) {
+                $breadcrumb_items[] = [
+                    "@type" => "ListItem",
+                    "position" => $i + 1,
+                    "name" => $item['name'],
+                    "item" => $item['url'],
+                ];
+            }
+        }
+        $has_breadcrumb = is_single() && $breadcrumb_items;
 
-    // 5. Article
-    $graph[] = [
-        "@type" => "Article",
-        "@id"   => get_permalink() . '#article',
-        "headline" => $social_headline,
-        "author" => ["@id" => home_url('/#organization')], // ССЫЛКА НА ОРГАНИЗАЦИЮ
-        "publisher" => ["@id" => home_url('/#organization')],
-        "datePublished" => get_the_date('c'),
-        "dateModified"  => $curr_date,
-        "mainEntityOfPage" => ["@id" => get_permalink() . '#webpage'],
-        "wordCount" => $word_count,
-        "image" => $img_url ? ["@type" => "ImageObject", "url" => $img_url] : null,
-    ];
+        $webpage = [
+            "@type" => "WebPage",
+            "@id"   => $webpage_id,
+            "url"   => get_permalink(),
+            "name"  => $seo_title,
+            "description" => $seo_desc,
+            "isPartOf" => ["@id" => home_url('/#website')],
+            "inLanguage" => $site_lang,
+            "datePublished" => get_the_date('c'),
+            "dateModified"  => $curr_date,
+        ];
+        if ($has_breadcrumb) {
+            $webpage["breadcrumb"] = ["@id" => get_permalink() . '#breadcrumb'];
+        }
+        $graph[] = $webpage;
+
+        if ($has_breadcrumb) {
+            $graph[] = [
+                "@type" => "BreadcrumbList",
+                "@id"   => get_permalink() . '#breadcrumb',
+                "itemListElement" => $breadcrumb_items,
+            ];
+        }
+
+        // Подсчет слов для кириллицы
+        $content = strip_tags(get_post_field('post_content', $post_id));
+        $word_count = count(preg_split('~[^\p{L}\p{N}]+~u', $content, -1, PREG_SPLIT_NO_EMPTY));
+
+        $article_author = UT_SCHEMA_LITERAL_SPEC
+            ? ["@type" => "Organization", "name" => $site_name]
+            : ["@id" => home_url('/#organization')];
+
+        $graph[] = [
+            "@type" => "Article",
+            "@id"   => get_permalink() . '#article',
+            "headline" => $social_headline,
+            "description" => $seo_desc,
+            "author" => $article_author,
+            "publisher" => ["@id" => home_url('/#organization')],
+            "datePublished" => get_the_date('c'),
+            "dateModified"  => $curr_date,
+            "mainEntityOfPage" => ["@id" => $webpage_id],
+            "wordCount" => $word_count,
+            "image" => $img_url ? ["@type" => "ImageObject", "url" => $img_url] : null,
+        ];
+
+        $faq_entities = ut_extract_faq_entities($post_id);
+        if ($faq_entities) {
+            $graph[] = [
+                "@type" => "FAQPage",
+                "@id"   => $webpage_id . '#faq',
+                "isPartOf" => ["@id" => $webpage_id],
+                "mainEntity" => $faq_entities,
+            ];
+        }
+    }
 
     $schema = [
         "@context" => "https://schema.org",

@@ -8,6 +8,7 @@ from .translations import (
     EDITORIAL, WELCOME_NEWS_TITLE, WELCOME_NEWS_CONTENT,
     get_editorial_name,
 )
+from core.console import action, result
 
 _TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 
@@ -27,6 +28,8 @@ def _b64(s: str) -> str:
 
 
 def generate_sh(manifest: dict, out_path: Path) -> None:
+    action("Генерация provision.sh и robots.txt")
+
     lang       = manifest["site"]["lang"]
     site_title = manifest["site"]["title"]
 
@@ -72,7 +75,7 @@ def generate_sh(manifest: dict, out_path: Path) -> None:
         display = out_path.relative_to(Path.cwd()).as_posix()
     except ValueError:
         display = out_path.as_posix()
-    print(f"  Записан: {display}")
+    result(f"Записан: {display}", style="green")
 
     robots_tpl = env.get_template("robots.txt.j2")
     robots_out = out_path.parent / "robots.txt"
@@ -81,4 +84,4 @@ def generate_sh(manifest: dict, out_path: Path) -> None:
         robots_display = robots_out.relative_to(Path.cwd()).as_posix()
     except ValueError:
         robots_display = robots_out.as_posix()
-    print(f"  Записан: {robots_display}")
+    result(f"Записан: {robots_display}", style="green")

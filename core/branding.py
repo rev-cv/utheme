@@ -5,6 +5,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from core.console import action, result
+
 _STEMS_FAVICON = ["favicon", "icon"]
 _STEMS_LOGO    = ["logo"]
 _EXTS          = [".png", ".webp", ".jpg", ".jpeg", ".svg", ".ico"]
@@ -27,6 +29,8 @@ def staging_name(src: Path) -> str:
 
 
 def copy_branding_to_build(spec_dir: Path, out_dir: Path) -> None:
+    action("Копирование брендинга (favicon, logo)")
+
     for stems, max_kb, max_height in (
         (_STEMS_FAVICON, 15,  64),
         (_STEMS_LOGO,    50, 100),
@@ -44,7 +48,7 @@ def copy_branding_to_build(spec_dir: Path, out_dir: Path) -> None:
 
         if suffix == ".svg":
             shutil.copy2(src, dst)
-            print(f"  Скопирован: {src.name}")
+            result(f"Скопирован: {src.name}", style="green")
             continue
 
         if suffix == ".ico":
@@ -54,22 +58,23 @@ def copy_branding_to_build(spec_dir: Path, out_dir: Path) -> None:
         height_ok = (not max_height) or (Image.open(src).height <= max_height)
         if src_kb <= max_kb and height_ok:
             shutil.copy2(src, dst)
-            print(f"  Скопирован: {src.name}  ({src_kb:.1f} KB)")
+            result(f"Скопирован: {src.name}  ({src_kb:.1f} KB)", style="green")
             continue
 
-        result = _process_branding_raster(src, max_kb=max_kb, max_height=max_height)
-        if result is None:
-            print(f"  [!] Не удалось обработать '{src.name}', скопирован оригинал")
+        packed = _process_branding_raster(src, max_kb=max_kb, max_height=max_height)
+        if packed is None:
+            result(f"Не удалось обработать '{src.name}', скопирован оригинал", style="yellow")
             shutil.copy2(src, dst)
             continue
 
-        shutil.copy2(result, dst)
+        shutil.copy2(packed, dst)
+        shutil.rmtree(packed.parent, ignore_errors=True)
         dst_kb = dst.stat().st_size / 1024
         info = f"{src_kb:.1f} → {dst_kb:.1f} KB"
         if max_height:
             w, h = Image.open(dst).size
             info += f" | {w}×{h}px"
-        print(f"  Брендинг: {src.name}  ({info})")
+        result(f"Брендинг: {src.name}  ({info})", style="green")
 
 
 def _convert_ico_to_png(src: Path, dst: Path, max_height: int | None) -> None:
@@ -88,16 +93,16 @@ def _convert_ico_to_png(src: Path, dst: Path, max_height: int | None) -> None:
         img.save(dst, format="PNG", optimize=True)
         src_kb = src.stat().st_size / 1024
         dst_kb = dst.stat().st_size / 1024
-        print(f"  Favicon: {src.name} → {dst.name}  ({src_kb:.1f} → {dst_kb:.1f} KB)")
+        result(f"Favicon: {src.name} → {dst.name}  ({src_kb:.1f} → {dst_kb:.1f} KB)", style="green")
     except Exception as e:
-        print(f"  [!] Ошибка конвертации ICO {src.name}: {e}")
+        result(f"Ошибка конвертации ICO {src.name}: {e}", style="bold red")
 
 
 def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> Path | None:
     try:
         img = Image.open(src)
     except Exception as e:
-        print(f"  [!] Ошибка открытия {src.name}: {e}")
+        result(f"Ошибка открытия {src.name}: {e}", style="bold red")
         return None
 
     has_alpha = img.mode in ("RGBA", "LA", "PA") or (
@@ -111,7 +116,8 @@ def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> 
 
     target   = max_kb * 1024
     suffix   = src.suffix.lower()
-    tmp      = Path(tempfile.mkdtemp()) / src.name
+    tmp_dir  = Path(tempfile.mkdtemp())
+    tmp      = tmp_dir / src.name
     quality  = 90
     resize_f = 1.0
 
@@ -145,6 +151,8 @@ def _process_branding_raster(src: Path, max_kb: int, max_height: int | None) -> 
             resize_f = round(resize_f - 0.1, 1)
             quality  = 90
         else:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
             return None
 
+    shutil.rmtree(tmp_dir, ignore_errors=True)
     return None

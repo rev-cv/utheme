@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 
 from core import branding
 from core.translations import resolve_locale
+from core.console import console, action, result, error
 
 REQUIRED_PAGE_FIELDS = ["slug", "title", "publish_at"]
 
@@ -43,12 +44,12 @@ def _link_images(articles: list[dict], pics: list[dict]) -> list[dict]:
         img for img in pics
         if Path(str(img.get('selected_image', ''))).stem.lower() not in _BRANDING_STEMS
     ]
-    result = []
+    linked = []
     for article in articles:
         copy = article.copy()
         copy['images'] = [img for img in content_images if img.get('html') == article.get('resource')]
-        result.append(copy)
-    return result
+        linked.append(copy)
+    return linked
 
 
 def build_manifest(structure: dict, pics: list[dict], spec_dir: Path) -> dict:
@@ -125,6 +126,7 @@ def build_manifest(structure: dict, pics: list[dict], spec_dir: Path) -> dict:
 
 
 def validate_manifest(manifest: dict, staging_dir: Path) -> None:
+    action("Валидация manifest.json")
     errors = []
 
     if not manifest.get("site", {}).get("title"):
@@ -147,9 +149,9 @@ def validate_manifest(manifest: dict, staging_dir: Path) -> None:
                 errors.append(f"{prefix}: .wp файл не найден ({content_path})")
 
     if errors:
-        print("\n  ОШИБКИ В МАНИФЕСТЕ:")
+        error("ОШИБКИ В МАНИФЕСТЕ:")
         for e in errors:
-            print(f"    ✗ {e}")
+            console.print(f"    ✗ {e}")
         raise RuntimeError("Манифест не прошёл валидацию")
 
-    print(f"  Манифест валиден. Страниц: {len(manifest['pages'])}")
+    result(f"Манифест валиден. Страниц: {len(manifest['pages'])}", style="green")

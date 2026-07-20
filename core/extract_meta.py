@@ -2,6 +2,8 @@ import re
 from pathlib import Path
 from bs4 import BeautifulSoup
 
+from core.console import warn
+
 def _parse_frontmatter(content: str) -> dict:
     """Парсит YAML frontmatter из MD-файла (только flat key: value)."""
     m = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
@@ -23,20 +25,20 @@ def _meta_from_html(content: str) -> dict:
     if title_tag:
         meta["title"] = title_tag.get_text(strip=True)
     else:
-        print("ВАЖНО! Title не обнаружен!")
+        warn("Title не обнаружен!")
 
     h1_tag = soup.find("h1")
     if h1_tag:
         meta["h1"] = h1_tag.get_text(strip=True)
     else:
-        print("ВАЖНО! H1 не обнаружен!")
+        warn("H1 не обнаружен!")
 
     desc_tag = (soup.find("meta", attrs={"name": "description"}) or
                 soup.find("meta", attrs={"property": "og:description"}))
     if desc_tag:
         meta["description"] = desc_tag.get("content", "").strip()
     else:
-        print("ВАЖНО! description не найден!")
+        warn("description не найден!")
 
     headline_tag = (soup.find("meta", attrs={"name": "headline"}) or
                     soup.find("meta", attrs={"property": "og:title"}) or
@@ -64,9 +66,9 @@ def _meta_from_md(content: str) -> dict:
     if not meta["title"]:
         meta["title"] = meta["h1"]
     if not meta["h1"]:
-        print("ВАЖНО! H1 не обнаружен!")
+        warn("H1 не обнаружен!")
     if not meta["description"]:
-        print("ВАЖНО! description не найден!")
+        warn("description не найден!")
 
     return meta
 
@@ -105,14 +107,14 @@ def resolve_resource_paths(base_path: Path, pages_list: list[dict]) -> list[dict
     Если файл не найден, выводит сообщение и обрывает выполнение скрипта.
     """
     resolved_list = []
-    
+
     for item in pages_list:
         new_item = item.copy()
         raw_resource = item["resource"]
         resource_path = base_path / raw_resource
-        
+
         target_file = None
-        
+
         # если это директория — ищем .html, потом .md
         if resource_path.is_dir():
             for name in ("index.html", "index.md"):
@@ -136,14 +138,14 @@ def resolve_resource_paths(base_path: Path, pages_list: list[dict]) -> list[dict
             target_file = resource_path.with_suffix(".html")
             if not target_file.exists():
                 target_file = resource_path.with_suffix(".md")
-            
+
         if target_file and target_file.exists():
             new_item["resource"] = target_file
         else:
             raise RuntimeError(f"Файл не найден для '{raw_resource}', ожидался: {target_file}")
-            
+
         resolved_list.append(new_item)
-        
+
     return resolved_list
 
 

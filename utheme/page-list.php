@@ -25,8 +25,8 @@ if ($current_slug === 'news') {
         'post_parent'    => get_the_ID(),
         'posts_per_page' => 12,
         'paged'          => $paged,
-        'orderby'        => 'menu_order',
-        'order'          => 'ASC',
+        'orderby'        => 'date',
+        'order'          => 'DESC',
         'tax_query'      => array(
             array(
                 'taxonomy' => 'category',
@@ -40,6 +40,14 @@ if ($current_slug === 'news') {
 }
 
 $query = new WP_Query($args);
+
+// Данные для CollectionPage.hasPart в микроразметке (my_custom_seo_head() в mod-seo.php)
+$GLOBALS['ut_collectionpage_items'] = array_map(function ($p) {
+    return [
+        'url'  => get_permalink($p->ID),
+        'name' => get_the_title($p->ID),
+    ];
+}, $query->posts);
 
 if ($query->found_posts <= 1) {
     add_filter('wp_robots', function ($robots) {

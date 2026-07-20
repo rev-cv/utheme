@@ -61,6 +61,8 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from bs4 import BeautifulSoup
 
+from core.console import ERROR_STYLE, console, action, result, error
+
 _PROTECTED_NAMES = {"logo", "favicon", "icon"}
 _MD_IMG = re.compile(r'!\[([^\]]*)\]\(([^)]+)\)')
 
@@ -115,7 +117,7 @@ def get_detailed_image_data(root_path: Path) -> list:
                     })
 
         except Exception as e:
-            print(f"Ошибка при обработке {html_file}: {e}")
+            error(f"Ошибка при обработке {html_file}: {e}")
 
     _re_index_md = re.compile(r'^index\d*\.md$')
     _fm_re = re.compile(r'^---\n(.*?)\n---', re.DOTALL)
@@ -160,7 +162,7 @@ def get_detailed_image_data(root_path: Path) -> list:
                     "filename_full": image_path.name,
                 })
         except Exception as e:
-            print(f"Ошибка при обработке {md_file}: {e}")
+            error(f"Ошибка при обработке {md_file}: {e}")
 
     return results
 
@@ -177,13 +179,12 @@ def _path_proximity(img_path: Path, html_path: Path) -> int:
 
 
 def find_and_select_images(folder: Path, pics: list) -> list:
-    print('\nВыявление картинок и проверка их наличия на диске.')
+    action(f"Индексирую все картинки в: {folder}")
 
     project_images_index = defaultdict(list)
     valid_extensions = {'.avif', '.webp', '.jpg', '.jpeg', '.png', '.gif', '.svg'}
 
     if folder and folder.exists():
-        print(f"Индексирую все картинки в: {folder}")
         for file in folder.rglob("*"):
             if file.suffix.lower() in valid_extensions:
                 project_images_index[file.stem].append(file)
@@ -216,9 +217,9 @@ def find_and_select_images(folder: Path, pics: list) -> list:
             missing_report[html_path].add(target_name)
 
     if missing_report:
-        print("\n" + "!" * 60)
-        print("КРИТИЧЕСКАЯ ОШИБКА: Некоторые картинки не найдены на диске!")
-        print("!" * 60)
+        console.rule(style=ERROR_STYLE)
+        error("КРИТИЧЕСКАЯ ОШИБКА: Некоторые картинки не найдены на диске!")
+        console.rule(style=ERROR_STYLE)
 
         for html_file, missing_imgs in missing_report.items():
             try:
@@ -226,20 +227,19 @@ def find_and_select_images(folder: Path, pics: list) -> list:
             except ValueError:
                 rel_html = html_file
 
-            print(f"\nФайл: {rel_html}")
+            console.print(f"\nФайл: {rel_html}")
             for img in sorted(missing_imgs):
-                print(f"  - {img} (не найдено ни одного расширения)")
+                console.print(f"  - {img} (не найдено ни одного расширения)")
 
         raise RuntimeError("Не найдены файлы изображений — проверьте наличие ресурсов")
 
-    print("Все картинки из HTML успешно найдены на диске.")
-    print('\n' + '=' * 50)
+    result("Все картинки из HTML успешно найдены на диске.", style="green")
     return pics
 
 
 def _normalize_image_names(pics: list) -> list:
     """Дедуплицирует имена картинок: добавляет хеш-суффикс и обновляет src в HTML."""
-    print("\nПроверка уникальности имен картинок в проекте.")
+    action("Проверка уникальности имён картинок в проекте.")
 
     plan        = defaultdict(list)
     name_counts = Counter(item['name'] for item in pics)
@@ -272,8 +272,7 @@ def _normalize_image_names(pics: list) -> list:
     )
 
     if not has_any_changes:
-        print("Все имена уникальны. Изменений не требуется.")
-        print('\n' + '=' * 50)
+        result("Все имена уникальны. Изменений не требуется.")
         return pics
 
     for html_path, changes in plan.items():
@@ -286,7 +285,7 @@ def _normalize_image_names(pics: list) -> list:
                     if c['pic_path'] != new_file_path:
                         c['pic_path'].rename(new_file_path)
                         c['item_ref']["selected_image"] = new_file_path
-                        print(f"  Переименован: {c['original']} → {c['new']}")
+                        result(f"Переименован: {c['original']} → {c['new']}", style="green")
                 c['item_ref']['name'] = c['new']
 
             if html_path.suffix == '.md':
@@ -328,9 +327,9 @@ def _normalize_image_names(pics: list) -> list:
                         f.write(str(soup))
 
         except Exception as e:
-            print(f"Ошибка при обработке {html_path}: {e}")
+            result(f"Ошибка при обработке {html_path}: {e}", style="bold red")
 
-    print("Готово! Все изменения применены.")
+    result("Готово! Все изменения применены.", style="green")
     return pics
 
 

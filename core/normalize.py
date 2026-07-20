@@ -1,6 +1,8 @@
 import re
 from pathlib import Path
 
+from core.console import action, result
+
 _BRANDING_EXTS = {".png", ".webp", ".jpg", ".jpeg", ".svg", ".ico"}
 _LOGO_STEMS    = {"logo"}
 _FAVICON_STEMS = {"favicon", "icon"}
@@ -72,7 +74,7 @@ RENAME_RULES = {
 def normalize_branding_assets(spec_dir: Path):
     """Перемещает logo.* и favicon/icon.* из PILLAR/ в корень spec/. Удаляет 404.html."""
     spec_dir = Path(spec_dir)
-    print(f"\nНормализация брендинга в: {spec_dir}")
+    action(f"Нормализация брендинга в: {spec_dir}")
 
     candidate_dirs = [spec_dir / "PILLAR", spec_dir / "HUB" / "PILLAR"]
     pillar_dir = next((d for d in candidate_dirs if d.is_dir()), None)
@@ -81,11 +83,10 @@ def normalize_branding_assets(spec_dir: Path):
         page_404 = pillar_dir / "404.html"
         if page_404.exists():
             page_404.unlink()
-            print(f"  Удалён: {page_404.relative_to(spec_dir)}")
+            result(f"Удалён: {page_404.relative_to(spec_dir)}", style="green")
 
     if pillar_dir is None:
-        print("  PILLAR/ не найдена, пропуск.")
-        print('=' * 50)
+        result("PILLAR/ не найдена, пропуск.", style="yellow")
         return
 
     moved = 0
@@ -105,22 +106,62 @@ def normalize_branding_assets(spec_dir: Path):
             continue
 
         file.rename(dst)
-        print(f"  Перемещён: {file.relative_to(spec_dir)} → {file.name}")
+        result(f"Перемещён: {file.relative_to(spec_dir)} → {file.name}", style="green")
         moved += 1
 
     if moved == 0:
-        print("  Брендинг: файлы уже на месте или не найдены в PILLAR/")
+        result("Брендинг: файлы уже на месте или не найдены в PILLAR/")
 
-    print('=' * 50)
+
+def bulk_rename_folders(directory):
+    """Массовое переименование папок по правилам RENAME_RULES (от глубоких к корневым)."""
+    root_path = Path(directory)
+    action("Запуск массового переименования ПАПОК:")
+
+    if not root_path.exists():
+        result(f"Папка не найдена: {root_path}", style="yellow")
+        return
+
+    lookup_map = {
+        variant.lower(): final_name
+        for final_name, variants in RENAME_RULES.items()
+        for variant in variants
+    }
+
+    dirs_to_process = sorted(
+        [p for p in root_path.rglob('*') if p.is_dir()],
+        key=lambda p: len(p.parts),
+        reverse=True,
+    )
+
+    renamed_count = 0
+
+    for folder_path in dirs_to_process:
+        current_name = folder_path.name
+        if current_name.lower() not in lookup_map:
+            continue
+
+        target_name = lookup_map[current_name.lower()]
+        if current_name == target_name:
+            continue
+
+        try:
+            folder_path.rename(folder_path.with_name(target_name))
+            result(f"{folder_path.parent.name}/{current_name} -> {target_name}", style="green")
+            renamed_count += 1
+        except OSError as e:
+            result(f"Ошибка при переименовании папки {folder_path}: {e}", style="bold red")
+
+    result(f"Готово. Переименовано папок: {renamed_count}")
 
 
 def bulk_rename(directory):
     """Массовое переименование файлов по правилам RENAME_RULES (рекурсивно)."""
     root_path = Path(directory)
-    print(f"\nЗапуск массового переименования ФАЙЛОВ:")
+    action("Запуск массового переименования ФАЙЛОВ:")
 
     if not root_path.exists():
-        print(f"Папка не найдена: {root_path}")
+        result(f"Папка не найдена: {root_path}", style="yellow")
         return
 
     lookup_map = {
@@ -147,69 +188,26 @@ def bulk_rename(directory):
         target_path = file_path.with_name(target_name)
         if target_path.exists() and target_path.resolve() != file_path.resolve():
             if target_path.name.lower() != file_path.name.lower():
-                print(f"Пропуск: {current_name} -> {target_name}. Файл {target_name} уже существует.")
+                result(f"Пропуск: {current_name} -> {target_name}. Файл {target_name} уже существует.", style="yellow")
                 continue
 
         try:
             file_path.rename(target_path)
-            print(f"{file_path.parent.name}/{current_name} -> {target_name}")
+            result(f"{file_path.parent.name}/{current_name} -> {target_name}", style="green")
             renamed_count += 1
         except OSError as e:
-            print(f"Ошибка при переименовании {file_path}: {e}")
+            result(f"Ошибка при переименовании {file_path}: {e}", style="bold red")
 
-    print(f"Готово. Переименовано файлов: {renamed_count}")
-    print('\n' + '=' * 50)
-
-
-def bulk_rename_folders(directory):
-    """Массовое переименование папок по правилам RENAME_RULES (от глубоких к корневым)."""
-    root_path = Path(directory)
-
-    if not root_path.exists():
-        return
-
-    lookup_map = {
-        variant.lower(): final_name
-        for final_name, variants in RENAME_RULES.items()
-        for variant in variants
-    }
-
-    dirs_to_process = sorted(
-        [p for p in root_path.rglob('*') if p.is_dir()],
-        key=lambda p: len(p.parts),
-        reverse=True,
-    )
-
-    print(f"\nЗапуск массового переименования ПАПОК:")
-    renamed_count = 0
-
-    for folder_path in dirs_to_process:
-        current_name = folder_path.name
-        if current_name.lower() not in lookup_map:
-            continue
-
-        target_name = lookup_map[current_name.lower()]
-        if current_name == target_name:
-            continue
-
-        try:
-            folder_path.rename(folder_path.with_name(target_name))
-            print(f"{folder_path.parent.name}/{current_name} -> {target_name}")
-            renamed_count += 1
-        except OSError as e:
-            print(f"Ошибка при переименовании папки {folder_path}: {e}")
-
-    print(f"Готово. Переименовано папок: {renamed_count}")
-    print('\n' + '=' * 50)
+    result(f"Готово. Переименовано файлов: {renamed_count}")
 
 
 def normalize_all_html_in_directory(directory: Path):
     """Рекурсивно удаляет пробелы перед двоеточием во всех .html файлах."""
     root_path = Path(directory)
-    print(f"\nЗапуск нормализации HTML файлов в: {root_path}")
+    action(f"Запуск нормализации HTML файлов в: {root_path}")
 
     if not root_path.exists():
-        print(f"    Папка не найдена: {root_path}")
+        result(f"Папка не найдена: {root_path}", style="yellow")
         return
 
     cleaned_count = 0
@@ -218,8 +216,9 @@ def normalize_all_html_in_directory(directory: Path):
             cleaned_count += 1
 
     if cleaned_count > 0:
-        print(f"Готово. Нормализовано файлов: {cleaned_count}")
-        print('\n' + '=' * 50)
+        result(f"Готово. Нормализовано файлов: {cleaned_count}", style="green")
+    else:
+        result("Изменений не потребовалось.")
 
 
 def _clean_html_spacing(file_path: Path) -> bool:
@@ -230,5 +229,5 @@ def _clean_html_spacing(file_path: Path) -> bool:
             file_path.write_text(cleaned, encoding='utf-8')
             return True
     except Exception as e:
-        print(f"    Ошибка при обработке {file_path}: {e}")
+        result(f"Ошибка при обработке {file_path}: {e}", style="bold red")
     return False

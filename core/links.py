@@ -7,6 +7,13 @@ from typing import Dict, List
 
 import requests
 from bs4 import BeautifulSoup
+from rich.progress import BarColumn, TaskProgressColumn, TextColumn, TimeElapsedColumn, Progress
+from rich.prompt import Confirm
+
+from core.console import (
+    ACTION_INDENT, ACCENT_STYLE, BAR_BACK_STYLE, BAR_DONE_STYLE, MUTED_STYLE,
+    SUCCESS_STYLE, console, action, result, error,
+)
 
 _PLACEHOLDER  = re.compile(r'%%PAGEURL:([^%]+)%%')
 _FUZZY_CUTOFF = 0.82
@@ -22,7 +29,7 @@ def check_links_in_articles(articles_list: List[Dict], max_workers: int = 10):
                       'Chrome/91.0.4472.124 Safari/537.36'
     }
 
-    print(f"\nЗапуск многопоточной проверки ссылок ({max_workers} потоков)...")
+    action(f"Проверка внешних ссылок ({max_workers} потоков)")
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_article = {}
@@ -42,38 +49,45 @@ def check_links_in_articles(articles_list: List[Dict], max_workers: int = 10):
                 future = executor.submit(_check_single_link, link, headers)
                 future_to_article[future] = resource_path
 
-        completed_count = 0
-        total_futures   = len(future_to_article)
+        total_futures = len(future_to_article)
 
-        for future in as_completed(future_to_article):
-            completed_count += 1
-            resource_path = future_to_article[future]
-            result        = future.result()
+        with Progress(
+            TextColumn(f"{ACTION_INDENT}{{task.description}}", style=ACCENT_STYLE),
+            BarColumn(
+                style=BAR_BACK_STYLE,
+                complete_style=BAR_DONE_STYLE,
+                finished_style=BAR_DONE_STYLE,
+                pulse_style=ACCENT_STYLE,
+            ),
+            TaskProgressColumn(style=SUCCESS_STYLE),
+            TextColumn("•", style=MUTED_STYLE),
+            TimeElapsedColumn(),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Проверка ссылок", total=total_futures)
 
-            if result:
-                short = _shorten_path(resource_path)
-                broken_links_map.setdefault(short, set()).add(result)
+            for future in as_completed(future_to_article):
+                resource_path = future_to_article[future]
+                broken        = future.result()
 
-            print(f"\rПрогресс: {completed_count}/{total_futures} ссылок проверено", end="")
+                if broken:
+                    short = _shorten_path(resource_path)
+                    broken_links_map.setdefault(short, set()).add(broken)
 
-    print("\r" + " " * 50 + "\r", end="")
+                progress.advance(task)
 
     if not broken_links_map:
-        print("Битых ссылок не найдено.")
+        result("Битых ссылок не найдено.", style="green")
         return
 
-    print("\n- Найдены битые ссылки:")
+    result(f"Найдены битые ссылки ({sum(len(v) for v in broken_links_map.values())}):", style="yellow")
     for path_str, links in sorted(broken_links_map.items()):
-        print(f"    - {path_str}")
+        console.print(f"        {path_str}")
         for link in sorted(links):
-            print(f"        {link}")
+            console.print(f"            {link}")
 
-    while True:
-        choice = input("\nИгнорировать? ( y / n ) ").lower().strip()
-        if choice == 'y':
-            return
-        elif choice == 'n':
-            raise RuntimeError("Проверка внешних ссылок прервана пользователем")
+    if not Confirm.ask("\nИгнорировать?"):
+        raise RuntimeError("Проверка внешних ссылок прервана пользователем")
 
 
 def _check_single_link(link: str, headers: dict) -> str | None:
@@ -103,6 +117,7 @@ def _shorten_path(full_path: Path) -> str:
 # ── Внутренние ссылки ─────────────────────────────────────────────────────────
 
 def check_internal_links(manifest: dict, staging_dir: Path) -> None:
+    action("Проверка внутренних ссылок")
     page_slugs = {p['slug'] for p in manifest.get('pages', [])}
 
     image_stems: set[str] = set()
@@ -151,15 +166,15 @@ def check_internal_links(manifest: dict, staging_dir: Path) -> None:
             wp_file.write_text(new_content, encoding='utf-8')
 
     if fixed:
-        print(f"\n  Авто-исправлено ({len(fixed)}):")
+        result(f"Авто-исправлено ({len(fixed)}):", style="yellow")
         for item in fixed:
-            print(f"  {item}")
+            console.print(f"        {item}")
 
     if errors:
-        print(f"\n  Ошибки ({len(errors)}):")
+        error(f"Ошибки ({len(errors)}):")
         for e in errors:
-            print(f"  {e}")
-        print(
+            console.print(f"        {e}")
+        console.print(
             "\n  Исправить ссылки в spec/ можно с помощью modlinks.py:\n"
             "    uv run modlinks.py rep <slug> <new-slug>   — заменить слаг\n"
             "    uv run modlinks.py rm  <slug>              — убрать ссылку (оставить текст)"
@@ -167,7 +182,7 @@ def check_internal_links(manifest: dict, staging_dir: Path) -> None:
         raise RuntimeError("Проверка внутренних ссылок не пройдена")
 
     if total == 0:
-        print("  Внутренних ссылок не найдено.")
+        result("Внутренних ссылок не найдено.")
     else:
         auto = f", авто-исправлено: {len(fixed)}" if fixed else ""
-        print(f"  Внутренних ссылок: {ok}/{total} корректны{auto}.")
+        result(f"Внутренних ссылок: {ok}/{total} корректны{auto}.", style="green")

@@ -2,6 +2,8 @@ import re
 from pathlib import Path
 from bs4 import BeautifulSoup, NavigableString
 
+from core.console import action, result as print_result
+
 
 def _preprocess_faq_blocks(html: str) -> str:
     """Конвертирует шорткод [faq]...[/faq] в HTML <details> теги, поддерживая разные структуры."""
@@ -24,7 +26,7 @@ def _preprocess_faq_blocks(html: str) -> str:
                 q_text = question.group(1)
                 a_text = answer.group(1)
                 details_tags.append(
-                    f'<details><summary>{q_text}</summary><p>{a_text}</p></details>'
+                    f'<details data-ut-faq="1"><summary>{q_text}</summary><p>{a_text}</p></details>'
                 )
         return '\n'.join(details_tags)
 
@@ -82,9 +84,13 @@ def _handle_table(tag):
 
 def _handle_details(tag):
     """Обработка <details> (аккордеон)."""
+    # data-ut-faq — маркер, проставленный _preprocess_faq_blocks() для настоящих FAQ-вопросов
+    # (в отличие от произвольных <details>-аккордеонов, написанных руками в исходном HTML).
+    is_faq = tag.get('data-ut-faq') == '1'
+
     summary_tag = tag.find('summary')
     summary_text = summary_tag.get_text(strip=True) if summary_tag else ''
-    
+
     if summary_tag:
         summary_tag.extract()
 
@@ -104,8 +110,12 @@ def _handle_details(tag):
         # Неизвестные теги просто игнорируются, как в основной функции
 
     inner_blocks_content = '\n'.join(inner_blocks)
-    
-    return f'<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_blocks_content}</details>\n<!-- /wp:details -->'
+
+    # Маркер вставляется как часть возвращаемой строки (а не узел BeautifulSoup),
+    # поэтому не теряется на фильтре NavigableString в основном цикле конвертации.
+    marker = '<!-- ut:faq -->\n' if is_faq else ''
+
+    return f'{marker}<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_blocks_content}</details>\n<!-- /wp:details -->'
 
 _CALLOUT_CLASS_MAP = {
     # canonical names (pass-through)
@@ -274,7 +284,7 @@ def _handle_div(tag):
                     inner_blocks.append(BLOCK_HANDLERS[child.name](child))
 
         inner_content = '\n'.join(inner_blocks)
-        return f'<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_content}</details>\n<!-- /wp:details -->'
+        return f'<!-- ut:faq -->\n<!-- wp:details -->\n<details class="wp-block-details"><summary>{summary_text}</summary>{inner_content}</details>\n<!-- /wp:details -->'
 
     return ""
 
@@ -453,7 +463,7 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
     Конвертирует содержимое в WP-блоки, сохраняет файл .wp рядом с исходным
     и добавляет содержимое блоков в поле 'wp_block' каждого объекта.
     """
-    print('\nЗапуск конвертации в WP блоки\n')
+    action("Конвертация HTML/MD → WP-блоки")
     
     updated_list = []
 
@@ -482,17 +492,16 @@ def conversion_init(pages_list: list[dict]) -> list[dict]:
             
             if wp_content:
                 new_item["wp_block"] = wp_content
-                print(f"{display_path}")
+                print_result(f"{display_path}", style="green")
             else:
                 new_item["wp_block"] = ""
-                print(f"Файл {display_path} пуст после конвертации")
+                print_result(f"Файл {display_path} пуст после конвертации", style="yellow")
 
         except Exception as e:
             raise RuntimeError(f"Ошибка в файле {display_path}: {e}") from e
 
         updated_list.append(new_item)
 
-    print('\n' + '='*50)
     return updated_list
 
 
@@ -505,9 +514,17 @@ def convert_pages(pages: list[dict], spec_dir: Path, out_dir: Path) -> None:
     resource_list = extraction.resolve_resource_paths(spec_dir, resource_list)
     converted     = conversion_init(resource_list)
 
-    for page, result in zip(content_pages, converted):
-        wp_content = result.get("wp_block", "")
+    for page, converted_item in zip(content_pages, converted):
+        wp_content = converted_item.get("wp_block", "")
+        # Проверка внешних ссылок выполняется позже над исходным structure.
+        # Возвращаем туда сконвертированный контент и разрешённый путь ресурса.
+        page["wp_block"] = wp_content
+        page["resource"] = converted_item.get("resource")
         out_file   = out_dir / f"{page['slug']}.wp"
         out_file.write_text(wp_content, encoding="utf-8")
 
-    print(f"  Конвертировано страниц: {len(content_pages)} (структурных пропущено: {len(pages) - len(content_pages)})")
+    print_result(
+        f"Конвертировано страниц: {len(content_pages)} "
+        f"(структурных пропущено: {len(pages) - len(content_pages)})",
+        style="green",
+    )

@@ -9,6 +9,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from core.console import action, result
+
 COMPOSE      = ["docker", "compose"]
 WP_SERVICE   = "wordpress"
 DB_CONTAINER = "wp_shared_db"
@@ -38,14 +40,14 @@ def run(manifest: dict, staging_dir: Path, wp_conf_dir: Path) -> dict | None:
     _cleanup_tmp(container, staging_dir.name)
     _extract_wp_config(container, wp_conf_dir)
 
-    print("\n  Деплой завершён.")
+    result("Деплой завершён.", style="green")
     return credentials
 
 
 # ─── Шаги ────────────────────────────────────────────────────────────────────
 
 def _find_free_port() -> None:
-    print("  Проверка порта...")
+    action("Проверка порта")
     raw = os.getenv("HOST_PORT", "8081")
     try:
         port = int(raw)
@@ -77,9 +79,9 @@ def _find_free_port() -> None:
     load_dotenv(override=True)
 
     if port != original:
-        print(f"  Порт изменён: {original} → {port}")
+        result(f"Порт изменён: {original} → {port}", style="green")
     else:
-        print(f"  Порт {port} свободен.")
+        result(f"Порт {port} свободен.", style="green")
 
 
 def _clean_wp_config_volume(wp_conf_dir: Path) -> None:
@@ -101,15 +103,15 @@ def _ensure_htaccess(wp_conf_dir: Path) -> None:
 
 
 def _ensure_shared_db() -> None:
-    print("  Проверка shared MariaDB...")
+    action("Проверка shared MariaDB")
     _ensure_network(DB_NETWORK)
 
-    result = subprocess.run(
+    proc = subprocess.run(
         ["docker", "inspect", "--format", "{{.State.Running}}", DB_CONTAINER],
         capture_output=True, text=True,
     )
-    if result.returncode == 0 and result.stdout.strip() == "true":
-        print(f"  {DB_CONTAINER} уже запущен.")
+    if proc.returncode == 0 and proc.stdout.strip() == "true":
+        result(f"{DB_CONTAINER} уже запущен.", style="green")
         return
 
     shared_db_dir = _shared_db_dir()
@@ -127,22 +129,23 @@ def _ensure_shared_db() -> None:
         compose_path.write_text(compose_content, encoding="utf-8", newline="\n")
 
     _run(["docker", "compose", "--project-directory", str(shared_db_dir), "up", "-d"])
+    result(f"{DB_CONTAINER} запущен.", style="green")
 
-    print("  Ожидание готовности БД...")
+    action("Ожидание готовности БД")
     for _ in range(30):
         r = subprocess.run(
             ["docker", "inspect", "--format", "{{.State.Health.Status}}", DB_CONTAINER],
             capture_output=True, text=True,
         )
         if r.stdout.strip() == "healthy":
-            print("  БД готова.")
+            result("БД готова.", style="green")
             return
         time.sleep(3)
-    print("  [!] БД не стала healthy за 90 сек, продолжаем...")
+    result("БД не стала healthy за 90 сек, продолжаем...", style="yellow")
 
 
 def _create_site_db() -> None:
-    print("  Создание БД для сайта...")
+    action("Создание БД для сайта")
     container_name = os.getenv("CONTAINER_NAME", "wp_site")
     ident = re.sub(r"[^a-zA-Z0-9_]", "_", container_name)
 
@@ -159,16 +162,16 @@ def _create_site_db() -> None:
     )
     root_pass = _read_db_root_password(_shared_db_dir())
     if not root_pass:
-        print("  [!] Не найден root-пароль MariaDB.")
+        result("Не найден root-пароль MariaDB.", style="bold red")
         sys.exit(1)
 
-    result = subprocess.run(
+    proc = subprocess.run(
         ["docker", "exec", DB_CONTAINER,
          "mysql", "-h", "127.0.0.1", "-u", "root", f"-p{root_pass}", "-e", sql],
         capture_output=True, text=True,
     )
-    if result.returncode != 0:
-        print(f"  [!] Ошибка создания БД: {result.stderr}")
+    if proc.returncode != 0:
+        result(f"Ошибка создания БД: {proc.stderr}", style="bold red")
         sys.exit(1)
 
     env_path = Path(".env")
@@ -182,11 +185,11 @@ def _create_site_db() -> None:
     os.environ.update({"DB_NAME": db_name, "DB_USER": db_user, "DB_PASSWORD": db_pass})
     load_dotenv(override=True)
 
-    print(f"  БД '{db_name}' и пользователь '{db_user}' готовы.")
+    result(f"БД '{db_name}' и пользователь '{db_user}' готовы.", style="green")
 
 
 def _start_container(container: str) -> None:
-    print("  Запуск контейнера WordPress...")
+    action("Запуск контейнера WordPress")
     _ensure_network(WEB_NETWORK)
 
     # Если контейнер уже запущен — берём его реальный порт (конфликта нет, он уже его держит).
@@ -194,38 +197,37 @@ def _start_container(container: str) -> None:
     r = subprocess.run(["docker", "port", container, "80"], capture_output=True, text=True)
     host_port = r.stdout.strip().split(":")[-1].strip() if r.returncode == 0 and r.stdout.strip() else "0"
 
-    result = subprocess.run(
+    proc = subprocess.run(
         COMPOSE + ["up", "-d", WP_SERVICE],
         capture_output=True, text=True,
         env={**os.environ, "HOST_PORT": host_port},
     )
-    if result.returncode != 0:
-        print(f"  [!] Docker error:\n{result.stderr}")
+    if proc.returncode != 0:
+        result(f"Docker error:\n{proc.stderr}", style="bold red")
         sys.exit(1)
 
-    print("  Ожидание готовности WordPress...")
     for _ in range(30):
         r = subprocess.run(
             ["docker", "inspect", "--format", "{{.State.Health.Status}}", container],
             capture_output=True, text=True,
         )
         if r.stdout.strip() == "healthy":
-            print("  WordPress готов.")
+            result("WordPress готов.", style="green")
             break
         time.sleep(5)
     else:
-        print("  [!] WP не стал healthy за 150 сек, продолжаем...")
+        result("WP не стал healthy за 150 сек, продолжаем...", style="yellow")
 
     # Читаем реально назначенный порт и обновляем .env / os.environ
     r = subprocess.run(["docker", "port", container, "80"], capture_output=True, text=True)
     if r.returncode != 0 or not r.stdout.strip():
-        print("  [!] Не удалось прочитать порт контейнера.")
+        result("Не удалось прочитать порт контейнера.", style="bold red")
         sys.exit(1)
     actual_port = r.stdout.strip().split(":")[-1].strip()
     existing_url = os.getenv("SITE_URL", "")
     actual_url = existing_url if existing_url and "localhost" not in existing_url else f"http://localhost:{actual_port}"
     _write_env_port(actual_port, actual_url)
-    print(f"  Порт назначен: {actual_port}")
+    result(f"Порт назначен: {actual_port}", style="green")
 
     # Права на wp-content + обязательные директории
     _exec_root(container,
@@ -248,37 +250,38 @@ def _start_container(container: str) -> None:
 
 
 def _copy_staging(staging_dir: Path, container: str) -> None:
-    print(f"  Копирование {staging_dir.name}/ → /tmp/ в контейнере...")
-    result = subprocess.run(
+    action(f"Копирование {staging_dir.name}/ → /tmp/ в контейнере")
+    proc = subprocess.run(
         ["docker", "cp", str(staging_dir), f"{container}:/tmp/"],
         capture_output=True, text=True,
     )
-    if result.returncode != 0:
-        print(f"  [!] docker cp failed: {result.stderr}")
+    if proc.returncode != 0:
+        result(f"docker cp failed: {proc.stderr}", style="bold red")
         sys.exit(1)
     # docker cp создаёт файлы от root — даём www-data право писать (sed -i нужен tmp-файл рядом)
     subprocess.run(
         ["docker", "exec", container, "chmod", "-R", "777", f"/tmp/{staging_dir.name}"],
         capture_output=True,
     )
-    print(f"  Скопировано в /tmp/{staging_dir.name}/")
+    result(f"Скопировано в /tmp/{staging_dir.name}/", style="green")
 
 
 def _copy_provision_sh(wp_conf_dir: Path, container: str) -> None:
     src = wp_conf_dir / "provision.sh"
-    print(f"  Копирование provision.sh → /tmp/ в контейнере...")
-    result = subprocess.run(
+    action("Копирование provision.sh → /tmp/ в контейнере")
+    proc = subprocess.run(
         ["docker", "cp", str(src), f"{container}:/tmp/provision.sh"],
         capture_output=True, text=True,
     )
-    if result.returncode != 0:
-        print(f"  [!] docker cp provision.sh failed: {result.stderr}")
+    if proc.returncode != 0:
+        result(f"docker cp provision.sh failed: {proc.stderr}", style="bold red")
         sys.exit(1)
+    result("Скопировано.", style="green")
 
 
 def _run_provision_sh(container: str) -> None:
-    print("  Запуск /tmp/provision.sh внутри контейнера...")
-    result = subprocess.run(
+    action("Запуск /tmp/provision.sh внутри контейнера")
+    proc = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
          "bash", "/tmp/provision.sh"],
         text=True,
@@ -287,17 +290,18 @@ def _run_provision_sh(container: str) -> None:
         ["docker", "exec", container, "rm", "-f", "/tmp/provision.sh"],
         capture_output=True,
     )
-    if result.returncode != 0:
-        print("  [!] provision.sh завершился с ошибкой.")
+    if proc.returncode != 0:
+        result("provision.sh завершился с ошибкой.", style="bold red")
         sys.exit(1)
-    print("  provision.sh выполнен.")
+    result("provision.sh выполнен.", style="green")
 
 
 def _process_credentials(container: str) -> dict | None:
     """Читает temp_wp.json из uploads/, пишет в .env и *_access.txt. Возвращает данные."""
+    action("Обработка учётных данных WordPress")
     json_path = Path("uploads") / "temp_wp.json"
     if not json_path.exists():
-        print("  temp_wp.json не найден, пропуск.")
+        result("temp_wp.json не найден, пропуск.", style="yellow")
         return None
 
     import json
@@ -328,7 +332,7 @@ def _process_credentials(container: str) -> dict | None:
         f.write(f"  email:    {admin_email}\n")
         f.write(f"  app pass: {app_pass}\n")
 
-    print(f"  Учётные данные записаны в {access_path.name}")
+    result(f"Учётные данные записаны в {access_path.name}", style="green")
 
     # Удаляем временный JSON из контейнера
     subprocess.run(
@@ -347,12 +351,12 @@ def _process_credentials(container: str) -> dict | None:
 
 
 def _cleanup_tmp(container: str, staging_name: str) -> None:
-    print(f"  Очистка /tmp/{staging_name}/ из контейнера...")
+    action(f"Очистка /tmp/{staging_name}/ из контейнера")
     subprocess.run(
         ["docker", "exec", container, "rm", "-rf", f"/tmp/{staging_name}"],
         capture_output=True,
     )
-    print("  Временные файлы удалены.")
+    result("Временные файлы удалены.", style="green")
 
 
 def _extract_wp_config(container: str, wp_conf_dir: Path) -> None:
@@ -361,22 +365,22 @@ def _extract_wp_config(container: str, wp_conf_dir: Path) -> None:
         _add_volume_to_compose("./wp-conf/wp-config.php:/var/www/html/wp-config.php")
         return
 
-    print("  Извлечение wp-config.php из контейнера...")
+    action("Извлечение wp-config.php из контейнера")
     config_path.parent.mkdir(parents=True, exist_ok=True)
-    result = subprocess.run(
+    proc = subprocess.run(
         ["docker", "cp", f"{container}:/var/www/html/wp-config.php", str(config_path)],
         capture_output=True, text=True,
     )
-    if result.returncode != 0:
-        print(f"  [!] Не удалось извлечь wp-config.php: {result.stderr}")
+    if proc.returncode != 0:
+        result(f"Не удалось извлечь wp-config.php: {proc.stderr}", style="bold red")
         return
 
     added = _add_volume_to_compose("./wp-conf/wp-config.php:/var/www/html/wp-config.php")
     if added:
-        print("  Пересоздание контейнера с wp-config.php volume...")
+        result("Пересоздание контейнера с wp-config.php volume...", style="green")
         subprocess.run(COMPOSE + ["up", "-d", WP_SERVICE], capture_output=True)
         _install_wpcli(container)
-    print(f"  wp-config.php сохранён в wp-conf/")
+    result("wp-config.php сохранён в wp-conf/", style="green")
 
 
 # ─── Вспомогательные функции ─────────────────────────────────────────────────
@@ -420,32 +424,32 @@ def _patch_provision_url(wp_conf_dir: Path) -> None:
     )
     if patched != content:
         sh.write_text(patched, encoding="utf-8", newline="\n")
-        print(f"  provision.sh: SITE_URL → {actual_url}")
-
+        action("Патч provision.sh")
+        result(f"SITE_URL → {actual_url}", style="green")
 
 
 def _install_wpcli(container: str) -> None:
-    print("  Установка WP-CLI...")
+    action("Установка WP-CLI")
     _exec_root(container,
         "curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && "
         "chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp"
     )
-    print("  WP-CLI установлен.")
+    result("WP-CLI установлен.", style="green")
 
 
 def _exec_root(container: str, cmd: str) -> None:
-    result = subprocess.run(
+    proc = subprocess.run(
         COMPOSE + ["exec", "-u", "root", WP_SERVICE, "bash", "-c", cmd],
         capture_output=True, text=True,
     )
-    if result.returncode != 0:
-        print(f"  [!] exec_root failed: {result.stderr.strip()}")
+    if proc.returncode != 0:
+        result(f"exec_root failed: {proc.stderr.strip()}", style="bold red")
 
 
 def _run(cmd: list) -> None:
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"  [!] Команда завершилась с ошибкой:\n{result.stderr}")
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if proc.returncode != 0:
+        result(f"Команда завершилась с ошибкой:\n{proc.stderr}", style="bold red")
         sys.exit(1)
 
 
@@ -513,7 +517,8 @@ def _update_theme_mount(theme_slug: str) -> None:
     )
     if updated != content:
         dc_path.write_text(updated, encoding="utf-8", newline="\n")
-        print(f"  Theme mount: ./utheme → /themes/{theme_slug}")
+        action("Обновление docker-compose.yml")
+        result(f"Theme mount: ./utheme → /themes/{theme_slug}", style="green")
 
 
 def _add_volume_to_compose(volume_line: str) -> bool:
@@ -560,45 +565,45 @@ def _remove_volume_from_compose(dest_path: str) -> bool:
 
 def install_plugin(slug: str) -> None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
-    print(f"  Установка плагина '{slug}'...")
-    result = subprocess.run(
+    action(f"Установка плагина '{slug}'")
+    proc = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
          "wp", "plugin", "install", slug, "--path=/var/www/html"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
-    if result.returncode != 0:
-        output = (result.stdout + result.stderr).strip()
-        print(f"  [!] Не удалось установить плагин '{slug}': {output}")
+    if proc.returncode != 0:
+        output = (proc.stdout + proc.stderr).strip()
+        result(f"Не удалось установить плагин '{slug}': {output}", style="bold red")
     else:
-        print(f"  Плагин '{slug}' установлен (не активирован).")
+        result(f"Плагин '{slug}' установлен (не активирован).", style="green")
 
 
 def activate_plugin(slug: str) -> None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
-    print(f"  Активация плагина '{slug}'...")
-    result = subprocess.run(
+    action(f"Активация плагина '{slug}'")
+    proc = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
          "wp", "plugin", "activate", slug, "--path=/var/www/html"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
-    if result.returncode != 0:
-        output = (result.stdout + result.stderr).strip()
-        print(f"  [!] Не удалось активировать плагин: {output}")
+    if proc.returncode != 0:
+        output = (proc.stdout + proc.stderr).strip()
+        result(f"Не удалось активировать плагин: {output}", style="bold red")
     else:
-        print(f"  Плагин '{slug}' активирован.")
+        result(f"Плагин '{slug}' активирован.", style="green")
 
 
 def configure_geo_plugin() -> None:
     container = os.getenv("CONTAINER_NAME", "wp_site")
-    print("  Настройка GEO: включение стилей плагина...")
+    action("Настройка GEO: включение стилей плагина")
     # tc_disable_styles = 1 → плагин НЕ грузит свой CSS → стили темы управляют виджетом.
-    result = subprocess.run(
+    proc = subprocess.run(
         ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
          "wp", "eval", "update_option('tc_disable_styles', 1);", "--path=/var/www/html"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
-    if result.returncode != 0:
-        print(f"  [!] Не удалось настроить GEO: {(result.stdout + result.stderr).strip()}")
+    if proc.returncode != 0:
+        result(f"Не удалось настроить GEO: {(proc.stdout + proc.stderr).strip()}", style="bold red")
         return
 
     verify = subprocess.run(
@@ -608,6 +613,6 @@ def configure_geo_plugin() -> None:
     )
     val = verify.stdout.strip()
     if val == "1":
-        print("  GEO: стили плагина отключены, управляет тема (tc_disable_styles = 1).")
+        result("Стили плагина отключены, управляет тема (tc_disable_styles = 1).", style="green")
     else:
-        print(f"  [!] GEO: неожиданное значение tc_disable_styles = {val!r}")
+        result(f"Неожиданное значение tc_disable_styles = {val!r}", style="bold red")
