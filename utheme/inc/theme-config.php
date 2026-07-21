@@ -28,6 +28,9 @@ function my_theme_get_config($key = null, $default = null)
             if (preg_match('/\$footer-menu:\s*["\']?([a-zA-Z0-9_-]+)["\']?/', $content, $m)) {
                 $config['footer-menu'] = $m[1];
             }
+            if (preg_match('/\$cookie-notice:\s*["\']?([a-zA-Z0-9_-]+)["\']?/', $content, $m)) {
+                $config['cookie-notice'] = $m[1];
+            }
             if (preg_match('/\$font-vibe:\s*["\']?([a-zA-Z0-9_-]+)["\']?/', $content, $m)) {
                 $config['font-vibe'] = $m[1];
             }

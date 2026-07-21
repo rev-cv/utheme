@@ -1,0 +1,56 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// Edge Bar: плашка снизу во всю ширину, вплотную к краям (см. .ut-cookie в shared.scss).
+@mixin styles {
+    @keyframes ut-cookie-edge-in {
+        from { opacity: 0; transform: translateY(100%); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .ut-cookie--edge {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 0;
+        transform: translateY(0);
+        animation: ut-cookie-edge-in 0.4s ease-out;
+
+        @if conf.$is-border == 'true' {
+            border-width: 1px 0 0 0;
+        }
+
+        &.ut-is-closed {
+            transform: translateY(100%);
+        }
+
+        @media (min-width: 640px) {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            column-gap: 24px;
+            row-gap: 8px;
+
+            .ut-cookie__text {
+                grid-column: 1;
+                grid-row: 1;
+                min-width: 0;
+            }
+
+            .ut-cookie__actions {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            .ut-cookie__btn {
+                flex: 0 0 auto;
+            }
+
+            .ut-cookie__links {
+                grid-column: 1 / -1;
+                grid-row: 2;
+            }
+        }
+    }
+}

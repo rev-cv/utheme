@@ -1,0 +1,135 @@
+@use "sass:color" as sys;
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// Общий блок для всех вариантов cookie-notice (original/push-banner/edge-bar).
+// Подключается в style.scss безусловно — варианты добавляют только модификатор
+// (.ut-cookie--original / --push / --edge) поверх этой базы.
+@mixin styles {
+    $z: 999999;
+
+    // Цветовая схема баннера — conf.$cookie-color: warning / section / contrast.
+    // Значения по умолчанию — warning (не следует за section/bg темы, должен
+    // одинаково бросаться в глаза в любой цветовой схеме сайта); ниже
+    // переопределяются для остальных двух режимов (Sass: присваивание внутри
+    // @if обновляет уже объявленную внешнюю переменную, а не создаёт локальную).
+    $bg-light:     conf.$color-warning-light;
+    $bg-dark:      conf.$color-warning-dark;
+    $txt-light:    conf.$color-callout-txt-light;
+    $txt-dark:     conf.$color-callout-txt-light;
+    $border-light: sys.adjust(conf.$color-warning-light, $lightness: -20%);
+    $border-dark:  sys.adjust(conf.$color-warning-dark,  $lightness: -15%);
+
+    @if conf.$cookie-color == 'section' {
+        $bg-light:     conf.$color-section-light;
+        $bg-dark:      conf.$color-section-dark;
+        $txt-light:    conf.$color-text-light;
+        $txt-dark:     conf.$color-text-dark;
+        $border-light: conf.$color-border-light;
+        $border-dark:  conf.$color-border-dark;
+    } @else if conf.$cookie-color == 'contrast' {
+        // Инверсия: фон — цвет текста темы, текст — цвет фона темы.
+        $bg-light:     conf.$color-text-light;
+        $bg-dark:      conf.$color-text-dark;
+        $txt-light:    conf.$color-bg-light;
+        $txt-dark:     conf.$color-bg-dark;
+        $border-light: conf.$color-accent-light;
+        $border-dark:  conf.$color-accent-dark;
+    }
+
+    .ut-cookie {
+        position: fixed;
+        z-index: $z;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px;
+        box-shadow: conf.$shadow-section;
+        opacity: 1;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+
+        @include f.mode((
+            background: ($bg-light,  $bg-dark),
+            color:      ($txt-light, $txt-dark),
+        ));
+
+        @if conf.$is-border == 'true' {
+            border: 1px solid $border-light;
+            @include f.dark-mode {
+                border-color: $border-dark;
+            }
+        }
+
+        &.ut-is-closed {
+            opacity: 0;
+        }
+
+        &__text {
+            margin: 0;
+            font-size: 1rem;
+            @include f.font-txt;
+        }
+
+        &__actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        &__btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: f.get-radius();
+            cursor: pointer;
+            font-weight: 600;
+            font-size: .875rem;
+            white-space: nowrap;
+            transition: opacity 0.2s ease;
+            @include f.font-txt;
+
+            &:hover {
+                opacity: 0.9;
+            }
+
+            &--accept {
+                background: conf.$color-accent-light;
+                color: conf.$color-bg-light;
+
+                @include f.dark-mode {
+                    background: conf.$color-accent-dark;
+                    color: conf.$color-bg-dark;
+                }
+            }
+
+            &--reject {
+                @include f.mode((
+                    background: (rgba($txt-light, 0.08), rgba($txt-dark, 0.08)),
+                    color:      ($txt-light, $txt-dark),
+                ));
+            }
+        }
+
+        &__links {
+            display: flex;
+            gap: 1em;
+            font-size: .875rem;
+        }
+
+        &__link {
+            text-decoration: none;
+            transition: color 0.2s ease;
+
+            @include f.mode((
+                color: (rgba($txt-light, 0.65), rgba($txt-dark, 0.65)),
+            ));
+
+            &:hover {
+                text-decoration: underline;
+                @include f.mode((
+                    color: ($txt-light, $txt-dark),
+                ));
+            }
+        }
+    }
+}

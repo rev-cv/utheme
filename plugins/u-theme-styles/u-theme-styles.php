@@ -6,6 +6,15 @@
 
 if (!defined('ABSPATH')) exit;
 
+// SCSS-компиляция через bundled dart-sass (bin/dart-sass/) — самодостаточный
+// опциональный модуль. Откат: rm -rf bin/dart-sass/ (или удалить этот inc-файл) —
+// класс UThemeScssCompiler либо не определится, либо is_available() вернёт false,
+// все вызовы ниже гейтятся через class_exists() и превращаются в no-op.
+$u_theme_scss_compiler_inc = __DIR__ . '/inc/scss-compiler.php';
+if (file_exists($u_theme_scss_compiler_inc)) {
+    require_once $u_theme_scss_compiler_inc;
+}
+
 class UThemeConfigurator {
 
     private string $scss_file;
@@ -34,6 +43,7 @@ class UThemeConfigurator {
         'main-menu'        => ['island', 'aside', 'boring', 'docs', 'hierarchical'],
         'menu-accent-align' => ['left', 'center', 'right'],
         'footer-menu'    => ['2columns', '4columns'],
+        'cookie-notice'  => ['original', 'push-banner', 'edge-bar'],
         'more-pages'     => ['grid', 'list', 'slider', 'carousel'],
         'toc-menu'       => ['circle', 'number', 'icon', 'tags', 'vertical-rule', 'two-columns', 'underline', 'card-row', 'numbers-right'],
         'stt-icon'       => [
@@ -60,6 +70,17 @@ class UThemeConfigurator {
         'radius-vibe' => ['sharp', 'neutral', 'dynamic', 'rounded', 'velocity', 'chess', 'sticker'],
     ];
 
+    // cookie-color НЕ рандомизируется независимо — он наследуется от того,
+    // какой cookie-notice выбран (пользователем в форме через JS или этим
+    // рандомайзером), см. handle_randomize(). Пользователь может затем
+    // вручную переключить Color на вкладке Components — это просто обычное
+    // сохранение формы, никак не связанное с рандомизацией.
+    private array $cookie_color_map = [
+        'original'    => 'contrast',
+        'push-banner' => 'warning',
+        'edge-bar'    => 'section',
+    ];
+
     // Единый маркер MODE-блока в конце файла.
     // Формат: /* MODE {LABEL} */ ... /* END MODE */
     // Все 6 комбинаций (brand/status × dark-only/both/light-only × auto/manual)
@@ -74,6 +95,10 @@ class UThemeConfigurator {
         add_action('admin_init',                          [$this, 'handle_save']);
         add_action('admin_init',                          [$this, 'handle_randomize']);
         add_action('wp_ajax_u_theme_preview_colors',      [$this, 'ajax_preview_colors']);
+
+        if (class_exists('UThemeScssCompiler')) {
+            add_action('init', ['UThemeScssCompiler', 'maybe_watch_compile']);
+        }
     }
 
     public function add_menu(): void {
@@ -136,6 +161,10 @@ class UThemeConfigurator {
     public function handle_save(): void {
         if (!isset($_POST['u_save_scss']) || !check_admin_referer('u_theme_update')) return;
 
+        if (class_exists('UThemeScssCompiler')) {
+            UThemeScssCompiler::save_watch_flag();
+        }
+
         $fields      = $_POST['u_fields'] ?? [];
         $manual_mode = isset($_POST['u_color_mode']) && $_POST['u_color_mode'] === 'manual';
         $theme_mode  = in_array($_POST['u_theme_mode'] ?? '', ['dark-only', 'light-only'], true)
@@ -165,7 +194,7 @@ class UThemeConfigurator {
         // Status Colors — записываем напрямую (они не в brand_color_vars).
         $string_vars = [
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages',
-            'table-style', 'image-style',
+            'table-style', 'image-style', 'cookie-notice', 'cookie-color',
             'font-vibe', 'radius-vibe', 'style', 'toc-icon', 'stt-icon',
             'is-menu-title', 'is-not-section', 'toc-show-title', 'is-left-align', 'is-border',
             'breadcrumbs-separator', 'menu-accent-align',
@@ -233,19 +262,9 @@ class UThemeConfigurator {
 
         file_put_contents($this->scss_file, $content, LOCK_EX);
 
-        // Save site classification options (WP options, not SCSS vars)
-        if (isset($_POST['site_stream'])) {
-            update_option('site_stream', sanitize_text_field($_POST['site_stream']));
+        if (class_exists('UThemeScssCompiler')) {
+            UThemeScssCompiler::compile_now('save');
         }
-        if (isset($_POST['site_subject'])) {
-            update_option('site_subject', sanitize_text_field($_POST['site_subject']));
-        }
-
-        // HTML lang override
-        if (isset($_POST['utheme_html_lang'])) {
-            update_option('utheme_html_lang', sanitize_text_field($_POST['utheme_html_lang']));
-        }
-        update_option('utheme_html_lang_enabled', isset($_POST['utheme_html_lang_enabled']) ? '1' : '0');
 
         add_settings_error('u_theme', 'saved', 'Настройки сохранены. Docker запустил пересборку!', 'updated');
     }
@@ -266,11 +285,16 @@ class UThemeConfigurator {
         if (!isset($_POST['u_randomize_scss']) || !check_admin_referer('u_theme_update')) return;
         if (!file_exists($this->scss_file)) return;
 
+        if (class_exists('UThemeScssCompiler')) {
+            UThemeScssCompiler::save_watch_flag();
+        }
+
         $this->random_config['callout-icon-set'] = $this->get_callout_icon_set_names();
 
         $content     = file_get_contents($this->scss_file);
         $string_vars = [
             'main-menu', 'footer-menu', 'toc-menu', 'details', 'article-card', 'more-pages', 'table-style', 'image-style',
+            'cookie-notice',
             'font-vibe', 'radius-vibe', 'style', 'is-not-section', 'is-left-align', 'is-border',
             'font-size', 'stt-icon', 'menu-accent-align',
             'callout', 'callout-icon-set',
@@ -282,6 +306,14 @@ class UThemeConfigurator {
             $formatted = in_array($var, $string_vars) ? '"' . $new_val . '"' : $new_val;
             $pattern   = '/(\$' . preg_quote($var, '/') . '(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
             $content   = preg_replace_callback($pattern, fn($m) => $m[1] . $m[2] . $formatted . $m[4], $content);
+
+            // cookie-color не рандомизируется независимо — наследует значение
+            // от только что выбранного cookie-notice (см. $cookie_color_map).
+            if ($var === 'cookie-notice' && isset($this->cookie_color_map[$new_val])) {
+                $color_val     = $this->cookie_color_map[$new_val];
+                $color_pattern = '/(\$cookie-color(?![\w-]))(\s*:\s*)([^;\n]+)(;)/m';
+                $content = preg_replace_callback($color_pattern, fn($m) => $m[1] . $m[2] . '"' . $color_val . '"' . $m[4], $content);
+            }
         }
 
         // Числовые диапазоны
@@ -295,6 +327,11 @@ class UThemeConfigurator {
         }
 
         file_put_contents($this->scss_file, $content, LOCK_EX);
+
+        if (class_exists('UThemeScssCompiler')) {
+            UThemeScssCompiler::compile_now('random');
+        }
+
         add_settings_error('u_theme', 'randomized', 'Тема рандомизирована! Docker запустил пересборку.', 'updated');
     }
 

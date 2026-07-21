@@ -1,4 +1,14 @@
-<?php get_template_part('components/cookie-notice') ?>
+<?php
+    $cookie_type = my_theme_get_config('cookie-notice', 'original');
+
+    if ($cookie_type === 'push-banner') {
+        get_template_part('components/cookie-push-banner');
+    } elseif ($cookie_type === 'edge-bar') {
+        get_template_part('components/cookie-edge-bar');
+    } else {
+        get_template_part('components/cookie-original');
+    }
+?>
 <footer>
     <div class="container">
         <?php

@@ -1,0 +1,14 @@
+# keyclass-cookie.yml
+# BEM-based: один блок покрывает все три варианта cookie-notice (original/push-banner/edge-bar),
+# различия — через модификатор (ut-cookie--original и т.д.), а не отдельные ключи,
+# т.к. на одном сайте одновременно грузится только один вариант.
+# Элементы (ut-cookie__actions и т.д.) и модификаторы (ut-cookie--push) покрываются
+# автоматически через substring-replace одного ключа ut-cookie — см. core/theme_obfuscate.py.
+# 25 вариантов — столько же, сколько в keyclass-main-menu.yml (N_THEMES), без пересечений с ним.
+
+ut-cookie: [
+  consent-bar, consent-strip, consent-band, consent-tray, consent-plate, consent-ledge, consent-note,
+  notice-bar, notice-strip, notice-band, notice-tray, notice-plate, notice-ledge,
+  gdpr-bar, gdpr-strip, gdpr-band, gdpr-tray, gdpr-plate, gdpr-ledge,
+  privacy-bar, privacy-strip, privacy-band, privacy-tray, privacy-plate, privacy-ledge
+]

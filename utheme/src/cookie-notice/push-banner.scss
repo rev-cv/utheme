@@ -1,0 +1,47 @@
+@use "../conf.scss" as conf;
+@use "../funcs.scss" as f;
+
+// Push Banner: плашка сверху во всю ширину, раздвигающая контент (см. .ut-cookie в shared.scss).
+@mixin styles {
+    .ut-cookie--push {
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        border-radius: 0;
+        transform: translateY(-100%);
+        transition: transform 0.35s ease;
+
+        @if conf.$is-border == 'true' {
+            border-width: 0 0 1px 0;
+        }
+
+        @media (min-width: 640px) {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            column-gap: 24px;
+            row-gap: 8px;
+
+            .ut-cookie__text {
+                grid-column: 1;
+                grid-row: 1;
+                min-width: 0;
+            }
+
+            .ut-cookie__actions {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            .ut-cookie__btn {
+                flex: 0 0 auto;
+            }
+
+            .ut-cookie__links {
+                grid-column: 1 / -1;
+                grid-row: 2;
+            }
+        }
+    }
+}

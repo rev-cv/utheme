@@ -201,6 +201,22 @@ jQuery(document).ready(function ($) {
         updateTocIconVisibility($(this));
     });
 
+    // ─── Cookie Notice: авто-подбор цветовой схемы под выбранный вариант ───
+    // Пользователь может после этого вручную переключить radio Color — его
+    // клик просто перезапишет то, что здесь подставлено (обычная семантика
+    // radio-инпутов, никакого отдельного состояния не требуется).
+    var uCookieColorMap = {
+        'original':    'contrast',
+        'push-banner': 'warning',
+        'edge-bar':    'section',
+    };
+
+    $(document).on('change', 'select[name="u_fields[cookie-notice]"]', function () {
+        var mapped = uCookieColorMap[$(this).val()];
+        if (!mapped) return;
+        $('input[name="u_fields[cookie-color]"][value="' + mapped + '"]').prop('checked', true).trigger('change');
+    });
+
     // ─── Icon dropdowns: универсальный обработчик ─────────────────────────
     // Открыть/закрыть
     $(document).on('click', '.u-icon-trigger', function (e) {

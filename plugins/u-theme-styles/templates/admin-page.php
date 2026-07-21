@@ -84,8 +84,20 @@ function u_h1_gradient_field(string $name, string $value): void {
             <button class="tab-btn active" data-target="basic">Basic</button>
             <button class="tab-btn" data-target="components">Components</button>
             <button class="tab-btn" data-target="colors">Colors</button>
-            <button class="tab-btn" data-target="site-info">Site Info</button>
+            <?php if (class_exists('UThemeScssCompiler')): ?>
+                <button class="tab-btn" data-target="logs">Logs</button>
+            <?php endif; ?>
             <div class="tabs-nav-spacer"></div>
+            <?php if (class_exists('UThemeScssCompiler') && UThemeScssCompiler::is_available()): ?>
+                <label class="switcher-label" title="Пересобирать style.css при ручном изменении .scss-файлов (не чаще раза в секунду, только для админов)">
+                    <span>Watch</span>
+                    <label class="switch">
+                        <input type="checkbox" name="u_watch_scss" value="1"
+                               <?= UThemeScssCompiler::is_watch_enabled() ? 'checked' : '' ?>>
+                        <span class="slider"></span>
+                    </label>
+                </label>
+            <?php endif; ?>
             <button type="submit" name="u_randomize_scss" value="1" class="button tabs-random-btn">&#x2684; Random</button>
             <button type="submit" name="u_save_scss" value="1" class="button button-primary tabs-save-btn">Save Settings</button>
         </nav>
@@ -544,6 +556,14 @@ function u_h1_gradient_field(string $name, string $value): void {
                         'desc'    => 'Блок "ещё почитать" под основным контентом страницы.<br><b>Grid</b> — мозаичная сетка с картинками.<br><b>List</b> — компактный список в несколько колонок.<br><b>Slider</b> — CSS-слайдер, одна статья на весь экран.<br><b>Carousel</b> — JS-карусель: 2–3 карточки одновременно, drag + автопрокрутка.',
                         'options' => ['grid', 'list', 'slider', 'carousel'],
                     ],
+                    'cookie-notice' => [
+                        'title'   => 'Cookie Notice',
+                        'desc'    => 'Плашка согласия на использование cookie.<br>
+                            <b>Original</b> — плавающая карточка снизу по центру.<br>
+                            <b>Push Banner</b> — плашка сверху, раздвигает контент страницы.<br>
+                            <b>Edge Bar</b> — плашка снизу во всю ширину, вплотную к краям.',
+                        'options' => ['original', 'push-banner', 'edge-bar'],
+                    ],
                 ];
 
                 foreach ($components as $id => $data): ?>
@@ -613,6 +633,27 @@ function u_h1_gradient_field(string $name, string $value): void {
                                                        value="<?= $align_opt ?>"
                                                        <?= ($v['menu-accent-align'] ?? 'center') === $align_opt ? 'checked' : '' ?>>
                                                 <span><?= ucfirst($align_opt) ?></span>
+                                            </label>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($id === 'cookie-notice'): ?>
+                                    <div style="display:flex; flex-direction:column; gap:4px;">
+                                        <span class="u-basic-field-label">Color</span>
+                                        <?php
+                                        $cookie_color_labels = [
+                                            'warning'  => 'Warning (yellow)',
+                                            'section'  => 'Section',
+                                            'contrast' => 'Contrast (inverted)',
+                                        ];
+                                        foreach ($cookie_color_labels as $color_opt => $color_label): ?>
+                                            <label class="u-checkbox-label">
+                                                <input type="radio"
+                                                       name="u_fields[cookie-color]"
+                                                       value="<?= $color_opt ?>"
+                                                       <?= ($v['cookie-color'] ?? 'warning') === $color_opt ? 'checked' : '' ?>>
+                                                <span><?= $color_label ?></span>
                                             </label>
                                         <?php endforeach; ?>
                                     </div>
@@ -1158,112 +1199,60 @@ function u_h1_gradient_field(string $name, string $value): void {
                 </div>
             </section>
 
-            <!-- ── Site Info ──────────────────────────────────────────────── -->
-            <section id="site-info" class="tab-pane">
-                <h2>Site Info</h2>
-                <?php
-                $streams = [
-                    'stream-1' => 'Stream 1',
-                    'stream-2' => 'Stream 2',
-                    'stream-3' => 'Stream 3',
-                    'stream-4' => 'Stream 4',
-                ];
-                $subjects = [
-                    'alpine_skiing', 'american_footbal', 'aussie_rules', 'badminton',
-                    'baseball', 'basketball', 'biathlon', 'boxing', 'cricket',
-                    'crosscountry', 'cycling', 'darts', 'english', 'esports',
-                    'field_hockey', 'floorball', 'football', 'formula1', 'golf',
-                    'greyhound_racing', 'handball', 'hockey', 'horse_racing', 'ice_hockey',
-                    'mma', 'motorsport', 'padel', 'rugby', 'rugby_league', 'snooker',
-                    'squash', 'table_tennis', 'tennis', 'volleyball', 'waterpolo',
-                ];
-                $cur_stream           = get_option('site_stream',              '');
-                $cur_subject          = get_option('site_subject',             '');
-                $cur_html_lang        = get_option('utheme_html_lang',         '');
-                $cur_html_lang_enabled = get_option('utheme_html_lang_enabled', '1');
-                $wp_default_lang      = get_bloginfo('language');
-                ?>
-                <div class="u-card">
-                    <div class="u-card-body">
-                        <div class="u-card-left">
-
-                            <div class="u-basic-field">
-                                <div class="u-basic-field-label">Stream of Site</div>
-                                <div class="u-basic-field-control">
-                                    <select name="site_stream">
-                                        <option value="">— not set —</option>
-                                        <?php foreach ($streams as $val => $label): ?>
-                                            <option value="<?= esc_attr($val) ?>"
-                                                <?= selected($cur_stream, $val, false) ?>>
-                                                <?= esc_html($label) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="u-basic-field">
-                                <div class="u-basic-field-label">Subject of Site</div>
-                                <div class="u-basic-field-control">
-                                    <select name="site_subject">
-                                        <option value="">— not set —</option>
-                                        <?php foreach ($subjects as $subject): ?>
-                                            <?php $label = ucwords(str_replace('_', ' ', $subject)); ?>
-                                            <option value="<?= esc_attr($subject) ?>"
-                                                <?= selected($cur_subject, $subject, false) ?>>
-                                                <?= esc_html($label) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="u-card" style="margin-top:16px">
-                    <div class="u-card-body">
-                        <div class="u-card-left">
-
-                            <div class="u-basic-field">
-                                <div class="u-basic-field-label">HTML Lang (frontend)</div>
-                                <div class="u-basic-field-control">
-                                    <input type="text"
-                                           name="utheme_html_lang"
-                                           value="<?= esc_attr($cur_html_lang) ?>"
-                                           placeholder="<?= esc_attr($wp_default_lang) ?>"
-                                           style="width:140px">
-                                    <p class="description" style="margin-top:4px">
-                                        WP locale для атрибута <code>lang</code> в <code>&lt;html&gt;</code>.
-                                        Примеры: <code>en_GB</code>, <code>fr_BE</code>, <code>pt_BR</code>.
-                                        Пусто — WordPress использует стандартное значение
-                                        (<code><?= esc_html($wp_default_lang) ?></code>).
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="u-basic-field">
-                                <div class="u-basic-field-label">Кастомный lang</div>
-                                <div class="u-basic-field-control">
-                                    <label>
-                                        <input type="checkbox"
-                                               name="utheme_html_lang_enabled"
-                                               value="1"
-                                               <?= checked($cur_html_lang_enabled, '1', false) ?>>
-                                        Переопределять locale для фронтенда
-                                    </label>
-                                    <p class="description" style="margin-top:4px">
-                                        Если снять галку — WordPress выводит locale по умолчанию,
-                                        поле выше игнорируется.
-                                    </p>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <!-- ── Logs ───────────────────────────────────────────────────── -->
+            <?php if (class_exists('UThemeScssCompiler')): ?>
+                <section id="logs" class="tab-pane">
+                    <h2>Compile Logs</h2>
+                    <p class="u-desc">Последние 100 попыток компиляции style.scss (Save / Random / Watch / деплой).</p>
+                    <?php
+                    $scss_log       = UThemeScssCompiler::get_log();
+                    $scss_log_labels = [
+                        'save'   => 'Save Settings',
+                        'random' => 'Randomize',
+                        'watch'  => 'Watch (авто)',
+                        'deploy' => 'Деплой',
+                    ];
+                    ?>
+                    <?php if (empty($scss_log)): ?>
+                        <p class="u-desc">Пока нет ни одной попытки компиляции.</p>
+                    <?php else: ?>
+                        <table class="wp-list-table widefat fixed striped">
+                            <thead>
+                                <tr>
+                                    <th style="width:170px">Время</th>
+                                    <th style="width:140px">Источник</th>
+                                    <th style="width:70px">Статус</th>
+                                    <th style="width:90px">Длительность</th>
+                                    <th>Ошибка</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($scss_log as $entry): ?>
+                                    <tr>
+                                        <td><?= esc_html(date_i18n('Y-m-d H:i:s', $entry['time'])) ?></td>
+                                        <td><?= esc_html($scss_log_labels[$entry['source']] ?? $entry['source']) ?></td>
+                                        <td>
+                                            <?php if (!empty($entry['ok'])): ?>
+                                                <span style="color:#2271b1;font-weight:600;">OK</span>
+                                            <?php else: ?>
+                                                <span style="color:#d63638;font-weight:600;">FAIL</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= esc_html(number_format((float) $entry['duration'], 2)) ?>s</td>
+                                        <td>
+                                            <?php if (!empty($entry['error'])): ?>
+                                                <code style="display:block;white-space:pre-wrap;font-size:11px;line-height:1.5;"><?= esc_html($entry['error']) ?></code>
+                                            <?php else: ?>
+                                                &mdash;
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </section>
+            <?php endif; ?>
 
         </div>
 

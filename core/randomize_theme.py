@@ -14,6 +14,9 @@ _CONFIG = {
     "footer-menu": [
         "2columns", "central"
     ],
+    "cookie-notice": [
+        "original", "push-banner", "edge-bar"
+    ],
     "toc-menu": [
         "circle", "number", "icon"
     ],
@@ -65,6 +68,16 @@ _CONFIG = {
 
 _NO_QUOTE_VARS = {"density-factor", "seed-hue", "font-size"}
 
+# cookie-color не рандомизируется независимо — наследуется от того, какой
+# cookie-notice выбран этим скриптом (зеркалит handle_randomize() в
+# u-theme-styles.php). Пользователь может затем вручную поменять cookie-color
+# в админке плагина — эта рандомизация его не трогает.
+_COOKIE_COLOR_MAP = {
+    "original": "contrast",
+    "push-banner": "warning",
+    "edge-bar": "section",
+}
+
 
 def randomize_theme() -> None:
     action("Рандомизация темы (conf.scss)")
@@ -95,6 +108,17 @@ def randomize_theme() -> None:
             return f"{match.group(1)}{rv}{match.group(3)}"
 
         content = pattern.sub(_replace, content)
+
+        if var_name == "cookie-notice" and new_val in _COOKIE_COLOR_MAP:
+            color_val = _COOKIE_COLOR_MAP[new_val]
+            color_pattern = re.compile(r'(\$cookie-color:\s*)(.+?)(;)')
+
+            def _replace_color(match, rv=f'"{color_val}"'):
+                if match.group(2).strip() != rv:
+                    changes.append(f"    $cookie-color: {match.group(2).strip()} → {rv}")
+                return f"{match.group(1)}{rv}{match.group(3)}"
+
+            content = color_pattern.sub(_replace_color, content)
 
     _SCSS_FILE.write_text(content, encoding="utf-8")
     if changes:

@@ -128,6 +128,9 @@ def run():
     phase(9, 9, "Завершение настройки")
     if platform.system() == "Windows":
         docker_setup.activate_plugin("u-theme-styles")
+        docker_setup.activate_plugin("sonar")
+        docker_setup.configure_theme_identity()
+        docker_setup.compile_theme_scss()
         if (ROOT_DIR / "plugins" / "GEO").exists():
             docker_setup.configure_geo_plugin()
         wp_plugins_raw = os.getenv("WP_PLUGINS", "")
@@ -139,16 +142,19 @@ def run():
             if activate:
                 docker_setup.activate_plugin(slug)
 
-    if platform.system() == "Windows":
-        action("Запуск Sass-контейнера")
-        proc = subprocess.run(
-            ["docker", "compose", "up", "-d", "sass"],
-            capture_output=True,
-            text=True,
-        )
-        if proc.returncode != 0:
-            raise RuntimeError(f"Не удалось запустить Sass-контейнер: {proc.stderr.strip()}")
-        result("Sass-контейнер запущен.", style="green")
+    # Заменено на docker_setup.compile_theme_scss() выше (bundled dart-sass
+    # внутри плагина, без Node/Docker-контейнера). Откат: раскомментировать
+    # этот блок + сервис "sass" в docker-compose.yml.
+    # if platform.system() == "Windows":
+    #     action("Запуск Sass-контейнера")
+    #     proc = subprocess.run(
+    #         ["docker", "compose", "up", "-d", "sass"],
+    #         capture_output=True,
+    #         text=True,
+    #     )
+    #     if proc.returncode != 0:
+    #         raise RuntimeError(f"Не удалось запустить Sass-контейнер: {proc.stderr.strip()}")
+    #     result("Sass-контейнер запущен.", style="green")
 
     if credentials:
         _print_credentials(credentials)

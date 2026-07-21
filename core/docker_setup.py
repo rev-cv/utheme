@@ -616,3 +616,59 @@ def configure_geo_plugin() -> None:
         result("Стили плагина отключены, управляет тема (tc_disable_styles = 1).", style="green")
     else:
         result(f"Неожиданное значение tc_disable_styles = {val!r}", style="bold red")
+
+
+def compile_theme_scss() -> None:
+    # Единственное место, которое сейчас порождает utheme/src/style.css на
+    # свежем деплое — раньше эту роль неявно выполнял стартовый компайл
+    # sass-контейнера (`sass --watch` всегда компилирует один раз при старте).
+    # Компилируем через тот же самый bundled dart-sass, что и плагин
+    # (plugins/u-theme-styles/bin/dart-sass), от www-data — чтобы владелец
+    # файла совпадал с тем, кто будет его позже перезаписывать из плагина.
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    action("Компиляция style.scss (dart-sass)")
+    php = (
+        "$f = WP_CONTENT_DIR . '/plugins/u-theme-styles/inc/scss-compiler.php'; "
+        "if (!file_exists($f)) { echo 'SKIP:no-compiler'; return; } "
+        "require_once $f; "
+        "if (!class_exists('UThemeScssCompiler') || !UThemeScssCompiler::is_available()) "
+        "{ echo 'SKIP:not-available'; return; } "
+        "echo UThemeScssCompiler::compile_now() ? 'OK' : 'FAIL';"
+    )
+    proc = subprocess.run(
+        ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+         "wp", "eval", php, "--path=/var/www/html"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    output = (proc.stdout + proc.stderr).strip()
+    if proc.returncode != 0 or "OK" not in output:
+        raise RuntimeError(f"Не удалось скомпилировать style.css: {output or 'нет вывода'}")
+    result("style.css скомпилирован (dart-sass).", style="green")
+
+
+def configure_theme_identity() -> None:
+    # Заполняет поля Theme Identity плагина Sonar (Settings → General) при
+    # деплое: имя всегда "UTheme" (мы и есть эта экосистема), версия — из
+    # CHANGELOG.md пайплайна. Сам плагин ничего не подставляет по умолчанию —
+    # это единственное место, которое реально знает эти значения.
+    container = os.getenv("CONTAINER_NAME", "wp_site")
+    action("Настройка Theme Identity (Sonar)")
+
+    changelog = Path(__file__).resolve().parent.parent / "CHANGELOG.md"
+    version = "unknown"
+    if changelog.exists():
+        match = re.search(r"^##\s*([\d.]+)\s*[—-]\s*([\d-]+)", changelog.read_text(encoding="utf-8"), re.MULTILINE)
+        if match:
+            version = match.group(1)
+
+    for opt, val in (("utheme_real_theme_name", "UTheme"), ("utheme_real_theme_version", version)):
+        proc = subprocess.run(
+            ["docker", "exec", "-u", "www-data", "-e", "HOME=/tmp", container,
+             "wp", "option", "update", opt, val, "--path=/var/www/html"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+        if proc.returncode != 0:
+            result(f"Не удалось задать {opt}: {(proc.stdout + proc.stderr).strip()}", style="bold red")
+            return
+
+    result(f"Theme Identity: UTheme {version}.", style="green")

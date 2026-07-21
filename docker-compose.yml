@@ -37,18 +37,22 @@ services:
       retries: 5
       start_period: 10s
 
-  sass:
-    image: node:alpine
-    working_dir: /src
-    networks:
-      - web_network
-    volumes:
-      - ./utheme/src:/src
-    profiles:
-      - dev
-    command: >
-      sh -c "npm install -g sass@1.77.8 &&
-      sass --watch --poll --style=compressed --load-path=/src style.scss:style.css"
+  # Заменено на bundled dart-sass внутри плагина u-theme-styles (bin/dart-sass) —
+  # компиляция style.scss теперь идёт через core/docker_setup.py:compile_theme_scss()
+  # при деплое и через сам плагин (Save/Random/Watch), без Node/Docker.
+  # Откат: раскомментировать сервис ниже + блок в pipeline.py (см. комментарий там).
+  # sass:
+  #   image: node:alpine
+  #   working_dir: /src
+  #   networks:
+  #     - web_network
+  #   volumes:
+  #     - ./utheme/src:/src
+  #   profiles:
+  #     - dev
+  #   command: >
+  #     sh -c "npm install -g sass@1.77.8 &&
+  #     sass --watch --poll --style=compressed --load-path=/src style.scss:style.css"
 
 volumes:
   wp_html:

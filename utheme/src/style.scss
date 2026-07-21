@@ -11,6 +11,11 @@
 @use 'footer/2column.scss' as footer_2columns;
 @use 'footer/4columns.scss' as footer_4columns;
 
+@use "cookie-notice/shared.scss" as cookie_shared;
+@use "cookie-notice/original.scss" as cookie_original;
+@use "cookie-notice/push-banner.scss" as cookie_push;
+@use "cookie-notice/edge-bar.scss" as cookie_edge;
+
 @use "page/page.scss";
 @use "page-single/single.scss";
 @use "scroll-to-top/scroll-to-top.scss";
@@ -92,7 +97,6 @@
 @use "scrollbar/scrollbar.scss";
 @use "selection/selection.scss";
 
-@use "cookie-modal/cookie-modal.scss";
 @use "art__geo/geo.scss";
 @use "art__geo/predictions.scss";
 
@@ -111,6 +115,19 @@
 }
 @else if conf.$main-menu =='hierarchical' {
     @include hierarchical.styles;
+}
+
+// блок вставки вариантов cookie-notice
+@include cookie_shared.styles;
+
+@if conf.$cookie-notice == 'push-banner' {
+    @include cookie_push.styles;
+}
+@else if conf.$cookie-notice == 'edge-bar' {
+    @include cookie_edge.styles;
+}
+@else {
+    @include cookie_original.styles;
 }
 
 // блок стилизация оглавления
