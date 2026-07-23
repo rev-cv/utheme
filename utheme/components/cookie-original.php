@@ -1,20 +1,24 @@
-<?php
-
-/**
- * Cookie Notification Component — Original
- *
- * Logic:
- * 1. Checks localStorage for consent on page load.
- * 2. If not found, injects the modal HTML into the DOM.
- * 3. Handles Accept/Reject actions using localStorage.
- */
-?>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const storageKey = 'cookie_consent_status';
 
-        if (!localStorage.getItem(storageKey)) {
+        function getConsent() {
+            const match = document.cookie.match(/(?:^|;\s*)cookie_consent_status=([^;]*)/);
+            return match ? decodeURIComponent(match[1]) : null;
+        }
+        function setConsent(value) {
+            const maxAge = 180 * 24 * 60 * 60;
+            document.cookie = storageKey + '=' + value + '; path=/; max-age=' + maxAge +
+                '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+        }
+
+        const legacy = localStorage.getItem(storageKey);
+        if (legacy && !getConsent()) {
+            setConsent(legacy);
+            localStorage.removeItem(storageKey);
+        }
+
+        if (!getConsent()) {
             showCookieModal();
         }
 
@@ -42,12 +46,12 @@
             const rejectBtn = modal.querySelector('.ut-cookie__btn--reject');
 
             acceptBtn.addEventListener('click', function() {
-                localStorage.setItem(storageKey, 'accepted');
+                setConsent('accepted');
                 removeModal(modal);
             });
 
             rejectBtn.addEventListener('click', function() {
-                localStorage.setItem(storageKey, 'rejected');
+                setConsent('rejected');
                 removeModal(modal);
             });
         }

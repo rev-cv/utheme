@@ -13,6 +13,7 @@ $inc_dir = get_stylesheet_directory() . '/inc/';
 
 $includes = array(
     'theme-config.php',
+    'cookie-consent.php',
     'language-pack.php',
     'setting-admin.php',
     'custom-styles.php',

@@ -24,3 +24,4 @@
         }
 
     ?>
+    <?php if (function_exists('utheme_render_cookie_push_banner')) utheme_render_cookie_push_banner(); ?>

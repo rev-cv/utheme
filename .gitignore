@@ -46,6 +46,7 @@ utheme/src/*.map
 example
 CLAUDE.md
 .claude
+.agents
 review.md
 .vscode
 review*.md

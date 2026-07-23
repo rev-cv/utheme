@@ -65,6 +65,7 @@ from core.console import ERROR_STYLE, console, action, result, error
 
 _PROTECTED_NAMES = {"logo", "favicon", "icon"}
 _MD_IMG = re.compile(r'!\[([^\]]*)\]\(([^)]+)\)')
+_MD_HEADIMG = re.compile(r'^headimg:\s*(["\']?)([^"\'\n]*)\1\s*$', re.MULTILINE)
 
 
 def get_detailed_image_data(root_path: Path) -> list:
@@ -305,6 +306,21 @@ def _normalize_image_names(pics: list) -> list:
                     return m.group(0)
 
                 new_content = _MD_IMG.sub(_replace_md, content)
+
+                def _replace_headimg(m: re.Match) -> str:
+                    nonlocal changed_md
+                    quote, src = m.group(1), m.group(2)
+                    p = Path(src)
+                    for c in changes:
+                        if c['new'] != c['original'] and p.stem == c['original']:
+                            ext = c['pic_path'].suffix if c['pic_path'] else p.suffix
+                            new_src = (p.parent / f"{c['new']}{ext}").as_posix()
+                            changed_md = True
+                            return f'headimg: {quote}{new_src}{quote}'
+                    return m.group(0)
+
+                new_content = _MD_HEADIMG.sub(_replace_headimg, new_content, count=1)
+
                 if changed_md:
                     html_path.write_text(new_content, encoding='utf-8')
             else:

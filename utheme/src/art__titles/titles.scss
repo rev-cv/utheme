@@ -37,6 +37,12 @@ aside,
         @include f.font-hd;
         font-size: clamp(.9rem, 5vw, 3rem);
         text-wrap: balance;
+        // background-clip:text красит фон строго в границах строкового бокса;
+        // курсивный жирный шрифт спускает хвостики (g/j/y) ниже этой границы
+        // на последней строке — запас снизу компенсирован отрицательным
+        // margin, чтобы геометрия блока не сдвигалась.
+        padding-bottom: 0.15em;
+        margin-bottom: -0.15em;
 
         @if conf.$is-left-align == 'true' {
             text-align: left;
@@ -121,6 +127,13 @@ aside,
         //         background: conf.$color-section-dark;
         //     }
         // }
+    }
+
+    // см. комментарий у h1 выше — та же защита от обрезанных хвостиков;
+    // .page-toc-title не трогаем — у него свой margin-bottom: 0 !important
+    h2 {
+        padding-bottom: 0.15em;
+        margin-bottom: -0.15em;
     }
 
     h3 {

@@ -18,9 +18,24 @@ class UThemeScssCompiler {
         return __DIR__ . '/../bin/dart-sass/sass';
     }
 
+    private static function dart_binary_path(): string {
+        return __DIR__ . '/../bin/dart-sass/src/dart';
+    }
+
     public static function is_available(): bool {
-        $bin = self::binary_path();
-        return function_exists('proc_open') && file_exists($bin) && is_executable($bin);
+        if (!function_exists('proc_open')) return false;
+
+        $bin  = self::binary_path();
+        $dart = self::dart_binary_path();
+        if (!file_exists($bin) || !file_exists($dart)) return false;
+
+        // Инструменты бэкапа/переноса сайта (например, wpvivid) обычно теряют
+        // бит "исполняемый" при упаковке/распаковке ZIP — самовосстанавливаемся
+        // вместо того, чтобы молча перестать работать после каждого рестора.
+        if (!is_executable($bin))  @chmod($bin, 0755);
+        if (!is_executable($dart)) @chmod($dart, 0755);
+
+        return is_executable($bin) && is_executable($dart);
     }
 
     private static function src_dir(): string {

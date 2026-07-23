@@ -9,7 +9,9 @@
         right: 0;
         width: 100%;
         border-radius: 0;
-        transform: translateY(-100%);
+        // Рендерится сервером сразу открытым (без анимации появления — это и
+        // убирает layout shift); transform ставится инлайн-стилем из JS
+        // только на закрытие, см. utheme/components/cookie-push-banner.php.
         transition: transform 0.35s ease;
 
         @if conf.$is-border == 'true' {

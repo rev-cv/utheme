@@ -6,6 +6,10 @@
  * Плашка снизу во всю ширину, вплотную к нижнему и боковым краям вьюпорта
  * (в отличие от Original — без центрирования, отступов и скругления).
  * Перекрывает часть контента, высоту страницы не раздвигает.
+ *
+ * Согласие — в cookie (не localStorage), общий механизм с push-banner/original,
+ * см. utheme/inc/cookie-consent.php. Мигрирует значение из старого localStorage,
+ * если оно ещё там осталось.
  */
 ?>
 
@@ -13,7 +17,23 @@
     document.addEventListener('DOMContentLoaded', function() {
         const storageKey = 'cookie_consent_status';
 
-        if (!localStorage.getItem(storageKey)) {
+        function getConsent() {
+            const match = document.cookie.match(/(?:^|;\s*)cookie_consent_status=([^;]*)/);
+            return match ? decodeURIComponent(match[1]) : null;
+        }
+        function setConsent(value) {
+            const maxAge = 180 * 24 * 60 * 60;
+            document.cookie = storageKey + '=' + value + '; path=/; max-age=' + maxAge +
+                '; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : '');
+        }
+
+        const legacy = localStorage.getItem(storageKey);
+        if (legacy && !getConsent()) {
+            setConsent(legacy);
+            localStorage.removeItem(storageKey);
+        }
+
+        if (!getConsent()) {
             showCookieBar();
         }
 
@@ -41,12 +61,12 @@
             const rejectBtn = bar.querySelector('.ut-cookie__btn--reject');
 
             acceptBtn.addEventListener('click', function() {
-                localStorage.setItem(storageKey, 'accepted');
+                setConsent('accepted');
                 removeBar(bar);
             });
 
             rejectBtn.addEventListener('click', function() {
-                localStorage.setItem(storageKey, 'rejected');
+                setConsent('rejected');
                 removeBar(bar);
             });
         }
